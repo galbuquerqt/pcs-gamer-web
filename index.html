@@ -598,8 +598,8 @@ function parseCPU(name) {
     if (!socket) return null;
     return { brand: 'Intel', socket, gen, igpu: true, score: 1, pcie: 3, short: `${m[1][0].toUpperCase() + m[1].slice(1)} G${n}` };
   }
-  if ((m = s.match(/(?:ryzen|\br)\s*([3579])\s*(?:pro\s*)?(\d{4})\s?(x3d|xt|ge|g|x|f)?\b/)) ||
-      (m = s.match(/ryzen\s*(?:pro\s*)?()(\d{4})\s?(x3d|xt|ge|g|x|f)?\b/))) {
+  if ((m = s.match(/(?:ryzen|\br)\s*([3579])\s*(?:pro\s*)?(\d{4})\s?(x3d|xt|ge|gt|g|x|f)?\b/)) ||
+      (m = s.match(/ryzen\s*(?:pro\s*)?()(\d{4})\s?(x3d|xt|ge|gt|g|x|f)?\b/))) {
     const numS = m[2], suf = m[3] || '', series = +numS[0], d2 = +numS[1];
     // Sem o "5" de "Ryzen 5 5500": a linha vem do 2º dígito do modelo (5500 → 5, 3200 → 3, 5700 → 7)
     const tier = m[1] ? +m[1] : d2 <= 3 ? 3 : d2 <= 6 ? 5 : d2 <= 8 ? 7 : 9;
@@ -746,11 +746,32 @@ function offerPrice(text) {
   }
   return vals.length ? Math.min(...vals) : 0;                                         // "de R$ 399 por R$ 268" → 268
 }
+// Placas de vídeo vendidas com mais de uma quantidade de memória: cada versão é uma placa diferente
+const GPU_VRAM = {
+  'gt 1030': [2, 4], 'gtx 1050': [2, 3], 'gtx 1060': [3, 6], 'rtx 2060': [6, 12], 'rtx 3050': [6, 8], 'rtx 3060': [8, 12], 'rtx 3080': [10, 12],
+  'rtx 4060 ti': [8, 16], 'rtx 5060 ti': [8, 16], 'rx 470': [4, 8], 'rx 480': [4, 8], 'rx 550': [2, 4], 'rx 560': [2, 4], 'rx 570': [4, 8],
+  'rx 580': [4, 8], 'rx 5500 xt': [4, 8], 'rx 6500 xt': [4, 8], 'rx 9060 xt': [8, 16], 'arc a770': [8, 16],
+};
+// Memória da placa escrita no texto ("16GB", "8 GB", "8G", "12GB GDDR6"), só entre as versões que existem
+function gpuVram(text, sizes) {
+  const re = /(?:^|[^\d.,])(\d{1,2})\s*g(?:b|ddr\d)?\b/g;
+  const s = lowerRaw(text);
+  let m;
+  while ((m = re.exec(s))) { const v = +m[1]; if (sizes.indexOf(v) >= 0) return v; }
+  return 0;
+}
+function gpuKey(text) {
+  const g = parseGPU(text);
+  if (!g || g.igpu) return null;
+  const sizes = GPU_VRAM[g.key];
+  const v = sizes ? gpuVram(text, sizes) : 0;
+  return { key: 'gpu:' + g.key + (v ? ':' + v + 'gb' : ''), label: g.label + (v ? ' ' + v + ' GB' : ''), needVram: !!sizes && !v, sizes: sizes || null };
+}
 // Chave do "mesmo produto" para comparar preços: modelo da placa de vídeo, modelo do processador,
 // chipset da placa-mãe, capacidade e tipo da memória, tipo e capacidade do SSD, potência da fonte.
 function productKey(kind, text, specs) {
   const s = lowerRaw(text);
-  if (kind === 'gpu') { const g = parseGPU(text); return g && !g.igpu ? { key: 'gpu:' + g.key, label: g.label } : null; }
+  if (kind === 'gpu') { const g = gpuKey(text); return g ? { key: g.key, label: g.label } : null; }
   if (kind === 'cpu') { const c = parseCPU(text); return c ? { key: 'cpu:' + c.short.toLowerCase(), label: c.short } : null; }
   if (kind === 'mobo') {
     const b = parseBoard(text);
@@ -2886,6 +2907,8 @@ function watchRecHTML(name, kind, id) {
   if (!String(name || '').trim()) return `<p class="hint" style="margin:0">Escreva o modelo como aparece nos anúncios.</p>`;
   const r = recognizeProduct(name, kind);
   if (!r) return `<div class="alert warn">${IC.warn}<span>Não reconheci essa peça. Escreva o modelo, como “Ryzen 7 5700X”, “RTX 4060”, “B550” ou “16 GB DDR4”, ou escolha o tipo de peça.</span></div>`;
+  const gk = r.kind === 'gpu' ? gpuKey(name) : null;
+  if (gk && gk.needVram) return `<div class="alert warn">${IC.warn}<span>A ${esc(gk.label)} existe com ${gk.sizes.join(' GB e ')} GB, e cada versão tem um preço. Escreva qual você quer, por exemplo “${esc(gk.label)} ${gk.sizes[gk.sizes.length - 1]}GB”.</span></div>`;
   const low = seenLow(r.key);
   const recs = histForKey(r.key);
   const other = S.watch.find(w => w.key === r.key && w.id !== id);
@@ -2935,6 +2958,8 @@ function saveWatch(id) {
   const r = recognizeProduct(name, kind);
   if (!name) { toast('Escreva o nome da peça.'); $('#w-name', root).focus(); return; }
   if (!r) { toast('Não reconheci essa peça. Escreva o modelo.'); $('#w-name', root).focus(); return; }
+  const gk = r.kind === 'gpu' ? gpuKey(name) : null;
+  if (gk && gk.needVram) { toast(`Escreva a memória da placa: ${gk.sizes.join(' ou ')} GB.`); $('#w-name', root).focus(); return; }
   if (!(max > 0)) { toast('Informe o preço máximo.'); $('#w-max', root).focus(); return; }
   const paused0 = !!$('#w-paused', root)?.checked;
   let w = id ? S.watch.find(x => x.id === id) : null;

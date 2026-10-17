@@ -296,6 +296,17 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-
 .offer .sub{font-size:12.5px;color:var(--ink-3);margin-top:2px}
 .o-rel{font-size:13px;font-weight:600;margin-top:4px}
 .o-rel.great{color:var(--good)} .o-rel.good{color:var(--ink-2)}
+.o-rel.target{color:var(--accent);display:flex;align-items:center;gap:5px}
+.o-rel.target svg{width:15px;height:15px;flex:none}
+.o-rel.low{color:var(--good);font-weight:500}
+.o-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.o-tools:empty{display:none}
+.o-mon{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:4px 10px;min-height:30px;border:1px solid var(--line-2);border-radius:8px;font-size:12.5px;font-weight:700;color:var(--accent);white-space:nowrap}
+.o-mon svg{width:14px;height:14px}
+.o-mon.on{border-color:transparent;background:var(--accent-soft)}
+.row .end .o-mon{margin-top:0}
+.rec-box{display:grid;gap:4px;padding:10px 12px;border-radius:10px;background:var(--surface-2);border:1px solid var(--line);font-size:14px}
+.rec-box .hint{margin:0}
 .coupon{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 10px;border:1px dashed var(--line-2);border-radius:8px;font-family:var(--f-mono);font-size:12.5px;font-weight:600;color:var(--ink-2)}
 .coupon svg{width:14px;height:14px}
 .o-act{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
@@ -724,9 +735,10 @@ function offerPrice(text) {
   const vals = [];
   let m;
   while ((m = re.exec(t))) {
-    const before = lowerRaw(t.slice(Math.max(0, m.index - 24), m.index));
-    const after = lowerRaw(t.slice(m.index + m[0].length, m.index + m[0].length + 20));
-    if (/\d\s*x\s*(de\s*)?$/.test(before)) continue;                                  // parcelas: 10x de R$ 26,85
+    // Só o trecho da mesma linha: "5700X" no fim da linha de cima não é parcela
+    const before = lowerRaw(t.slice(Math.max(0, m.index - 24), m.index)).split(/\n/).pop();
+    const after = lowerRaw(t.slice(m.index + m[0].length, m.index + m[0].length + 20)).split(/\n/)[0];
+    if (/(^|[^a-z0-9])\d{1,2}\s*x\s*(de\s*)?$/.test(before)) continue;                 // parcelas: 10x de R$ 26,85
     if (/(frete|acima\s+de|compras?\s+de|desconto\s+de|economi[sz]e|cashback|cupom\s+de|off\s+de|ganhe)\s*$/.test(before)) continue;
     if (/^\s*(de\s+desconto|off\b|em\s+cashback|de\s+cashback|de\s+volta)/.test(after)) continue;
     const v = parseMoney(m[1]);
@@ -767,6 +779,50 @@ function productKey(kind, text, specs) {
   }
   return null;
 }
+// Reconhece o produto escrito pelo usuário (preço-alvo). kind = categoria escolhida, ou vazio para descobrir.
+function recognizeProduct(text, kind) {
+  const t = String(text || '').trim();
+  if (!t) return null;
+  const tryKind = k => { const p = productKey(k, t); return p ? { kind: k, key: p.key, label: p.label } : null; };
+  if (kind) return tryKind(kind);
+  const s = lowerRaw(t);
+  const found = OFFER_KINDS.map(([k, re]) => { const m = s.match(re); return m ? { k, i: m.index } : null; }).filter(Boolean).sort((a, b) => a.i - b.i);
+  for (const f of found) { const r = tryKind(f.k); if (r) return r; }
+  for (const k of ['cpu', 'gpu', 'mobo', 'ram', 'psu', 'ssd']) { const r = tryKind(k); if (r) return r; }
+  return null;
+}
+// Compras do histórico que são o mesmo produto, da mais barata para a mais cara
+function histForKey(key) {
+  return S.hist.filter(h => { const k = productKey(h.cat, h.name, h.specs); return k && k.key === key; }).sort((a, b) => a.cost - b.cost);
+}
+// Preço-alvo ativo para o produto
+function watchFor(key) {
+  const list = S.watch || [];
+  for (let i = 0; i < list.length; i++) if (list[i].key === key && !list[i].paused) return list[i];
+  return null;
+}
+// Preços vistos nos canais: menor preço por dia, guardado por 90 dias
+const SEEN_DAYS = 90;
+function dayStr(ms) {
+  const d = new Date(ms);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+const seenId = key => 'v_' + String(key).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+function seenFor(key) {
+  const list = S.seen || [];
+  for (let i = 0; i < list.length; i++) if (list[i].key === key) return list[i];
+  return null;
+}
+// Menor preço visto nos últimos 90 dias: { price, store, day } ou null
+function seenLow(key) {
+  const r = seenFor(key);
+  if (!r || !Array.isArray(r.pts)) return null;
+  const cut = dayStr(Date.now() - SEEN_DAYS * 864e5);
+  let best = null;
+  r.pts.forEach(p => { if (p[0] >= cut && p[1] > 0 && (!best || p[1] < best.price)) best = { price: p[1], store: p[2] || '', day: p[0] }; });
+  return best;
+}
+
 function parseOffer(text) {
   const raw = String(text || '').trim();
   if (!raw) return null;
@@ -788,8 +844,11 @@ function parseOffer(text) {
   }
   if (!o.key) { o.status = 'unknown'; return o; }
   if (!(o.price > 0)) { o.status = 'noprice'; return o; }
-  const recs = S.hist.filter(h => { const k = productKey(h.cat, h.name, h.specs); return k && k.key === o.key; })
-    .sort((a, b) => a.cost - b.cost);
+  const w = watchFor(o.key);
+  if (w && o.price <= w.max) o.target = w.max;
+  const low = seenLow(o.key);
+  o.low = low ? low.price : 0;
+  const recs = histForKey(o.key);
   o.recs = recs;
   if (!recs.length) { o.status = 'new'; return o; }
   const best = recs[0];
@@ -802,38 +861,81 @@ function parseOffer(text) {
   o.status = o.price <= best.cost ? 'great' : o.price <= best.cost * (1 + tol / 100) ? 'good' : 'high';
   return o;
 }
-// Texto curto do aviso (usado também pela notificação no APK)
-function offerAlertText(o) {
-  if (!o || !['great', 'good'].includes(o.status)) return '';
-  const rel = o.status === 'great'
-    ? (o.diff < 0 ? `${money(-o.diff)} abaixo do seu melhor preço` : 'igual ao seu melhor preço')
-    : `${NUM1.format(o.diffPct)}% acima do seu melhor preço`;
-  return `${o.label} por ${money(o.price)} · ${rel} (${money(o.best.cost)})${o.coupon ? ` · cupom ${o.coupon}` : ''}`;
+// Vale avisar? Bom preço pelo histórico ou dentro do preço-alvo.
+function offerIsAlert(o) { return !!o && (o.status === 'great' || o.status === 'good' || o.target > 0); }
+// Frases do aviso. Recebe o registro da oferta (price, best, status, target, low).
+function offerRelText(r) {
+  if (!(r.best > 0) || (r.status !== 'great' && r.status !== 'good')) return '';
+  if (r.status === 'great') return r.price < r.best ? `${money(r.best - r.price)} abaixo do seu melhor (${money(r.best)})` : `igual ao seu melhor (${money(r.best)})`;
+  return `${NUM1.format(r.diffPct)}% acima do seu melhor (${money(r.best)})`;
+}
+function offerLowText(r) {
+  if (!(r.low > 0)) return '';
+  if (r.price < r.low) return `menor preço visto em 90 dias (antes ${money(r.low)})`;
+  if (r.price === r.low) return 'igual ao menor preço visto em 90 dias';
+  return '';
+}
+// Registro guardado na lista de Ofertas (e enviado pelo leitor do Android)
+function offerRecord(o, channel) {
+  return {
+    k: o.key + '|' + o.price, channel: String(channel || ''), store: o.store, kind: o.kind, label: o.label,
+    title: o.title.slice(0, 200), price: o.price, best: o.best ? o.best.cost : 0, bestCond: o.best ? o.best.cond || '' : '',
+    diffPct: o.best ? round2(o.diffPct) : 0, status: o.status === 'great' || o.status === 'good' ? o.status : 'target',
+    target: o.target || 0, low: o.low || 0, coupon: o.coupon, link: o.link,
+  };
+}
+// Título e texto da notificação
+function offerNotice(r, store) {
+  const title = (r.target > 0 ? 'Preço-alvo: ' : '') + r.label + ' por ' + money(r.price);
+  const text = [store || r.store, r.target > 0 ? 'seu alvo: até ' + money(r.target) : '', offerRelText(r), offerLowText(r), r.coupon ? 'cupom ' + r.coupon : '']
+    .filter(Boolean).join(' · ');
+  return { nTitle: title, nText: text };
+}
+// Guarda o preço visto (menor do dia) para o produto. Devolve true se mudou algo.
+function recordSeen(v) {
+  if (!v || !v.key || !(+v.price > 0)) return false;
+  const at = +v.at || Date.now();
+  const day = dayStr(at), price = round2(+v.price);
+  let r = seenFor(v.key);
+  if (!r) { r = { id: seenId(v.key), key: v.key, kind: v.kind || '', label: v.label || v.key, pts: [] }; S.seen.push(r); }
+  if (v.label) r.label = v.label;
+  const p = r.pts.find(x => x[0] === day);
+  if (p) { if (price >= p[1]) return false; p[1] = price; p[2] = String(v.store || ''); return true; }
+  r.pts.push([day, price, String(v.store || '')]);
+  const cut = dayStr(Date.now() - SEEN_DAYS * 864e5);
+  r.pts = r.pts.filter(x => x[0] >= cut).sort((a, b) => (a[0] < b[0] ? -1 : 1)).slice(-120);
+  return true;
+}
+// Loja para mostrar: a do texto ou o nome do canal
+function offerStore(o, channel) {
+  if (o.store) return o.store;
+  const c = String(channel || '').split('(')[0].replace(EMOJI, ' ').replace(/[^0-9A-Za-zÀ-ÿ\s+&!.-]/g, ' ').replace(/\s+/g, ' ').trim();
+  return c.length > 24 ? '' : c;
 }
 
 // Recebe o texto de uma promoção e, se for bom preço, guarda na lista de Ofertas.
 // Devolve o registro criado (ou null). Repetições do mesmo produto e preço em 12 h são ignoradas.
 function ingestOffer(text, channel) {
   const o = parseOffer(text);
-  if (!o || !['great', 'good'].includes(o.status)) return null;
+  if (!o || !o.key || !(o.price > 0)) return null;
+  let changed = recordSeen({ key: o.key, kind: o.kind, label: o.label, price: o.price, store: offerStore(o, channel) });
+  let rec = null;
   const since = Date.now() - 12 * 3600e3;
   const key = o.key + '|' + o.price;
-  if (S.offers.some(x => x.k === key && x.at > since)) return null;
-  const rec = {
-    id: newId(), k: key, at: Date.now(), channel: String(channel || ''), store: o.store, kind: o.kind, label: o.label,
-    title: o.title.slice(0, 200), price: o.price, best: o.best.cost, bestCond: o.best.cond || '', diffPct: round2(o.diffPct),
-    status: o.status, coupon: o.coupon, link: o.link, seen: false, dismissed: false,
-  };
-  S.offers.unshift(rec);
-  commit();
+  if (offerIsAlert(o) && !S.offers.some(x => x.k === key && x.at > since)) {
+    rec = Object.assign({ id: newId(), at: Date.now() }, offerRecord(o, channel), { seen: false, dismissed: false });
+    S.offers.unshift(rec);
+    changed = true;
+  }
+  if (changed) commit();
   return rec;
 }
-window.PCG = { ingestOffer, offerAlertText };
+window.PCG = { ingestOffer, offerNotice };
 
 /* ================= Estado e persistência ================= */
 const KEY = 'pcsgamer.v1';
 const UIKEY = 'pcsgamer.ui';
-const COLLS = ['builds', 'inv', 'hist', 'sales', 'offers'];
+const COLLS = ['builds', 'inv', 'hist', 'sales', 'offers', 'watch', 'seen'];
 const DEFAULT_AD = {
   cond: 'Montagem nova e testada!',
   os: 'Windows 11 instalado e configurado, pronto para uso.',
@@ -843,14 +945,14 @@ const DEFAULT_AD = {
 function defaultSettings() {
   return { nextCode: 1, card: { on: false, pct: 0 }, ad: { ...DEFAULT_AD }, theme: 'auto', lastBackup: null, staleDays: 30, offers: { tol: 5, groups: [...DEFAULT_GROUPS] } };
 }
-function blankState() { return { v: 1, builds: [], inv: [], hist: [], sales: [], offers: [], settings: defaultSettings() }; }
+function blankState() { return { v: 1, builds: [], inv: [], hist: [], sales: [], offers: [], watch: [], seen: [], settings: defaultSettings() }; }
 
 let S = blankState();
 let META = { savedAt: 0, dirty: false, tomb: {}, dtomb: {}, settingsAt: 0 };
 let SNAP = {};
 let UI = {
   tab: 'home', pcFilter: 'ativos', cmpFilter: 'all', calcOpen: {}, stockFilter: 'all', stockCat: '', q: { cat: '', text: '', offer: '' },
-  open: { attention: true, cmp: true, monthly: true, capital: true, salesAvulsas: false, recent: true },
+  open: { attention: true, cmp: true, monthly: true, capital: true, salesAvulsas: false, recent: true, watch: true, seen: false },
   grp: {},
 };
 
@@ -897,7 +999,18 @@ function sanitizeState(raw) {
   // Ofertas: guarda só os últimos 30 dias, no máximo 150
   const cut = Date.now() - 30 * 864e5;
   st.offers = st.offers.filter(o => +o.at > cut && o.label && +o.price > 0).sort((a, b) => b.at - a.at).slice(0, 150);
-  st.offers.forEach(o => { o.price = round2(o.price); o.best = round2(o.best); o.seen = !!o.seen; o.dismissed = !!o.dismissed; if (!['great', 'good'].includes(o.status)) o.status = 'good'; });
+  st.offers.forEach(o => {
+    o.price = round2(o.price); o.best = round2(o.best); o.target = round2(o.target); o.low = round2(o.low);
+    o.seen = !!o.seen; o.dismissed = !!o.dismissed;
+    if (!['great', 'good', 'target'].includes(o.status)) o.status = o.target > 0 ? 'target' : 'good';
+  });
+  // Preços-alvo
+  st.watch = st.watch.filter(w => w.key && +w.max > 0);
+  st.watch.forEach(w => { w.key = String(w.key); w.label = String(w.label || w.key); w.name = String(w.name || w.label); w.kind = String(w.kind || ''); w.max = round2(w.max); w.paused = !!w.paused; w.at = +w.at || Date.now(); });
+  // Preços vistos nos canais: só os últimos 90 dias
+  const seenCut = dayStr(Date.now() - SEEN_DAYS * 864e5);
+  st.seen.forEach(r => { r.key = String(r.key || ''); r.label = String(r.label || r.key); r.pts = (Array.isArray(r.pts) ? r.pts : []).filter(p => Array.isArray(p) && typeof p[0] === 'string' && p[0] >= seenCut && +p[1] > 0); });
+  st.seen = st.seen.filter(r => r.key && r.pts.length).sort((a, b) => (b.pts[b.pts.length - 1][0] < a.pts[a.pts.length - 1][0] ? -1 : 1)).slice(0, 400);
   const maxCode = Math.max(0, ...st.inv.map(i => i.code || 0), ...st.sales.map(s => s.item?.code || 0));
   if (st.settings.nextCode <= maxCode) st.settings.nextCode = maxCode + 1;
   repairLinks(st);
@@ -1269,7 +1382,7 @@ function monthly() {
    cada registro também vai para lá, para não se perder e abrir em outro aparelho. */
 const Cloud = {
   db: null, root: null, on: false, status: 'local', busy: false, again: false, timer: null, pushed: {}, lastPull: 0,
-  cols: { builds: 'builds', inv: 'inv', hist: 'hist', sales: 'sales', offers: 'offers' },
+  cols: { builds: 'builds', inv: 'inv', hist: 'hist', sales: 'sales', offers: 'offers', watch: 'watch', seen: 'seen' },
 
   async init() {
     if (!window.claude || typeof window.claude.use !== 'function') { this.setStatus('local'); return; }
@@ -1328,7 +1441,8 @@ const Cloud = {
       COLLS.forEach(c => { this.pushed[c] = {}; remote[c].forEach(r => { this.pushed[c][r.id] = JSON.stringify(r); }); });
       let next;
       if (!META.dirty) {
-        next = { v: 1, builds: remote.builds, inv: remote.inv, hist: remote.hist, sales: remote.sales, settings: meta.settings || S.settings };
+        next = { v: 1, settings: meta.settings || S.settings };
+        COLLS.forEach(c => { next[c] = remote[c]; });
       } else {
         next = { v: 1, settings: (meta.savedAt || 0) > META.savedAt ? (meta.settings || S.settings) : S.settings };
         COLLS.forEach(c => {
@@ -1443,6 +1557,7 @@ const IC = {
   check: svg('<path d="m5 12.5 4.5 4.5L19 7"/>'),
   money: svg('<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>'),
   link: svg('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'),
+  target: svg('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>'),
   plan: svg('<path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h4"/>'),
 };
 
@@ -1491,7 +1606,7 @@ const Sheet = {
   },
   closeAll() { while (this.stack.length) this.close(true); },
 };
-function confirmBox({ title, text, ok = 'Confirmar', danger = false, alt = null, check = null }) {
+function confirmBox({ title, text, ok = 'Confirmar', cancel = 'Cancelar', danger = false, alt = null, check = null }) {
   return new Promise(resolve => {
     let done = false;
     const finish = v => { if (done) return; done = true; resolve(v); };
@@ -1500,7 +1615,7 @@ function confirmBox({ title, text, ok = 'Confirmar', danger = false, alt = null,
       body: `<div class="form">${text ? `<p style="margin:0">${text}</p>` : ''}
         ${check ? `<label class="check"><input type="checkbox" id="cf-check" ${check.on ? 'checked' : ''}> ${esc(check.label)}</label>` : ''}
         <div class="sheet-foot" style="flex-wrap:wrap">
-          <button class="btn" data-a="cf" data-v="no">Cancelar</button>
+          <button class="btn" data-a="cf" data-v="no">${esc(cancel)}</button>
           ${alt ? `<button class="btn" data-a="cf" data-v="alt">${esc(alt)}</button>` : ''}
           <button class="btn ${danger ? 'danger solid' : 'primary'}" data-a="cf" data-v="ok">${esc(ok)}</button>
         </div></div>`,
@@ -1934,19 +2049,29 @@ function ago(ms) {
   return h < 48 ? 'ontem' : `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 const shortChannel = c => { const m = String(c || '').match(/@(\w+)/); return m ? '@' + m[1] : String(c || '').split('(')[0].trim(); };
+const capFirst = s => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+const dayShort = d => (d ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '');
+const anyWatch = key => S.watch.find(w => w.key === key) || null;
+// Botão para criar um preço-alvo a partir de uma peça vista
+function watchBtn(key, label, kind, price) {
+  const w = anyWatch(key);
+  if (w) return `<button class="o-mon on" data-a="watch" data-id="${w.id}">${IC.target} Alvo ${money(w.max)}${w.paused ? ' · pausado' : ''}</button>`;
+  return `<button class="o-mon" data-a="watch-new" data-key="${esc(key)}" data-label="${esc(label)}" data-kind="${esc(kind || '')}" data-price="${price || 0}">${IC.target} Monitorar</button>`;
+}
 function offersFeedHTML() {
   const list = S.offers.filter(o => !o.dismissed).sort((a, b) => b.at - a.at);
   const tol = NUM1.format(S.settings.offers.tol).replace(',0', '');
   const rows = list.map(o => {
-    const rel = o.status === 'great'
-      ? (o.price < o.best ? `${money(o.best - o.price)} abaixo do seu melhor (${money(o.best)})` : `igual ao seu melhor (${money(o.best)})`)
-      : `${NUM1.format(o.diffPct)}% acima do seu melhor (${money(o.best)})`;
+    const key = String(o.k || '').split('|')[0];
+    const rel = offerRelText(o), low = offerLowText(o);
     return `<div class="offer ${o.seen ? '' : 'new'}">
       <div class="main">
         <div class="o-line"><b>${esc(o.label)}</b> por <b class="o-price">${money(o.price)}</b></div>
         <div class="sub">${esc(joinDot(o.store, shortChannel(o.channel), ago(o.at)))}</div>
-        <div class="o-rel ${o.status}">${rel}</div>
-        ${o.coupon ? `<button class="coupon" data-a="copy-coupon" data-v="${esc(o.coupon)}">${IC.copy} Cupom ${esc(o.coupon)}</button>` : ''}
+        ${o.target > 0 ? `<div class="o-rel target">${IC.target} Dentro do seu alvo de até ${money(o.target)}</div>` : ''}
+        ${rel ? `<div class="o-rel ${o.status}">${capFirst(rel)}</div>` : ''}
+        ${low ? `<div class="o-rel low">${capFirst(low)}</div>` : ''}
+        <div class="o-tools">${o.coupon ? `<button class="coupon" data-a="copy-coupon" data-v="${esc(o.coupon)}">${IC.copy} Cupom ${esc(o.coupon)}</button>` : ''}${key ? watchBtn(key, o.label, o.kind, o.price) : ''}</div>
       </div>
       <div class="o-act">
         ${o.link ? `<a class="btn sm primary" href="${esc(o.link)}" target="_blank" rel="noopener noreferrer">Abrir</a>` : ''}
@@ -1957,8 +2082,46 @@ function offersFeedHTML() {
   const groups = S.settings.offers.groups.map(shortChannel).join(', ');
   return `${nativeStatusHTML()}<div class="feed-h"><h2>Bons preços</h2>${list.length ? `<button class="link-btn" style="margin:0" data-a="offers-clear">Limpar lista</button>` : ''}</div>
     ${list.length ? `<div class="list">${rows}</div>
-      <p class="hint" style="margin:8px 2px 0">Aparece aqui toda peça dos canais igual, abaixo ou até ${tol}% acima do melhor preço que você já pagou.</p>`
-    : `<div class="list"><div class="empty"><b>Nenhum bom preço por enquanto</b>Quando ${esc(groups || 'os canais')} anunciarem uma peça igual, abaixo ou até ${tol}% acima do melhor preço que você já pagou, ela aparece aqui com o link e o cupom.</div></div>`}`;
+      <p class="hint" style="margin:8px 2px 0">Aparece aqui toda peça dos canais igual, abaixo ou até ${tol}% acima do melhor preço que você já pagou, e as que ficarem dentro dos seus preços-alvo.</p>`
+    : `<div class="list"><div class="empty"><b>Nenhum bom preço por enquanto</b>Quando ${esc(groups || 'os canais')} anunciarem uma peça igual, abaixo ou até ${tol}% acima do melhor preço que você já pagou, ou dentro de um preço-alvo seu, ela aparece aqui com o link e o cupom.</div></div>`}
+    <div style="margin-top:18px">${watchSecHTML()}${seenSecHTML()}</div>`;
+}
+/* Preços-alvo */
+function watchLowText(key) {
+  const low = seenLow(key);
+  return low ? `Menor visto em 90 dias: ${money(low.price)}${low.store ? ` na ${low.store}` : ''} (${dayShort(low.day)})` : 'Ainda não apareceu nos canais';
+}
+function watchSecHTML() {
+  const ws = S.watch.slice().sort((a, b) => (a.paused - b.paused) || a.label.localeCompare(b.label, 'pt-BR'));
+  const rows = ws.map(w => `<button class="row" data-a="watch" data-id="${w.id}">
+      <span class="row-ic" style="color:${w.paused ? 'var(--ink-3)' : 'var(--accent)'}">${IC.target}</span>
+      <span class="main"><span class="title">${esc(w.label)}</span><span class="sub">${esc(watchLowText(w.key))}</span></span>
+      <span class="end"><span class="v">até ${money(w.max)}</span>${w.paused ? '<br><span class="pill neutral" style="margin-top:4px">Pausado</span>' : ''}</span></button>`).join('');
+  const body = ws.length ? `<div class="list">${rows}</div>`
+    : `<div class="list"><div class="empty"><b>Nenhum preço-alvo</b>Cadastre uma peça e o máximo que você pagaria nela. Quando aparecer nos canais por até esse valor, você recebe o aviso, mesmo que nunca tenha comprado essa peça.</div></div>`;
+  return sec('watch', 'Preços-alvo', body, { count: ws.filter(w => !w.paused).length || null, actions: `<button class="btn sm" data-a="watch-new">${IC.plus} Novo</button>` });
+}
+/* Preços vistos nos canais */
+function seenListHTML() {
+  const q = norm(UI.seenQ || '');
+  const list = S.seen.filter(r => !q || norm(r.label).includes(q))
+    .sort((a, b) => { const x = a.pts[a.pts.length - 1][0], y = b.pts[b.pts.length - 1][0]; return x < y ? 1 : x > y ? -1 : a.label.localeCompare(b.label, 'pt-BR'); });
+  if (!list.length) return `<div class="list"><div class="empty">${q ? 'Nenhuma peça com esse nome.' : NATIVE ? 'Toda peça reconhecida nos canais entra aqui com o menor preço dos últimos 90 dias.' : 'Os preços são registrados pelo app do celular, que lê o Telegram, e aparecem aqui pelo Google Drive.'}</div></div>`;
+  const shown = UI.seenAll || q ? list : list.slice(0, 20);
+  const rows = shown.map(r => {
+    const low = seenLow(r.key), last = r.pts[r.pts.length - 1];
+    const sub = joinDot(low ? `menor ${money(low.price)}${low.store ? ' na ' + low.store : ''} (${dayShort(low.day)})` : '',
+      last && (!low || last[0] !== low.day) ? `último ${money(last[1])} (${dayShort(last[0])})` : '');
+    return `<div class="row"><span class="main"><span class="title">${esc(r.label)}</span><span class="sub">${esc(sub)}</span>
+      ${watchBtn(r.key, r.label, r.kind, low ? low.price : 0)}</span></div>`;
+  }).join('');
+  return `<div class="list">${rows}</div>${shown.length < list.length ? `<button class="link-btn" data-a="seen-all">Ver todas (${list.length})</button>` : ''}`;
+}
+function seenSecHTML() {
+  const body = `<p class="hint" style="margin:0 2px 10px">O menor preço de cada peça anunciada nos canais nos últimos 90 dias, mesmo quando não é um bom preço para você. Ajuda a escolher um preço-alvo realista.</p>
+    ${S.seen.length > 8 ? `<label class="field" style="margin-bottom:10px"><input type="search" id="seen-q" data-f="seen-q" value="${esc(UI.seenQ || '')}" placeholder="Filtrar peça" autocomplete="off"></label>` : ''}
+    <div id="seen-list">${seenListHTML()}</div>`;
+  return sec('seen', 'Preços vistos nos canais', body, { count: S.seen.length || null });
 }
 function priceChart(recs, offer) {
   const pts = recs.filter(r => isDate(r.date) && r.cost > 0).sort((a, b) => a.date.localeCompare(b.date));
@@ -2442,6 +2605,7 @@ function saveSlotForm(bid, cat, kind) {
   const d = readPartForm(root);
   if (!d.name) { toast('Escreva o nome da peça.'); $('#pf-name', root).focus(); return; }
   const pt = slotPart(b, cat);
+  let created = null;
   if (kind === 'plan' || (kind === 'edit' && pt?.mode === 'plan')) {
     b.slots[cat] = { mode: 'plan', name: d.name, cost: d.cost, specs: d.specs };
   } else if (kind === 'edit' && pt?.mode === 'inv') {
@@ -2453,12 +2617,13 @@ function saveSlotForm(bid, cat, kind) {
     const h = S.hist.find(x => x.invId === sl.item.id);
     if (h) Object.assign(h, { name: d.name, cost: d.cost, cond: d.cond, date: d.date || h.date });
   } else {
-    const it = createItem({ ...d, cat });
-    linkItem(b, it);
+    created = createItem({ ...d, cat });
+    linkItem(b, created);
   }
   Sheet.close();
   commit();
   toast('Peça salva');
+  askCloseWatch(created);
 }
 
 /* Venda e etapa */
@@ -2715,6 +2880,84 @@ function confirmRestore(text) {
   });
 }
 
+/* ================= Preços-alvo ================= */
+const WATCH_KINDS = ['cpu', 'gpu', 'mobo', 'ram', 'ssd', 'psu'];
+function watchRecHTML(name, kind, id) {
+  if (!String(name || '').trim()) return `<p class="hint" style="margin:0">Escreva o modelo como aparece nos anúncios.</p>`;
+  const r = recognizeProduct(name, kind);
+  if (!r) return `<div class="alert warn">${IC.warn}<span>Não reconheci essa peça. Escreva o modelo, como “Ryzen 7 5700X”, “RTX 4060”, “B550” ou “16 GB DDR4”, ou escolha o tipo de peça.</span></div>`;
+  const low = seenLow(r.key);
+  const recs = histForKey(r.key);
+  const other = S.watch.find(w => w.key === r.key && w.id !== id);
+  const lines = [
+    low ? `Menor visto nos canais em 90 dias: <b>${money(low.price)}</b>${low.store ? ` na ${esc(low.store)}` : ''} (${dayShort(low.day)})` : 'Ainda não apareceu nos canais nos últimos 90 dias.',
+    recs.length ? `Seu melhor preço pago: <b>${money(recs[0].cost)}</b>${recs[0].cond ? ` (${esc(condLabel(recs[0].cond))})` : ''}` : 'Você ainda não comprou essa peça.',
+  ];
+  return `<div class="rec-box"><div>Reconhecido como <b>${esc(KIND_LABEL[r.kind] || '')} · ${esc(r.label)}</b></div>
+    ${lines.map(l => `<div class="hint">${l}</div>`).join('')}
+    ${other ? `<div class="hint" style="color:var(--warn)">Você já tem um preço-alvo para essa peça (até ${money(other.max)}). Salvar atualiza ele.</div>` : ''}</div>`;
+}
+function openWatch(id, pre) {
+  const w = id ? S.watch.find(x => x.id === id) : null;
+  if (id && !w) return;
+  const d = w || pre || {};
+  const name = w ? w.name : d.label || '';
+  const kind = d.kind && WATCH_KINDS.includes(d.kind) ? d.kind : '';
+  const max = w ? w.max : (+d.price > 0 ? Math.floor(+d.price) : 0);
+  const open = Sheet.isOpen() ? 'replace' : 'open';
+  Sheet[open]({
+    title: w ? 'Preço-alvo' : 'Novo preço-alvo',
+    body: `<div class="form">
+        <label class="field"><span>Peça</span><input type="text" id="w-name" data-f="w-name" value="${esc(name)}" placeholder="Ex.: Ryzen 7 5700X, RTX 4060, B550" autocomplete="off"></label>
+        <label class="field"><span>Tipo de peça</span><select id="w-kind" data-f="w-kind"><option value="">Descobrir pelo nome</option>${WATCH_KINDS.map(k => `<option value="${k}" ${k === kind ? 'selected' : ''}>${KIND_LABEL[k]}</option>`).join('')}</select></label>
+        <div id="w-rec">${watchRecHTML(name, kind, w ? w.id : '')}</div>
+        ${moneyField('w-max', 'Avisar quando custar até', max)}
+        ${w ? `<label class="check"><input type="checkbox" id="w-paused" ${w.paused ? 'checked' : ''}> Pausar os avisos deste alvo</label>` : ''}
+        <p class="hint" style="margin:0">Vale para qualquer marca e loja dos canais: o app compara pelo modelo, como faz com o seu histórico.</p>
+      </div>
+      <div class="sheet-foot">
+        ${w ? `<button class="btn danger" data-a="watch-del" data-id="${w.id}">${IC.trash} Excluir</button>` : '<button class="btn" data-a="sheet-close">Cancelar</button>'}
+        <button class="btn primary" data-a="watch-save" data-id="${w ? w.id : ''}">Salvar</button></div>`,
+    onMount: el => { if (!w && !name) setTimeout(() => { const i = $('#w-name', el); if (i) i.focus(); }, 60); },
+  });
+}
+function refreshWatchRec() {
+  const root = Sheet.top();
+  if (!root) return;
+  const box = $('#w-rec', root);
+  if (box) box.innerHTML = watchRecHTML($('#w-name', root).value, $('#w-kind', root).value, $('[data-a="watch-save"]', root).dataset.id);
+}
+function saveWatch(id) {
+  const root = Sheet.top();
+  const name = $('#w-name', root).value.trim();
+  const kind = $('#w-kind', root).value;
+  const max = parseMoney($('#w-max', root).value);
+  const r = recognizeProduct(name, kind);
+  if (!name) { toast('Escreva o nome da peça.'); $('#w-name', root).focus(); return; }
+  if (!r) { toast('Não reconheci essa peça. Escreva o modelo.'); $('#w-name', root).focus(); return; }
+  if (!(max > 0)) { toast('Informe o preço máximo.'); $('#w-max', root).focus(); return; }
+  const paused0 = !!$('#w-paused', root)?.checked;
+  let w = id ? S.watch.find(x => x.id === id) : null;
+  const other = S.watch.find(x => x.key === r.key && x !== w);
+  if (other) { if (w) S.watch = S.watch.filter(x => x !== w); w = other; }
+  const paused = paused0;
+  if (!w) { w = { id: newId(), at: Date.now() }; S.watch.push(w); }
+  Object.assign(w, { key: r.key, kind: r.kind, label: r.label, name, max: round2(max), paused });
+  Sheet.close(); commit();
+  toast(paused ? 'Preço-alvo pausado' : `Pronto: você será avisado quando ${r.label} aparecer por até ${money(max)}`);
+}
+// Depois de cadastrar a compra de uma peça, oferece encerrar o preço-alvo dela
+function askCloseWatch(it) {
+  if (!it) return;
+  const k = productKey(it.cat, it.name, it.specs);
+  const w = k && S.watch.find(x => x.key === k.key && !x.paused);
+  if (!w) return;
+  setTimeout(() => {
+    confirmBox({ title: 'Preço-alvo', text: `Você cadastrou a compra de <b>${esc(it.name)}</b>. Encerrar o preço-alvo de ${esc(w.label)} (até ${money(w.max)})?`, ok: 'Encerrar', cancel: 'Manter' })
+      .then(ok => { if (!ok) return; S.watch = S.watch.filter(x => x.id !== w.id); commit(); toast('Preço-alvo encerrado'); });
+  }, 400);
+}
+
 /* ================= Ponte com o app Android =================
    No APK existe window.AndroidBridge. Aqui no navegador ela não existe e nada disto é usado. */
 const NATIVE = (typeof window !== 'undefined' && window.AndroidBridge) ? window.AndroidBridge : null;
@@ -2725,6 +2968,8 @@ function engineSnapshot() {
   return {
     hist: S.hist.map(h => ({ cat: h.cat, name: h.name, cost: h.cost, cond: h.cond || '', date: h.date || '', specs: h.specs || {} })),
     offers: S.settings.offers,
+    watch: S.watch.filter(w => !w.paused).map(w => ({ key: w.key, label: w.label, max: w.max })),
+    seen: S.seen.map(r => ({ key: r.key, pts: r.pts })),
   };
 }
 let nativeSyncT = null;
@@ -2733,12 +2978,14 @@ function nativeSync() {
   clearTimeout(nativeSyncT);
   nativeSyncT = setTimeout(() => nativeCall('syncData', JSON.stringify(engineSnapshot())), 300);
 }
-// Ofertas que o leitor encontrou enquanto o app estava fechado
+// Ofertas que o leitor encontrou enquanto o app estava fechado, e os preços vistos nos canais
 function pullNativeOffers() {
   if (!NATIVE) return 0;
-  let arr = [];
+  let arr = [], seen = [];
   try { arr = JSON.parse(nativeCall('takeOffers') || '[]'); } catch (e) { arr = []; }
-  let added = 0;
+  try { seen = JSON.parse(nativeCall('takeSeen') || '[]'); } catch (e) { seen = []; }
+  let added = 0, seenChanged = false;
+  if (Array.isArray(seen)) seen.forEach(v => { if (v && recordSeen(v)) seenChanged = true; });
   arr.forEach(r => {
     if (!r || !r.label || !(+r.price > 0)) return;
     const at = +r.at || Date.now();
@@ -2746,11 +2993,12 @@ function pullNativeOffers() {
     S.offers.unshift({
       id: newId(), k: String(r.k || ''), at, channel: String(r.channel || ''), store: r.store || '', kind: r.kind || '', label: r.label,
       title: String(r.title || '').slice(0, 200), price: round2(r.price), best: round2(r.best), bestCond: r.bestCond || '', diffPct: round2(r.diffPct),
-      status: r.status === 'great' ? 'great' : 'good', coupon: r.coupon || '', link: r.link || '', seen: false, dismissed: false,
+      status: ['great', 'good', 'target'].includes(r.status) ? r.status : 'good', target: round2(r.target), low: round2(r.low),
+      coupon: r.coupon || '', link: r.link || '', seen: false, dismissed: false,
     });
     added++;
   });
-  if (added) commit();
+  if (added || seenChanged) commit();
   return added;
 }
 function nativeStatus() {
@@ -3085,6 +3333,16 @@ const A = {
     confirmBox({ title: 'Limpar lista', text: 'Remover todas as ofertas da lista?', ok: 'Limpar' })
       .then(ok => { if (!ok) return; S.offers.forEach(o => { o.dismissed = true; }); commit(); });
   },
+  watch: t => openWatch(t.dataset.id),
+  'watch-new': t => openWatch(null, t.dataset.key ? { label: t.dataset.label, kind: t.dataset.kind, price: +t.dataset.price || 0 } : null),
+  'watch-save': t => saveWatch(t.dataset.id),
+  'watch-del': t => {
+    const w = S.watch.find(x => x.id === t.dataset.id);
+    if (!w) return;
+    confirmBox({ title: 'Excluir preço-alvo', text: `Parar de monitorar <b>${esc(w.label)}</b>?`, ok: 'Excluir', danger: true })
+      .then(ok => { if (!ok) return; S.watch = S.watch.filter(x => x.id !== w.id); Sheet.closeAll(); commit(); toast('Preço-alvo excluído'); });
+  },
+  'seen-all': () => { UI.seenAll = true; const el = $('#seen-list'); if (el) el.innerHTML = seenListHTML(); },
   'copy-coupon': t => copyText(t.dataset.v, `Cupom ${t.dataset.v} copiado`),
   'calc-toggle': t => { UI.calcOpen[t.dataset.id] = !UI.calcOpen[t.dataset.id]; render(); if (UI.calcOpen[t.dataset.id]) { const i = $('#bt-' + t.dataset.id); if (i) i.focus(); } },
   'rename-pc': t => openRename(t.dataset.id),
@@ -3166,6 +3424,7 @@ const A = {
     const it = createItem(d);
     Sheet.close(); commit();
     toast(`Peça ${code(it.code)} salva. Anote o código na caixa.`);
+    askCloseWatch(it);
   },
   item: t => { Sheet.closeAll(); openItem(t.dataset.id); },
   'item-edit': t => openEditItem(t.dataset.id),
@@ -3314,6 +3573,8 @@ document.addEventListener('input', e => {
     case 'b-target': if (b) { UI.target = UI.target || {}; UI.target[b.id] = parseMoney(el.value); const g = $('#tgt-' + b.id); if (g) g.innerHTML = targetHTML(b); } break;
     case 'q-text': UI.q.text = el.value; $('#q-res').innerHTML = pricesResults(); break;
     case 'q-offer': UI.q.offer = el.value; $('#q-res').innerHTML = pricesResults(); break;
+    case 'w-name': refreshWatchRec(); break;
+    case 'seen-q': UI.seenQ = el.value; { const l = $('#seen-list'); if (l) l.innerHTML = seenListHTML(); } break;
     case 'set-ad': S.settings.ad[el.dataset.k] = el.value; commitQuiet(); break;
     case 'card-pct': S.settings.card.pct = Math.min(parseMoney(el.value), 30); commitQuiet(); break;
   }
@@ -3340,6 +3601,7 @@ document.addEventListener('change', e => {
     case 'b-notes': if (b) { b.notes = el.value; stamp(); } break;
     case 'stock-cat': UI.stockCat = el.value; render(); break;
     case 'q-cat': UI.q.cat = el.value; $('#q-res').innerHTML = pricesResults(); break;
+    case 'w-kind': refreshWatchRec(); break;
     case 'card-on': S.settings.card.on = el.checked; commit(); break;
     case 'card-pct': S.settings.card.pct = Math.min(parseMoney(el.value), 30); el.value = S.settings.card.pct ? NUM2.format(S.settings.card.pct) : ''; stamp(); break;
     case 'of-tol': S.settings.offers.tol = Math.min(50, parseMoney(el.value)); el.value = NUM1.format(S.settings.offers.tol).replace(',0', ''); stamp(); break;

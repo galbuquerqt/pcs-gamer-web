@@ -1,0 +1,3095 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>PCs Gamer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: single-column app shell — sticky header, content column (max 760px), fixed bottom tab bar.
+   Cards only for PCs, part rows and sheets; everything else sits on the page ground. */
+:root{
+  --bg:#ECEFF5; --surface:#FFFFFF; --surface-2:#F5F7FB; --line:#D9E0EB; --line-2:#C7D0DE;
+  --ink:#121826; --ink-2:#465166; --ink-3:#768196;
+  --accent:#2A55E5; --accent-ink:#FFFFFF; --accent-soft:#E2E9FD;
+  --good:#127A4B; --good-soft:#DCF2E6; --warn:#9A5800; --warn-soft:#FCEFD6;
+  --crit:#BE2F38; --crit-soft:#FBE2E3; --info:#3D5888; --info-soft:#E5EBF5;
+  --shadow:0 1px 2px rgba(18,24,38,.06),0 6px 20px rgba(18,24,38,.07);
+  --scrim:rgba(14,18,26,.42);
+  --f-display:"Chakra Petch","Segoe UI",system-ui,sans-serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:12px; --r-sm:8px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1118; --surface:#151B25; --surface-2:#1B2230; --line:#283143; --line-2:#364056;
+    --ink:#E7EBF3; --ink-2:#A8B1C3; --ink-3:#7A8498;
+    --accent:#7F9CFF; --accent-ink:#0A1020; --accent-soft:#1D2848;
+    --good:#4FC88B; --good-soft:#12301F; --warn:#EFB24C; --warn-soft:#33260D;
+    --crit:#FF7C83; --crit-soft:#3A191C; --info:#9EB4DF; --info-soft:#1B2437;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35); --scrim:rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1118; --surface:#151B25; --surface-2:#1B2230; --line:#283143; --line-2:#364056;
+  --ink:#E7EBF3; --ink-2:#A8B1C3; --ink-3:#7A8498;
+  --accent:#7F9CFF; --accent-ink:#0A1020; --accent-soft:#1D2848;
+  --good:#4FC88B; --good-soft:#12301F; --warn:#EFB24C; --warn-soft:#33260D;
+  --crit:#FF7C83; --crit-soft:#3A191C; --info:#9EB4DF; --info-soft:#1B2437;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35); --scrim:rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+/* The app's own theme switch (Ajustes) wins over the system/viewer theme. */
+:root[data-app-theme="light"]{
+  --bg:#ECEFF5; --surface:#FFFFFF; --surface-2:#F5F7FB; --line:#D9E0EB; --line-2:#C7D0DE;
+  --ink:#121826; --ink-2:#465166; --ink-3:#768196;
+  --accent:#2A55E5; --accent-ink:#FFFFFF; --accent-soft:#E2E9FD;
+  --good:#127A4B; --good-soft:#DCF2E6; --warn:#9A5800; --warn-soft:#FCEFD6;
+  --crit:#BE2F38; --crit-soft:#FBE2E3; --info:#3D5888; --info-soft:#E5EBF5;
+  --shadow:0 1px 2px rgba(18,24,38,.06),0 6px 20px rgba(18,24,38,.07); --scrim:rgba(14,18,26,.42);
+  color-scheme:light;
+}
+:root[data-app-theme="dark"]{
+  --bg:#0D1118; --surface:#151B25; --surface-2:#1B2230; --line:#283143; --line-2:#364056;
+  --ink:#E7EBF3; --ink-2:#A8B1C3; --ink-3:#7A8498;
+  --accent:#7F9CFF; --accent-ink:#0A1020; --accent-soft:#1D2848;
+  --good:#4FC88B; --good-soft:#12301F; --warn:#EFB24C; --warn-soft:#33260D;
+  --crit:#FF7C83; --crit-soft:#3A191C; --info:#9EB4DF; --info-soft:#1B2437;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35); --scrim:rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent;font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0;padding:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.muted{color:var(--ink-3)} .small{font-size:13px} .tiny{font-size:12px}
+.mono{font-family:var(--f-mono)}
+.good{color:var(--good)} .bad{color:var(--crit)} .warnc{color:var(--warn)}
+h1,h2,h3{margin:0;text-wrap:balance}
+
+/* Header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.brand-mark{width:30px;height:30px;border-radius:8px;background:var(--ink);color:var(--bg);display:grid;place-items:center;flex:none}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:21px;letter-spacing:.01em;line-height:1}
+.brand .sync{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ink-3);flex:none}
+.dot.ok{background:var(--good)} .dot.busy{background:var(--warn)} .dot.err{background:var(--crit)}
+.icon-btn{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;color:var(--ink-2);border:1px solid var(--line);background:var(--surface)}
+.icon-btn:active{transform:scale(.97)}
+.icon-btn svg{width:20px;height:20px}
+.icon-btn.add{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.icon-btn.add svg{width:22px;height:22px;stroke-width:2.4}
+.top-actions{display:flex;gap:8px;flex:none}
+
+main{padding-block:14px calc(96px + env(safe-area-inset-bottom,0px))}
+
+/* Bottom tabs */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs .wrap{display:grid;grid-template-columns:repeat(5,1fr)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 9px;font-size:11.5px;font-weight:600;color:var(--ink-3);min-width:0}
+.tab svg{width:22px;height:22px}
+.tab[aria-current="page"]{color:var(--accent)}
+
+/* Sections */
+.sec{margin-top:20px}
+.sec:first-child{margin-top:0}
+.sec-h{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:6px 0;min-height:40px}
+.sec-h h2{font-family:var(--f-display);font-weight:600;font-size:17px;letter-spacing:.01em;flex:1;min-width:0}
+.sec-h .count{font-size:12px;font-weight:700;color:var(--ink-3);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+.chev{width:20px;height:20px;color:var(--ink-3);transition:transform .2s;flex:none}
+[aria-expanded="false"] > .chev{transform:rotate(-90deg)}
+.link-btn[aria-expanded="true"] > .chev{transform:none}
+.sec-b{margin-top:8px}
+.label{font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+
+/* Panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.panel + .panel{margin-top:10px}
+.banner{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:var(--r);background:var(--warn-soft);color:var(--ink);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);margin-bottom:14px}
+.banner > svg{width:22px;height:22px;flex:none;color:var(--warn);margin-top:1px}
+.banner b{display:block}
+.banner .btn{margin-top:8px}
+
+/* Pipeline strip */
+.pipe{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:4px}
+.stage{display:flex;flex-direction:column;justify-content:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:10px 10px 9px;text-align:left;min-width:0}
+.stage .n{font-family:var(--f-display);font-weight:700;font-size:28px;line-height:1}
+.stage .t{font-size:12px;font-weight:600;color:var(--ink-2);margin-top:4px;line-height:1.25}
+.stage.s-estoque .n{color:var(--accent)} .stage.s-vendido .n{color:var(--good)}
+.pipe .arr{display:grid;place-items:center;color:var(--ink-3)}
+.money-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.figure{display:flex;flex-direction:column;justify-content:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;min-width:0}
+.figure .v{font-family:var(--f-display);font-weight:700;font-size:22px;line-height:1.1;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.figure .s{font-size:12.5px;color:var(--ink-3);margin-top:3px}
+.bars-h{display:flex;height:8px;border-radius:999px;overflow:hidden;background:var(--surface-2);margin-top:10px}
+.bars-h span{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px;color:var(--ink-2)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:baseline}
+
+/* Lists */
+.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.row{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border-top:1px solid var(--line);width:100%;text-align:left;min-height:52px}
+.row:first-child{border-top:0}
+button.row:active,.row.tap:active{background:var(--surface-2)}
+.row .main{flex:1;min-width:0}
+.row .title{display:block;font-weight:600;overflow-wrap:anywhere}
+.row .sub{display:block;font-size:12.5px;color:var(--ink-3);margin-top:1px}
+.row .end{text-align:right;flex:none;padding-top:1px}
+.row-ic{flex:none;width:18px;margin-top:1px}
+.row-ic svg{width:18px;height:18px}
+.row .end .v{font-weight:700}
+.empty{padding:22px 16px;text-align:center;color:var(--ink-3);font-size:14px}
+.empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+
+/* Filtros em segmentos (contagem + rótulo) */
+.fseg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:3px;background:var(--surface-2);border:1px solid var(--line);border-radius:13px;padding:3px;width:100%}
+.fseg button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 2px 7px;border-radius:10px;min-width:0;color:var(--ink-2)}
+.fseg .n{font-family:var(--f-display);font-weight:700;font-size:17px;line-height:1.1}
+.fseg .t{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.fseg button[aria-pressed="true"]{background:var(--surface);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.link-btn{display:inline-flex;align-items:center;gap:7px;min-height:42px;margin-top:6px;font-weight:700;font-size:14px;color:var(--accent)}
+.link-btn > svg{width:18px;height:18px}
+.link-btn .chev{width:18px;height:18px;color:var(--accent)}
+.link-btn[aria-expanded="false"] .chev{transform:rotate(-90deg)}
+.pc-actions{display:flex;flex-direction:column;gap:8px}
+.btns3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.btns3 .btn{padding:0 6px;font-size:13.5px;gap:5px;min-width:0}
+.btns3 .btn svg{width:16px;height:16px;flex:none}
+.ad-btns{display:flex;flex-direction:column;gap:8px}
+
+/* Pills, chips, tags */
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap;line-height:1.2}
+.s-montagem.pill{background:var(--info-soft);color:var(--info)}
+.s-estoque.pill{background:var(--accent-soft);color:var(--accent)}
+.s-vendido.pill{background:var(--good-soft);color:var(--good)}
+.pill.caminho{background:var(--warn-soft);color:var(--warn)}
+.pill.neutral{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
+.pill.crit{background:var(--crit-soft);color:var(--crit)} .pill.warn{background:var(--warn-soft);color:var(--warn)}
+.tag{font-family:var(--f-mono);font-weight:600;font-size:12px;padding:1px 6px;border-radius:5px;border:1px solid var(--line-2);color:var(--ink-2);background:var(--surface-2);white-space:nowrap}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:13.5px;color:var(--ink-2)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.toolbar .chips{flex:1;min-width:0}
+.toolbar .fseg{flex:1}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:0 16px;border-radius:10px;font-weight:700;font-size:14.5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);white-space:nowrap}
+.btn svg{width:18px;height:18px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--crit);border-color:color-mix(in srgb,var(--crit) 35%,var(--line))}
+.btn.danger.solid{background:var(--crit);color:#fff;border-color:var(--crit)}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13.5px}
+.btn.block{width:100%}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns .btn{flex:1 1 auto}
+
+/* Forms */
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field > span{font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.form{display:flex;flex-direction:column;gap:14px}
+input[type="text"],input[type="date"],input[type="search"],select,textarea{width:100%;min-height:46px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface-2);padding:10px 12px;font-size:16px;color:var(--ink);min-width:0}
+textarea{min-height:88px;resize:vertical;line-height:1.4}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;background:var(--surface)}
+.money-in{position:relative}
+.money-in::before{content:"R$";position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;font-weight:700;color:var(--ink-3);pointer-events:none}
+.money-in input{padding-left:38px}
+.pct-in{position:relative}
+.pct-in::after{content:"%";position:absolute;right:12px;top:50%;transform:translateY(-50%);font-weight:700;color:var(--ink-3);pointer-events:none}
+.unit-in{position:relative}
+.unit-in input{padding-right:40px}
+.unit-in em{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-style:normal;font-weight:700;color:var(--ink-3);pointer-events:none}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:3px}
+.seg button{min-height:38px;border-radius:8px;font-weight:700;font-size:13px;color:var(--ink-2);padding:0 6px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.seg.status button[aria-pressed="true"].s-montagem{color:var(--info)}
+.seg.status button[aria-pressed="true"].s-estoque{color:var(--accent)}
+.seg.status button[aria-pressed="true"].s-vendido{color:var(--good)}
+.check{display:flex;gap:10px;align-items:center;min-height:44px;font-weight:600}
+.check input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+.hint{font-size:12.5px;color:var(--ink-3)}
+.detect{font-size:12.5px;color:var(--info);background:var(--info-soft);border-radius:8px;padding:6px 10px}
+.sugg{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.sugg button{display:flex;justify-content:space-between;gap:10px;text-align:left;padding:10px 12px;border-top:1px solid var(--line);font-size:14px}
+.sugg button:first-child{border-top:0}
+.sugg button span:last-child{color:var(--ink-3);white-space:nowrap;font-size:12.5px}
+
+/* PC cards */
+.pcs{display:flex;flex-direction:column;gap:12px}
+.pc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:80px}
+.pc.flash{animation:flash 1.4s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:var(--shadow)}}
+.pc-head{display:block;width:100%;text-align:left;padding:14px}
+.pc-head .l1{display:flex;align-items:center;gap:8px}
+.pc-head .name{font-family:var(--f-display);font-weight:600;font-size:17px;flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.2}
+.pc-head .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.nums div{min-width:0}
+.nums .k{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.nums .v{font-weight:700;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-body{border-top:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:18px}
+.block-t{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
+.slots{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.slot{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 12px;border-top:1px solid var(--line);min-height:54px;background:var(--surface)}
+.slot:first-child{border-top:0}
+.slot:active{background:var(--surface-2)}
+.slot .c{flex:1;min-width:0}
+.slot .cat,.slot .nm,.slot .sp{display:block}
+.slot .cat{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.slot .nm{font-weight:600;font-size:14.5px;overflow-wrap:anywhere}
+.slot .nm.empty-slot{color:var(--accent);font-weight:600}
+.slot .nm.empty-slot.optional{color:var(--ink-3);font-weight:500}
+.slot .sp{font-size:12px;color:var(--ink-3)}
+.slot .r{text-align:right;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.slot .r .v{font-weight:700;font-size:14px}
+.slot-total{display:flex;justify-content:space-between;padding:10px 12px;background:var(--surface-2);border-top:1px solid var(--line);font-weight:700}
+.missing{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px;font-size:12.5px}
+.alerts{display:flex;flex-direction:column;gap:6px}
+.alert{display:flex;gap:9px;align-items:flex-start;padding:9px 11px;border-radius:9px;font-size:13.5px;line-height:1.35}
+.alert svg{width:16px;height:16px;flex:none;margin-top:1px}
+.alert.crit{background:var(--crit-soft);color:var(--crit)}
+.alert.warn{background:var(--warn-soft);color:var(--warn)}
+.alert.info{background:var(--info-soft);color:var(--info)}
+.alert span{color:var(--ink)}
+.calc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:10px}
+.calc .k{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.calc .v{font-weight:700}
+.suggest-line{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.suggest-line .field{flex:0 0 110px}
+.suggest-line .out{flex:1;min-width:150px;font-size:14px}
+
+/* Comparativo */
+.cmp .row{align-items:flex-start}
+.cmp .row .end .m{font-size:12.5px}
+.cmp-foot{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;padding:12px 14px;background:var(--surface-2);border-top:1px solid var(--line);font-size:13px}
+.cmp-foot b{font-size:14px}
+
+/* Charts */
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--f-body);font-size:11px;fill:var(--ink-3)}
+.chart .lbl{fill:var(--ink-2);font-weight:700}
+
+/* Stock */
+.grp + .grp{margin-top:14px}
+.grp-h{display:flex;align-items:center;gap:8px;width:100%;padding:4px 2px 8px;text-align:left}
+.grp-h h3{font-size:14px;font-weight:700;flex:1}
+
+/* Ofertas */
+.feed-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 10px}
+.feed-h h2{font-family:var(--f-display);font-weight:600;font-size:17px}
+.offer{display:flex;gap:10px;padding:12px 14px;border-top:1px solid var(--line)}
+.offer:first-child{border-top:0}
+.offer.new{background:color-mix(in srgb,var(--good) 7%,var(--surface))}
+.offer .main{flex:1;min-width:0}
+.o-line{font-size:15.5px;line-height:1.3;overflow-wrap:anywhere}
+.o-price{font-family:var(--f-display);font-size:17px}
+.offer .sub{font-size:12.5px;color:var(--ink-3);margin-top:2px}
+.o-rel{font-size:13px;font-weight:600;margin-top:4px}
+.o-rel.great{color:var(--good)} .o-rel.good{color:var(--ink-2)}
+.coupon{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 10px;border:1px dashed var(--line-2);border-radius:8px;font-family:var(--f-mono);font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.coupon svg{width:14px;height:14px}
+.o-act{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+.o-act .btn{text-decoration:none}
+.o-x{width:32px;height:32px;display:grid;place-items:center;border-radius:8px;color:var(--ink-3)}
+.o-x svg{width:16px;height:16px}
+.tab{position:relative}
+.tab .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:var(--crit);color:#fff;font-size:10.5px;font-weight:700;display:grid;place-items:center;line-height:1}
+
+/* Oferta colada (sem uso) */
+.of-res{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.of-res .verdict{margin-top:0}
+.of-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.of-name{font-family:var(--f-display);font-weight:600;font-size:18px;line-height:1.2;margin:2px 0}
+.of-price{font-family:var(--f-display);font-weight:700;font-size:20px;white-space:nowrap}
+.of-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.of-meta .btn{text-decoration:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px}
+.stats .k{font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.stats .v{font-weight:700;font-size:16px}
+.verdict{margin-top:12px;padding:10px 12px;border-radius:9px;font-weight:600;font-size:14px}
+.verdict.good{background:var(--good-soft);color:var(--good)}
+.verdict.bad{background:var(--crit-soft);color:var(--crit)}
+.verdict.mid{background:var(--surface-2);color:var(--ink-2)}
+
+/* Sheet & modal */
+#layer{position:fixed;inset:0;z-index:50;pointer-events:none}
+.scrim{position:fixed;inset:0;background:var(--scrim);opacity:0;transition:opacity .18s;pointer-events:auto}
+.scrim.in{opacity:1}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:min(92%,92dvh);display:flex;flex-direction:column;background:var(--surface);border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);transform:translateY(100%);transition:transform .22s cubic-bezier(.2,.8,.2,1);pointer-events:auto;max-width:760px;margin:0 auto}
+.sheet.in{transform:none}
+.sheet-h{display:flex;align-items:center;gap:10px;padding:14px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.sheet-h h2{font-family:var(--f-display);font-weight:600;font-size:18px;flex:1;min-width:0;overflow-wrap:anywhere}
+.sheet-b{overflow-y:auto;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));overscroll-behavior:contain}
+.sheet .x{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:var(--ink-2);background:var(--surface-2)}
+.sheet-foot{display:flex;gap:8px;margin-top:18px}
+.sheet-foot .btn{flex:1}
+.optlist{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--surface);width:100%;min-height:56px}
+.opt:active{background:var(--surface-2)}
+.opt .ic{width:36px;height:36px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.opt .ic svg{width:19px;height:19px}
+.opt b{display:block}
+.opt small{display:block;color:var(--ink-3);font-size:12.5px}
+.divider{height:1px;background:var(--line);margin:4px 0}
+.part-card{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:var(--surface-2)}
+.part-card .nm{font-weight:700;font-size:15.5px;overflow-wrap:anywhere}
+.part-card .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;font-size:13px;color:var(--ink-2)}
+.preview{font-family:var(--f-body);font-size:14px;white-space:pre-wrap;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;max-height:340px;overflow:auto;line-height:1.45}
+.counter{font-size:12px;color:var(--ink-3);text-align:right}
+.counter.over{color:var(--crit);font-weight:700}
+
+/* Search */
+.search-box{display:flex;gap:8px;align-items:center}
+.search-box input{flex:1}
+.res-h{margin:16px 0 6px}
+
+/* Toast */
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;z-index:60;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;transition:all .2s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+#toast.in{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:420px){
+  .nums{grid-template-columns:repeat(2,1fr)}
+  .grid3{grid-template-columns:1fr 1fr}
+  .stage .n{font-size:24px}
+  .figure .v{font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+</style>
+<header class="top"><div class="wrap">
+  <div class="brand"><span class="brand-mark" id="brand-mark" aria-hidden="true"></span><div style="min-width:0"><h1>PCs Gamer</h1><div class="sync" id="sync"></div></div></div>
+  <div class="top-actions"><button class="icon-btn" id="search-btn" data-a="search" aria-label="Buscar"></button><button class="icon-btn add" id="add-btn" hidden></button></div>
+</div></header>
+<main id="main"></main>
+<nav class="tabs" aria-label="Seções"><div class="wrap" id="nav"></div></nav>
+<div id="layer"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+'use strict';
+/* ================= Utilitários ================= */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const clone = o => JSON.parse(JSON.stringify(o));
+const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const NUM2 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const NUM1 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const money = v => BRL.format(Number(v) || 0);
+const moneyIn = v => (Number(v) || 0) > 0 ? NUM2.format(v) : '';
+const pct = v => (v == null || !isFinite(v)) ? '—' : NUM1.format(v) + '%';
+const round2 = v => Math.round((Number(v) || 0) * 100) / 100;
+
+function parseMoney(str) {
+  let s = String(str == null ? '' : str).replace(/[R$\s %]/g, '');
+  if (!s) return 0;
+  if (s.includes('-')) return 0;
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+  const v = parseFloat(s);
+  if (!isFinite(v) || v < 0) return 0;
+  return round2(v);
+}
+function parseIntSafe(str) {
+  const v = parseInt(String(str == null ? '' : str).replace(/\D/g, ''), 10);
+  return isFinite(v) && v > 0 ? v : 0;
+}
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+const isDate = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+function dayNum(s) { const [y, m, d] = s.split('-').map(Number); return Date.UTC(y, m - 1, d) / 864e5; }
+function daysBetween(a, b) { return (isDate(a) && isDate(b)) ? Math.round(dayNum(b) - dayNum(a)) : null; }
+function daysSince(s) { const d = daysBetween(s, today()); return d == null ? null : Math.max(0, d); }
+function fmtDate(s) { if (!isDate(s)) return ''; const [y, m, d] = s.split('-'); return `${d}/${m}/${y}`; }
+const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const MONTHS_LONG = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+function monthShort(ym) { const [y, m] = ym.split('-'); return `${MONTHS[+m - 1]}/${y.slice(2)}`; }
+function monthLong(ym) { const [y, m] = ym.split('-'); return `${MONTHS_LONG[+m - 1]} de ${y}`; }
+function plural(n, one, many) { return `${n} ${n === 1 ? one : many}`; }
+const code = c => '#' + String(c || 0).padStart(3, '0');
+
+/* Texto normalizado para buscas: minúsculas, sem acento, letras e números separados */
+function norm(s) {
+  return String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ').replace(/([a-z])(\d)/g, '$1 $2').replace(/(\d)([a-z])/g, '$1 $2')
+    .replace(/\s+/g, ' ').trim();
+}
+function toks(s) {
+  const t = norm(s).split(' ').filter(Boolean);
+  for (let i = 1; i < t.length; i++) if (t[i] === 's' && /^\d{4}$/.test(t[i - 1])) t[i] = 'super';
+  return t;
+}
+const lowerRaw = s => String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+/* ================= Catálogo ================= */
+const CATS = [
+  { k: 'cpu', l: 'Processador', s: 'Processador' },
+  { k: 'cooler', l: 'Cooler de CPU', s: 'Cooler', opt: true },
+  { k: 'gpu', l: 'Placa de vídeo', s: 'Placa de vídeo' },
+  { k: 'mobo', l: 'Placa-mãe', s: 'Placa-mãe' },
+  { k: 'ram', l: 'Memória RAM', s: 'Memória RAM' },
+  { k: 'nvme', l: 'SSD NVMe', s: 'SSD NVMe' },
+  { k: 'sata', l: 'SSD SATA / HDD', s: 'SSD SATA / HDD' },
+  { k: 'psu', l: 'Fonte', s: 'Fonte' },
+  { k: 'case', l: 'Gabinete', s: 'Gabinete' },
+  { k: 'fans', l: 'Ventilação / fans', s: 'Fans', opt: true },
+];
+const CAT = Object.fromEntries(CATS.map(c => [c.k, c]));
+const CONDS = { nova: 'Nova', usada: 'Usada', reparada: 'Reparada e testada' };
+const condLabel = c => CONDS[c] || '';
+const condOk = c => (CONDS[c] ? c : '');
+const joinDot = (...a) => a.filter(Boolean).join(' · ');
+const STATUS = { montagem: 'Em montagem', estoque: 'Em estoque', vendido: 'Vendido' };
+const RAM_GB = [4, 8, 12, 16, 24, 32, 48, 64, 96, 128];
+const DISK_GB = [120, 128, 240, 250, 256, 480, 500, 512, 960, 1000, 2000, 4000];
+const gbLabel = g => g >= 1000 ? (g / 1000).toLocaleString('pt-BR') + ' TB' : g + ' GB';
+
+function cleanSpecs(cat, sp) {
+  const o = {};
+  sp = sp || {};
+  if (cat === 'ram') {
+    if (sp.gb > 0) o.gb = +sp.gb;
+    if (['DDR3', 'DDR4', 'DDR5'].includes(sp.type)) o.type = sp.type;
+    if ([1, 2, 4].includes(+sp.sticks)) o.sticks = +sp.sticks;
+  } else if (cat === 'nvme' || cat === 'sata') {
+    if (sp.gb > 0) o.gb = +sp.gb;
+  } else if (cat === 'psu' || cat === 'gpu') {
+    if (sp.w > 0) o.w = +sp.w;
+  }
+  return o;
+}
+function specLabel(cat, sp) {
+  sp = sp || {};
+  if (cat === 'ram') {
+    const p = [];
+    if (sp.gb) p.push(sp.sticks > 1 ? `${sp.gb} GB (${sp.sticks}x${+(sp.gb / sp.sticks).toFixed(1)} GB)` : `${sp.gb} GB`);
+    if (sp.type) p.push(sp.type);
+    if (sp.sticks === 1) p.push('1 pente');
+    return p.join(' · ');
+  }
+  if ((cat === 'nvme' || cat === 'sata') && sp.gb) return gbLabel(sp.gb);
+  if (cat === 'psu' && sp.w) return sp.w + ' W';
+  if (cat === 'gpu' && sp.w) return `consumo ${sp.w} W`;
+  return '';
+}
+function guessSpecs(cat, name) {
+  const s = lowerRaw(name);
+  const o = {};
+  let m;
+  if (cat === 'ram') {
+    if ((m = s.match(/\b([124])\s*x\s*(\d{1,2})\s*(?:gb)?\b(?!\s*mhz)/))) { o.sticks = +m[1]; o.gb = +m[1] * +m[2]; }
+    else if ((m = s.match(/(\d{1,3})\s*gb/))) o.gb = +m[1];
+    if ((m = s.match(/ddr\s*([345])/))) o.type = 'DDR' + m[1];
+  } else if (cat === 'nvme' || cat === 'sata') {
+    if ((m = s.match(/(\d+(?:[.,]\d+)?)\s*tb/))) o.gb = Math.round(parseFloat(m[1].replace(',', '.')) * 1000);
+    else if ((m = s.match(/(\d{2,4})\s*gb/))) o.gb = +m[1];
+  } else if (cat === 'psu') {
+    if ((m = s.match(/(\d{3,4})\s*w(?:atts?)?\b/))) o.w = +m[1];
+  }
+  return cleanSpecs(cat, o);
+}
+
+/* ================= Reconhecimento de peças ================= */
+// modelo | consumo típico (W) | faixa de desempenho 0-5 | linhas PCIe quando menos de 16
+const GPU_TABLE = `gt 710|19|0;gt 730|38|0;gt 1030|30|0;gtx 750 ti|60|1;gtx 750|55|1;gtx 950|90|1;gtx 960|120|1;gtx 970|145|2;gtx 980 ti|250|3;gtx 980|165|2;
+gtx 1050 ti|75|1;gtx 1050|75|1;gtx 1060|120|2;gtx 1070 ti|180|3;gtx 1070|150|3;gtx 1080 ti|250|4;gtx 1080|180|3;gtx 1630|75|1|8;gtx 1650 super|100|2;gtx 1650|75|1;
+gtx 1660 super|125|2;gtx 1660 ti|120|2;gtx 1660|120|2;rtx 2060 super|175|3;rtx 2060|160|2;rtx 2070 super|215|3;rtx 2070|175|3;rtx 2080 super|250|4;rtx 2080 ti|250|4;rtx 2080|215|4;
+rtx 3050|130|2|8;rtx 3060 ti|200|3;rtx 3060|170|3;rtx 3070 ti|290|4;rtx 3070|220|4;rtx 3080 ti|350|5;rtx 3080|320|5;rtx 3090 ti|450|5;rtx 3090|350|5;
+rtx 4060 ti|165|3|8;rtx 4060|115|3|8;rtx 4070 ti super|285|5;rtx 4070 ti|285|5;rtx 4070 super|220|4;rtx 4070|200|4;rtx 4080 super|320|5;rtx 4080|320|5;rtx 4090|450|5;
+rtx 5050|130|2|8;rtx 5060 ti|180|3|8;rtx 5060|145|3|8;rtx 5070 ti|300|5;rtx 5070|250|4;rtx 5080|360|5;rtx 5090|575|5;
+rx 460|75|1;rx 470|120|1;rx 480|150|2;rx 550|50|0;rx 560|75|1;rx 570|150|2;rx 580|185|2;rx 590|225|2;vega 56|210|3;vega 64|295|3;
+rx 5500 xt|130|2|8;rx 5600 xt|150|3;rx 5700 xt|225|3;rx 5700|180|3;rx 6400|53|1|4;rx 6500 xt|107|1|4;rx 6600 xt|160|3|8;rx 6600|132|3|8;rx 6650 xt|180|3|8;
+rx 6700 xt|230|4;rx 6700|175|3;rx 6750 xt|250|4;rx 6800 xt|300|5;rx 6800|250|4;rx 6900 xt|300|5;rx 6950 xt|335|5;
+rx 7600 xt|190|3|8;rx 7600|165|3|8;rx 7700 xt|245|4;rx 7800 xt|263|4;rx 7900 gre|260|5;rx 7900 xtx|355|5;rx 7900 xt|315|5;rx 9060 xt|160|3|16;rx 9070 xt|304|5;rx 9070|220|5;
+arc a380|75|1|8;arc a580|175|2|8;arc a750|225|3;arc a770|225|3;arc b570|150|3|8;arc b580|190|3|8`;
+const GPU_PRETTY = { gt: 'GT', gtx: 'GTX', rtx: 'RTX', rx: 'RX', arc: 'Arc', vega: 'Vega', ti: 'Ti', super: 'Super', xt: 'XT', xtx: 'XTX', gre: 'GRE' };
+const GPUS = (() => {
+  const variants = [];
+  GPU_TABLE.replace(/\n/g, '').split(';').forEach(row => {
+    const [k, w, t, lanes] = row.split('|');
+    const kt = toks(k);
+    let label = kt.map(x => GPU_PRETTY[x] || x).join(' ').replace(/\b([ab]) (\d{3})\b/, (m, a, n) => a.toUpperCase() + n);
+    if (kt[0] === 'vega') label = 'RX ' + label;
+    const g = { key: k, label, w: +w, tier: +t, lanes: +(lanes || 16) };
+    variants.push({ t: kt, g });
+    if (['gtx', 'rtx', 'rx', 'arc'].includes(kt[0]) && (/^\d{4}$/.test(kt[1]) || kt[0] === 'arc')) variants.push({ t: kt.slice(1), g });
+  });
+  return variants.sort((a, b) => b.t.length - a.t.length);
+})();
+function containsSeq(hay, needle) {
+  outer: for (let i = 0; i + needle.length <= hay.length; i++) {
+    for (let j = 0; j < needle.length; j++) if (hay[i + j] !== needle[j]) continue outer;
+    return true;
+  }
+  return false;
+}
+function parseGPU(name) {
+  if (!name) return null;
+  const raw = lowerRaw(name);
+  if (/integrad|onboard|igpu/.test(raw)) return { igpu: true, label: 'Vídeo integrado', w: 0, tier: 0, lanes: 16 };
+  const t = toks(name);
+  for (const v of GPUS) if (containsSeq(t, v.t)) return v.g;
+  return null;
+}
+
+const SOCK = {
+  '1155': 'LGA 1155 (Intel 2ª/3ª ger.)', '1150': 'LGA 1150 (Intel 4ª/5ª ger.)', '1151': 'LGA 1151 (Intel 6ª/7ª ger.)',
+  '1151v2': 'LGA 1151 (Intel 8ª/9ª ger.)', '1200': 'LGA 1200 (Intel 10ª/11ª ger.)', '1700': 'LGA 1700 (Intel 12ª a 14ª ger.)',
+  '1851': 'LGA 1851 (Intel Core Ultra 200)', AM4: 'AM4 (AMD)', AM5: 'AM5 (AMD)',
+};
+const INTEL_SOCKET_BY_GEN = g => g <= 3 ? '1155' : g <= 5 ? '1150' : g <= 7 ? '1151' : g <= 9 ? '1151v2' : g <= 11 ? '1200' : g <= 14 ? '1700' : null;
+
+function parseCPU(name) {
+  if (!name) return null;
+  const s = lowerRaw(name);
+  let m;
+  if ((m = s.match(/ultra\s*([3579])\s*-?\s*(\d{3})\s*([a-z]{0,2})\b/))) {
+    const t = +m[1];
+    return { brand: 'Intel', socket: '1851', gen: 15, igpu: !m[3].includes('f'), score: t <= 3 ? 3 : t === 5 ? 4 : 5, pcie: 5, short: `Core Ultra ${t} ${m[2]}${m[3].toUpperCase()}` };
+  }
+  if ((m = s.match(/\bi([3579])\s*-?\s*(\d{4,5})\s*([a-z]{0,2})\b/))) {
+    const tier = +m[1], numS = m[2], suf = m[3];
+    const gen = numS.length === 5 ? +numS.slice(0, 2) : +numS[0];
+    if (gen < 2 || gen > 14) return null;
+    const socket = INTEL_SOCKET_BY_GEN(gen);
+    let score;
+    if (gen <= 3) score = 1;
+    else if (gen <= 7) score = tier <= 3 ? 1 : 2;
+    else if (gen <= 9) score = tier <= 3 ? 2 : tier <= 7 ? 3 : 4;
+    else if (gen <= 11) score = tier <= 3 ? 2 : tier === 5 ? 3 : 4;
+    else score = tier <= 3 ? 3 : tier === 5 ? 4 : 5;
+    return { brand: 'Intel', socket, gen, igpu: !suf.includes('f'), score, pcie: gen <= 10 ? 3 : 4, short: `i${tier}-${numS}${suf.toUpperCase()}` };
+  }
+  if ((m = s.match(/(pentium|celeron)[^0-9]*?\b(?:gold\s*|silver\s*)?g?\s*(\d{4})\b/))) {
+    const n = +m[2];
+    let socket = null, gen = null;
+    if (n >= 1600 && n < 3000) { socket = '1155'; gen = 3; }
+    else if (n >= 3200 && n < 3500) { socket = '1150'; gen = 4; }
+    else if (n >= 3900 && n < 4900) { socket = '1151'; gen = 7; }
+    else if (n >= 4900 && n < 5900) { socket = '1151v2'; gen = 9; }
+    else if (n >= 5900 && n < 6900) { socket = '1200'; gen = 10; }
+    else if (n >= 6900 && n < 8000) { socket = '1700'; gen = 12; }
+    if (!socket) return null;
+    return { brand: 'Intel', socket, gen, igpu: true, score: 1, pcie: 3, short: `${m[1][0].toUpperCase() + m[1].slice(1)} G${n}` };
+  }
+  if ((m = s.match(/(?:ryzen|\br)\s*([3579])\s*(?:pro\s*)?(\d{4})\s?(x3d|xt|ge|g|x|f)?\b/)) ||
+      (m = s.match(/ryzen\s*(?:pro\s*)?()(\d{4})\s?(x3d|xt|ge|g|x|f)?\b/))) {
+    const numS = m[2], suf = m[3] || '', series = +numS[0], d2 = +numS[1];
+    // Sem o "5" de "Ryzen 5 5500": a linha vem do 2º dígito do modelo (5500 → 5, 3200 → 3, 5700 → 7)
+    const tier = m[1] ? +m[1] : d2 <= 3 ? 3 : d2 <= 6 ? 5 : d2 <= 8 ? 7 : 9;
+    if (![1, 2, 3, 4, 5, 7, 8, 9].includes(series)) return null;
+    const am5 = series >= 7;
+    const g = /g/.test(suf);
+    const x3d = /3d/.test(suf);
+    let score;
+    if (series === 1) score = tier >= 7 ? 2 : 1;
+    else if (series === 2) score = tier >= 5 ? 2 : 1;
+    else if (series === 3) score = g ? 1 : tier === 3 ? 2 : 3;
+    else if (series === 4) score = 2;
+    else if (series === 5) score = x3d ? 5 : (/^5[789]/.test(numS) && /x/.test(suf)) || /^59/.test(numS) ? 4 : 3;
+    else if (series === 8) score = numS === '8400' || numS === '8500' ? 3 : 4;
+    else score = x3d ? 5 : tier >= 7 ? 5 : 4;
+    let pcie = 4;
+    if (!am5 && (series <= 2 || series === 4 || (series === 3 && g) || (series === 5 && (g || numS === '5500')))) pcie = 3;
+    const igpu = am5 ? !/f/.test(suf) : g;
+    return { brand: 'AMD', socket: am5 ? 'AM5' : 'AM4', series, igpu, score, pcie, x3d, apuZenPlus: series === 3 && g, short: `Ryzen ${tier} ${numS}${suf.toUpperCase()}` };
+  }
+  if ((m = s.match(/athlon\s*(?:silver|gold)?\s*(200|220|240|300|3000)\s*(ge|g)?\b/))) {
+    return { brand: 'AMD', socket: 'AM4', series: 2, igpu: true, score: 1, pcie: 3, short: `Athlon ${m[1]}${(m[2] || '').toUpperCase()}` };
+  }
+  return null;
+}
+
+const CHIPSETS = (() => {
+  const map = {};
+  const add = (list, socket, pcie, series) => list.split(' ').forEach(k => { map[k] = { chip: k.toUpperCase(), socket, pcie, series }; });
+  add('h61 b75 h77 z77 z68 p67 h67 q77', '1155', 2, 'ivy');
+  add('h81 b85 h87 z87 h97 z97 q87', '1150', 3, 'haswell');
+  add('h110 b150 h170 z170 q170 b250 h270 z270 q270', '1151', 3, '100');
+  add('h310 b360 b365 h370 z370 z390 q370', '1151v2', 3, '300');
+  add('h410 b460 h470 z490 q470', '1200', 3, '400');
+  add('h510 b560 h570 z590 q570', '1200', 4, '500');
+  add('h610 b660 h670 z690 q670', '1700', 4, '600');
+  add('b760 h770 z790', '1700', 4, '700');
+  add('h810 b860 z890 w880', '1851', 5, '800');
+  add('a320 b350 x370', 'AM4', 3, '300a');
+  add('b450 x470', 'AM4', 3, '400a');
+  add('a520', 'AM4', 3, '500a');
+  add('b550 x570', 'AM4', 4, '500a');
+  add('a620 b650 x670 b840 b850 x870', 'AM5', 4, '600a');
+  return map;
+})();
+function parseBoard(name) {
+  if (!name) return null;
+  const s = lowerRaw(name);
+  const parts = s.split(/[^a-z0-9]+/).filter(Boolean);
+  let found = null;
+  for (const p of parts) {
+    const m = p.match(/^([abhpqwxz])(\d{2,3})[a-z]{0,2}$/);
+    if (m && CHIPSETS[m[1] + m[2]]) { found = CHIPSETS[m[1] + m[2]]; break; }
+  }
+  if (!found) return null;
+  const d = s.match(/\bd(?:dr)?\s?([345])\b/);
+  return { ...found, ddr: d ? 'DDR' + d[1] : null };
+}
+function ramNeeded(board, cpu) {
+  const socket = (board && board.socket) || (cpu && cpu.socket);
+  if (!socket) return null;
+  if (socket === 'AM4' || socket === '1151' || socket === '1151v2' || socket === '1200') return 'DDR4';
+  if (socket === 'AM5' || socket === '1851') return 'DDR5';
+  if (socket === '1150' || socket === '1155') return 'DDR3';
+  if (socket === '1700') return (board && board.ddr) || 'either';
+  return null;
+}
+function detectLine(cat, name) {
+  if (!name || !name.trim()) return '';
+  if (cat === 'gpu') {
+    const g = parseGPU(name);
+    if (!g) return 'Modelo não reconhecido: informe o consumo (W) para checar a fonte.';
+    if (g.igpu) return 'Usa o vídeo integrado do processador.';
+    return `Reconhecida: ${g.label} · consumo típico ${g.w} W · ${PROFILES[g.tier].name}`;
+  }
+  if (cat === 'cpu') {
+    const c = parseCPU(name);
+    if (!c) return 'Modelo não reconhecido: os alertas de compatibilidade ficam desligados para ele.';
+    return `Reconhecido: ${c.short} · ${SOCK[c.socket]}${c.igpu ? ' · tem vídeo integrado' : ' · sem vídeo integrado'}`;
+  }
+  if (cat === 'mobo') {
+    const b = parseBoard(name);
+    if (!b) return 'Chipset não reconhecido: escreva o chipset no nome (ex.: B450M, H610M).';
+    const ram = b.socket === '1700' ? (b.ddr ? ` · ${b.ddr}` : ' · escreva DDR4 ou DDR5 no nome') : '';
+    return `Reconhecida: chipset ${b.chip} · ${SOCK[b.socket]}${ram}`;
+  }
+  return '';
+}
+
+const PROFILES = [
+  { name: 'Uso diário e jogos leves', text: 'Ideal para estudos, trabalho e jogos leves como LoL, Valorant e CS2 com ajustes baixos.' },
+  { name: 'Gamer de entrada', text: 'Roda muito bem jogos competitivos (Valorant, CS2, Fortnite, LoL) e títulos mais pesados em configurações baixas a médias.' },
+  { name: 'Full HD', text: 'Jogos atuais em Full HD (1080p) com configurações médias a altas e ótimo desempenho nos competitivos.' },
+  { name: 'Full HD alto / Quad HD de entrada', text: 'Full HD no alto/ultra com folga e Quad HD (1440p) em configurações médias.' },
+  { name: 'Quad HD', text: 'Jogos atuais em Quad HD (1440p) com configurações altas.' },
+  { name: 'Quad HD alto / 4K de entrada', text: 'Quad HD no ultra com alta taxa de quadros e 4K em configurações médias a altas.' },
+];
+
+/* ================= Ofertas do Telegram =================
+   Lê o texto de uma promoção (colado aqui ou, no APK, vindo da notificação),
+   descobre a peça e o preço e compara com o melhor preço que você já pagou. */
+const DEFAULT_GROUPS = ['CPU+SSD+MOBO+RAM+REFRIGERAÇÃO (@placamaedorocha)', 'CAÇA PREÇO DO ROCHA (@HardTecPromocoes)', 'RB Store (@rbstorenet)'];
+const STORES = [
+  ['Mercado Livre', /mercado\s*livre/i], ['Amazon', /amazon/i], ['Shopee', /shopee/i], ['KaBuM!', /kabum/i],
+  ['Terabyte', /terabyte/i], ['Pichau', /pichau/i], ['AliExpress', /aliexpress/i], ['Magalu', /magalu|magazine\s*luiza/i],
+  ['Casas Bahia', /casas\s*bahia/i], ['Americanas', /americanas/i], ['Fast Shop', /fast\s*shop/i],
+];
+const EMOJI = /[\u{1F000}-\u{1FAFF}☀-➿️‍⭐⬆⬇⤴⤵〰〽㊗㊙]/gu;
+// O que não é peça avulsa: kits, PCs prontos, notebooks e periféricos
+const OFFER_SKIP = /kit\s*upgrade|\bcombo\b|\bpc\s*gamer\b|computador|\bnotebook\b|\blaptop\b|\bmonitor\b|smartphone|celular|\bconsole\b|\bcontrole\b|headset|teclado|\bmouse\b|cadeira|smartwatch|\btv\b|\biphone\b/;
+const OFFER_KINDS = [
+  ['gpu', /placa\s*de\s*video|\bgpu\b|geforce|radeon\s*rx|\brtx\s?\d|\bgtx\s?\d|\brx\s?\d{3,4}|\barc\s*[ab]\d/],
+  ['cpu', /processador|\bryzen\b|intel\s*core|core\s*ultra|\bi[3579][\s-]\d{4,5}/],
+  ['mobo', /placa[\s-]*mae|motherboard|\bmobo\b/],
+  ['ram', /memoria|(?<![a-z])ddr[345]|\bram\b/],
+  ['ssd', /\bssd\b|nvme|\bm\.?2\b|\bhdd?\b/],
+  ['psu', /\bfonte\b|\bpsu\b/],
+];
+const KIND_LABEL = { gpu: 'Placa de vídeo', cpu: 'Processador', mobo: 'Placa-mãe', ram: 'Memória RAM', ssd: 'Armazenamento', psu: 'Fonte' };
+
+function offerLines(text) {
+  return String(text || '').split(/\r?\n+/).map(l => l.replace(EMOJI, ' ').replace(/\s+/g, ' ').trim()).filter(Boolean);
+}
+function offerTitle(text) {
+  const lines = offerLines(text);
+  const isStoreOnly = l => { let r = l; STORES.forEach(([, re]) => { r = r.replace(re, ''); }); return !/[a-z0-9]/i.test(r); };
+  const keep = lines.filter(l => !/https?:\/\/|R\$|\bcupom\b|\bfrete\b|\bparcel|\bpix\b|^an[uú]ncio$/i.test(l) && !isStoreOnly(l) && l.length > 5);
+  return keep.join(' ') || lines.join(' ');
+}
+function offerPrice(text) {
+  const t = String(text || '');
+  const re = /R\$\s*([\d.]+(?:,\d{1,2})?)/gi;
+  const vals = [];
+  let m;
+  while ((m = re.exec(t))) {
+    const before = lowerRaw(t.slice(Math.max(0, m.index - 24), m.index));
+    const after = lowerRaw(t.slice(m.index + m[0].length, m.index + m[0].length + 20));
+    if (/\d\s*x\s*(de\s*)?$/.test(before)) continue;                                  // parcelas: 10x de R$ 26,85
+    if (/(frete|acima\s+de|compras?\s+de|desconto\s+de|economi[sz]e|cashback|cupom\s+de|off\s+de|ganhe)\s*$/.test(before)) continue;
+    if (/^\s*(de\s+desconto|off\b|em\s+cashback|de\s+cashback|de\s+volta)/.test(after)) continue;
+    const v = parseMoney(m[1]);
+    if (v >= 10) vals.push(v);
+  }
+  return vals.length ? Math.min(...vals) : 0;                                         // "de R$ 399 por R$ 268" → 268
+}
+// Chave do "mesmo produto" para comparar preços: modelo da placa de vídeo, modelo do processador,
+// chipset da placa-mãe, capacidade e tipo da memória, tipo e capacidade do SSD, potência da fonte.
+function productKey(kind, text, specs) {
+  const s = lowerRaw(text);
+  if (kind === 'gpu') { const g = parseGPU(text); return g && !g.igpu ? { key: 'gpu:' + g.key, label: g.label } : null; }
+  if (kind === 'cpu') { const c = parseCPU(text); return c ? { key: 'cpu:' + c.short.toLowerCase(), label: c.short } : null; }
+  if (kind === 'mobo') {
+    const b = parseBoard(text);
+    if (!b) return null;
+    const itx = /itx/.test(s) || /\b[abhqwxz]\d{3}i\b/.test(s);
+    return { key: 'mobo:' + b.chip + (itx ? ':itx' : ''), label: `Placa-mãe ${b.chip}${itx ? ' Mini-ITX' : ''}` };
+  }
+  if (kind === 'ram') {
+    const sp = { ...guessSpecs('ram', text), ...(specs || {}) };
+    if (!sp.gb || !sp.type) return null;
+    return { key: `ram:${sp.type}:${sp.gb}`, label: `Memória ${sp.gb} GB ${sp.type}` };
+  }
+  if (kind === 'nvme' || kind === 'sata' || kind === 'ssd') {
+    const gb = (specs && specs.gb) || guessSpecs('nvme', text).gb;
+    if (!gb) return null;
+    let type;
+    if (kind === 'nvme') type = 'nvme';
+    else if (kind === 'sata') type = /\bhdd?\b/.test(s) && !/\bssd\b/.test(s) ? 'hdd' : 'sata';
+    else type = /nvme|\bm\.?2\b|pcie/.test(s) ? 'nvme' : /\bhdd?\b/.test(s) && !/\bssd\b/.test(s) ? 'hdd' : 'sata';
+    const name = { nvme: 'SSD NVMe', sata: 'SSD SATA', hdd: 'HD' }[type];
+    return { key: `disk:${type}:${gb}`, label: `${name} ${gbLabel(gb)}` };
+  }
+  if (kind === 'psu') {
+    const w = (specs && specs.w) || guessSpecs('psu', text).w;
+    return w ? { key: 'psu:' + w, label: `Fonte ${w} W` } : null;
+  }
+  return null;
+}
+function parseOffer(text) {
+  const raw = String(text || '').trim();
+  if (!raw) return null;
+  const title = offerTitle(raw);
+  const s = lowerRaw(title);
+  const o = {
+    title, price: offerPrice(raw),
+    store: (STORES.find(([, re]) => re.test(raw)) || [''])[0],
+    coupon: (raw.match(/[Cc]upom:?\s*([A-Z0-9][A-Z0-9_-]{3,})\b/) || [])[1] || '',
+    link: (raw.match(/https?:\/\/[^\s)]+/) || [])[0] || '',
+  };
+  if (OFFER_SKIP.test(s)) { o.status = 'skip'; return o; }
+  const found = OFFER_KINDS.map(([k, re]) => { const m = s.match(re); return m ? { k, i: m.index } : null; }).filter(Boolean).sort((a, b) => a.i - b.i);
+  const main = found.filter(f => ['gpu', 'cpu', 'mobo'].includes(f.k));
+  if (main.length >= 2 && /\+|\bkit\b/.test(s)) { o.status = 'skip'; return o; }  // processador + placa-mãe juntos
+  for (const f of found) {
+    const pk = productKey(f.k, title);
+    if (pk) { o.kind = f.k; Object.assign(o, pk); break; }
+  }
+  if (!o.key) { o.status = 'unknown'; return o; }
+  if (!(o.price > 0)) { o.status = 'noprice'; return o; }
+  const recs = S.hist.filter(h => { const k = productKey(h.cat, h.name, h.specs); return k && k.key === o.key; })
+    .sort((a, b) => a.cost - b.cost);
+  o.recs = recs;
+  if (!recs.length) { o.status = 'new'; return o; }
+  const best = recs[0];
+  const of = S.settings.offers || {};
+  const tol = Math.max(0, +(of.tol == null ? 5 : of.tol));
+  o.best = best;
+  o.avg = recs.reduce((t, h) => t + h.cost, 0) / recs.length;
+  o.diff = o.price - best.cost;
+  o.diffPct = best.cost > 0 ? o.diff / best.cost * 100 : 0;
+  o.status = o.price <= best.cost ? 'great' : o.price <= best.cost * (1 + tol / 100) ? 'good' : 'high';
+  return o;
+}
+// Texto curto do aviso (usado também pela notificação no APK)
+function offerAlertText(o) {
+  if (!o || !['great', 'good'].includes(o.status)) return '';
+  const rel = o.status === 'great'
+    ? (o.diff < 0 ? `${money(-o.diff)} abaixo do seu melhor preço` : 'igual ao seu melhor preço')
+    : `${NUM1.format(o.diffPct)}% acima do seu melhor preço`;
+  return `${o.label} por ${money(o.price)} · ${rel} (${money(o.best.cost)})${o.coupon ? ` · cupom ${o.coupon}` : ''}`;
+}
+
+// Recebe o texto de uma promoção e, se for bom preço, guarda na lista de Ofertas.
+// Devolve o registro criado (ou null). Repetições do mesmo produto e preço em 12 h são ignoradas.
+function ingestOffer(text, channel) {
+  const o = parseOffer(text);
+  if (!o || !['great', 'good'].includes(o.status)) return null;
+  const since = Date.now() - 12 * 3600e3;
+  const key = o.key + '|' + o.price;
+  if (S.offers.some(x => x.k === key && x.at > since)) return null;
+  const rec = {
+    id: newId(), k: key, at: Date.now(), channel: String(channel || ''), store: o.store, kind: o.kind, label: o.label,
+    title: o.title.slice(0, 200), price: o.price, best: o.best.cost, bestCond: o.best.cond || '', diffPct: round2(o.diffPct),
+    status: o.status, coupon: o.coupon, link: o.link, seen: false, dismissed: false,
+  };
+  S.offers.unshift(rec);
+  commit();
+  return rec;
+}
+window.PCG = { ingestOffer, offerAlertText };
+
+/* ================= Estado e persistência ================= */
+const KEY = 'pcsgamer.v1';
+const UIKEY = 'pcsgamer.ui';
+const COLLS = ['builds', 'inv', 'hist', 'sales', 'offers'];
+const DEFAULT_AD = {
+  cond: 'Montagem nova e testada!',
+  os: 'Windows 11 instalado e configurado, pronto para uso.',
+  terms: 'Não aceito trocas por bicicleta ou celular.\nAceito cartão.\nEntrega conforme local.',
+  notes: '',
+};
+function defaultSettings() {
+  return { nextCode: 1, card: { on: false, pct: 0 }, ad: { ...DEFAULT_AD }, theme: 'auto', lastBackup: null, staleDays: 30, offers: { tol: 5, groups: [...DEFAULT_GROUPS] } };
+}
+function blankState() { return { v: 1, builds: [], inv: [], hist: [], sales: [], offers: [], settings: defaultSettings() }; }
+
+let S = blankState();
+let META = { savedAt: 0, dirty: false, tomb: {} };
+let SNAP = {};
+let UI = {
+  tab: 'home', pcFilter: 'ativos', cmpFilter: 'all', calcOpen: {}, stockFilter: 'all', stockCat: '', q: { cat: '', text: '', offer: '' },
+  open: { attention: true, cmp: true, monthly: true, capital: true, salesAvulsas: false, recent: true },
+  grp: {},
+};
+
+function sanitizeState(raw) {
+  const st = blankState();
+  if (!raw || typeof raw !== 'object') return st;
+  for (const c of COLLS) st[c] = Array.isArray(raw[c]) ? raw[c].filter(r => r && typeof r === 'object' && typeof r.id === 'string') : [];
+  const set = raw.settings && typeof raw.settings === 'object' ? raw.settings : {};
+  st.settings = { ...defaultSettings(), ...set, card: { ...defaultSettings().card, ...(set.card || {}) }, ad: { ...DEFAULT_AD, ...(set.ad || {}) } };
+  st.settings.nextCode = Math.max(1, parseInt(st.settings.nextCode, 10) || 1);
+  const of = set.offers && typeof set.offers === 'object' ? set.offers : {};
+  st.settings.offers = {
+    tol: isFinite(+of.tol) && of.tol !== '' && of.tol != null ? Math.min(50, Math.max(0, +of.tol)) : 5,
+    groups: Array.isArray(of.groups) ? of.groups.map(g => String(g).trim()).filter(Boolean) : [...DEFAULT_GROUPS],
+  };
+  // Builds
+  st.builds.forEach(b => {
+    b.name = String(b.name || 'PC sem nome');
+    if (!STATUS[b.status]) b.status = 'montagem';
+    b.slots = b.slots && typeof b.slots === 'object' ? b.slots : {};
+    for (const k of Object.keys(b.slots)) if (!CAT[k] || !b.slots[k]) delete b.slots[k];
+    b.price = round2(b.price);
+    b.sale = b.sale && typeof b.sale === 'object' ? b.sale : { price: 0, date: '', card: false };
+    b.sale.price = round2(b.sale.price);
+    if (!isDate(b.sale.date)) b.sale.date = '';
+    b.sale.card = !!b.sale.card;
+    b.ad = b.ad && typeof b.ad === 'object' ? b.ad : {};
+    b.createdAt = b.createdAt || Date.now();
+    b.notes = String(b.notes || '');
+    if (!isDate(b.readyAt)) b.readyAt = null;
+  });
+  st.inv.forEach(i => {
+    if (!CAT[i.cat]) i.cat = 'cpu';
+    i.name = String(i.name || '');
+    i.cost = round2(i.cost);
+    i.cond = condOk(i.cond);
+    if (!['disp', 'caminho'].includes(i.status)) i.status = 'disp';
+    i.specs = cleanSpecs(i.cat, i.specs);
+    if (!isDate(i.date)) i.date = '';
+    if (!i.code) i.code = st.settings.nextCode++;
+  });
+  st.hist.forEach(h => { if (!CAT[h.cat]) h.cat = 'cpu'; h.cond = condOk(h.cond); if (h.kind !== 'manual') h.kind = 'auto'; h.cost = round2(h.cost); h.specs = cleanSpecs(h.cat, h.specs); if (!isDate(h.date)) h.date = ''; });
+  st.sales.forEach(s => { s.price = round2(s.price); s.card = !!s.card; if (!isDate(s.date)) s.date = ''; });
+  // Ofertas: guarda só os últimos 30 dias, no máximo 150
+  const cut = Date.now() - 30 * 864e5;
+  st.offers = st.offers.filter(o => +o.at > cut && o.label && +o.price > 0).sort((a, b) => b.at - a.at).slice(0, 150);
+  st.offers.forEach(o => { o.price = round2(o.price); o.best = round2(o.best); o.seen = !!o.seen; o.dismissed = !!o.dismissed; if (!['great', 'good'].includes(o.status)) o.status = 'good'; });
+  const maxCode = Math.max(0, ...st.inv.map(i => i.code || 0), ...st.sales.map(s => s.item?.code || 0));
+  if (st.settings.nextCode <= maxCode) st.settings.nextCode = maxCode + 1;
+  repairLinks(st);
+  return st;
+}
+// Os vínculos da montagem mandam: corrige peças com vínculo quebrado.
+function repairLinks(st) {
+  const owner = {};
+  st.builds.forEach(b => {
+    for (const [cat, sl] of Object.entries(b.slots)) {
+      if (sl.mode === 'inv') {
+        const it = st.inv.find(i => i.id === sl.invId);
+        if (!it || owner[it.id] || b.status === 'vendido') {
+          // Peça sumiu, está em duas montagens ou o PC já foi vendido: vira registro fixo
+          const base = it || sl.snap || {};
+          b.slots[cat] = b.status === 'vendido'
+            ? { mode: 'sold', item: { ...clone(base), id: base.id || sl.invId, cat } }
+            : { mode: 'plan', name: base.name || '', cost: round2(base.cost), specs: cleanSpecs(cat, base.specs) };
+          continue;
+        }
+        if (it.cat !== cat) { b.slots[cat] = { mode: 'plan', name: it.name, cost: it.cost, specs: cleanSpecs(cat, it.specs) }; continue; }
+        owner[it.id] = b.id;
+      } else if (sl.mode === 'plan') {
+        sl.name = String(sl.name || ''); sl.cost = round2(sl.cost); sl.specs = cleanSpecs(cat, sl.specs);
+      } else if (sl.mode !== 'sold' || !sl.item) delete b.slots[cat];
+    }
+  });
+  st.inv.forEach(i => { i.buildId = owner[i.id] || null; });
+}
+
+function snapKey(r) { const { u, ...rest } = r; return JSON.stringify(rest); }
+function buildSnap() { SNAP = {}; for (const c of COLLS) { SNAP[c] = {}; S[c].forEach(r => { SNAP[c][r.id] = snapKey(r); }); } }
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const o = JSON.parse(raw);
+      S = sanitizeState(o.state);
+      META = { savedAt: o.savedAt || 0, dirty: !!o.dirty, tomb: o.tomb || {} };
+    }
+  } catch (e) { console.warn('Falha ao ler dados locais', e); }
+  try { const u = JSON.parse(localStorage.getItem(UIKEY) || 'null'); if (u) { UI.open = { ...UI.open, ...(u.open || {}) }; UI.grp = u.grp || {}; UI.pcFilter = ['ativos', 'montagem', 'estoque', 'vendido'].includes(u.pcFilter) ? u.pcFilter : 'ativos'; UI.cmpFilter = ['all', 'montagem', 'estoque', 'vendido'].includes(u.cmpFilter) ? u.cmpFilter : 'all'; } } catch (e) {}
+  for (const c of COLLS) META.tomb[c] = META.tomb[c] || {};
+  buildSnap();
+}
+let localOk = true;
+function saveLocal() {
+  try { localStorage.setItem(KEY, JSON.stringify({ state: S, savedAt: META.savedAt, dirty: META.dirty, tomb: META.tomb })); localOk = true; }
+  catch (e) { localOk = false; console.warn('Falha ao salvar localmente', e); }
+}
+function saveUI() { try { localStorage.setItem(UIKEY, JSON.stringify({ open: UI.open, grp: UI.grp, pcFilter: UI.pcFilter, cmpFilter: UI.cmpFilter })); } catch (e) {} }
+
+// Registra a mudança: carimba os registros alterados, guarda exclusões e agenda o envio.
+function stamp() {
+  const now = Date.now();
+  for (const c of COLLS) {
+    const seen = {};
+    S[c].forEach(r => {
+      seen[r.id] = 1;
+      const k = snapKey(r);
+      if (SNAP[c][r.id] !== k) { r.u = now; SNAP[c][r.id] = k; }
+      else if (!r.u) r.u = now;
+    });
+    for (const id of Object.keys(SNAP[c])) if (!seen[id]) { delete SNAP[c][id]; META.tomb[c][id] = now; }
+  }
+  META.savedAt = now;
+  META.dirty = true;
+  saveLocal();
+  Cloud.schedule();
+  nativeSync();
+}
+function commit() { stamp(); render(); }
+let quietTimer = null;
+function commitQuiet() { clearTimeout(quietTimer); quietTimer = setTimeout(stamp, 350); }
+
+/* ================= Consultas ================= */
+const findBuild = id => S.builds.find(b => b.id === id);
+const findInv = id => S.inv.find(i => i.id === id);
+
+function slotPart(b, cat) {
+  const sl = b.slots[cat];
+  if (!sl) return null;
+  if (sl.mode === 'inv') {
+    const it = findInv(sl.invId) || sl.snap;
+    if (!it) return null;
+    return { mode: 'inv', invId: sl.invId, name: it.name, cost: round2(it.cost), specs: it.specs || {}, cond: it.cond, code: it.code, status: it.status, date: it.date };
+  }
+  if (sl.mode === 'plan') return { mode: 'plan', name: sl.name, cost: round2(sl.cost), specs: sl.specs || {} };
+  if (sl.mode === 'sold') { const it = sl.item; return { mode: 'sold', name: it.name, cost: round2(it.cost), specs: it.specs || {}, cond: it.cond, code: it.code, date: it.date }; }
+  return null;
+}
+function parts(b) { const o = {}; CATS.forEach(c => { const p = slotPart(b, c.k); if (p && (p.name || p.cost)) o[c.k] = p; }); return o; }
+function buildCost(b) { return round2(CATS.reduce((s, c) => s + (slotPart(b, c.k)?.cost || 0), 0)); }
+function cardFee(price, card) { return S.settings.card.on && card ? round2(price * (S.settings.card.pct || 0) / 100) : 0; }
+function fin(b) {
+  const cost = buildCost(b);
+  const sold = b.status === 'vendido';
+  const realized = sold && b.sale.price > 0;
+  const price = realized ? b.sale.price : b.price;
+  const fee = sold ? cardFee(price, b.sale.card) : 0;
+  const profit = price > 0 ? round2(price - cost - fee) : null;
+  return {
+    cost, price, fee, profit, sold, realized,
+    margin: price > 0 ? profit / price * 100 : null,
+    roi: price > 0 && cost > 0 ? profit / cost * 100 : null,
+  };
+}
+function storageGB(p) { return (p.nvme?.specs?.gb || 0) + (p.sata?.specs?.gb || 0); }
+
+function missingList(b) {
+  const p = parts(b);
+  const cpu = p.cpu ? parseCPU(p.cpu.name) : null;
+  const miss = [];
+  if (!p.cpu) miss.push('Processador');
+  if (!p.gpu && !(cpu && cpu.igpu)) miss.push('Placa de vídeo');
+  if (!p.mobo) miss.push('Placa-mãe');
+  if (!p.ram) miss.push('Memória RAM');
+  if (!p.nvme && !p.sata) miss.push('Armazenamento');
+  if (!p.psu) miss.push('Fonte');
+  if (!p.case) miss.push('Gabinete');
+  return miss;
+}
+
+// Alertas: crit = erro que bloqueia o anúncio; warn = atenção; info = lembrete
+function alertsFor(b) {
+  const A = [];
+  const f = fin(b);
+  if (b.status === 'vendido') {
+    if (!(b.sale.price > 0)) A.push({ lvl: 'warn', msg: 'Registre o valor efetivamente vendido. Até lá o cálculo usa o preço pretendido.' });
+    if (!b.sale.date) A.push({ lvl: 'warn', msg: 'Registre a data da venda para ela entrar no resumo mensal.' });
+    if (f.profit != null && f.profit < 0) A.push({ lvl: 'crit', msg: `Venda com prejuízo de ${money(-f.profit)}.` });
+    return A;
+  }
+  const p = parts(b);
+  const cpu = p.cpu ? parseCPU(p.cpu.name) : null;
+  const gpuP = p.gpu ? parseGPU(p.gpu.name) : null;
+  const board = p.mobo ? parseBoard(p.mobo.name) : null;
+
+  const miss = missingList(b);
+  if (miss.length) A.push({ lvl: 'info', msg: `Faltam: ${miss.join(', ')}.` });
+
+  if (cpu && board && cpu.socket !== board.socket) {
+    A.push({ lvl: 'crit', tag: 'socket', msg: `Processador e placa-mãe incompatíveis: ${cpu.short} é ${SOCK[cpu.socket]}, a ${board.chip} é ${SOCK[board.socket]}.` });
+  } else if (cpu && board) {
+    if (board.socket === '1200' && board.series === '400' && cpu.gen === 11) A.push({ lvl: 'warn', msg: `Placas série 400 (${board.chip}) em geral não aceitam Intel 11ª geração. Confirme no site do fabricante.` });
+    if (board.socket === '1700' && board.series === '600' && cpu.gen >= 13) A.push({ lvl: 'info', msg: `A ${board.chip} pode precisar de atualização de BIOS para a ${cpu.gen}ª geração.` });
+    if (board.socket === 'AM4' && cpu.series === 5 && board.series === '300a') A.push({ lvl: 'warn', msg: `A ${board.chip} precisa de BIOS recente para Ryzen 5000, e nem todo modelo recebeu. Confirme antes de montar.` });
+    if (board.socket === 'AM4' && cpu.series === 5 && board.series === '400a') A.push({ lvl: 'info', msg: `Confirme se a BIOS da ${board.chip} já suporta Ryzen 5000.` });
+    if (board.socket === 'AM4' && board.series === '500a' && (cpu.series <= 2 || cpu.apuZenPlus)) A.push({ lvl: 'warn', msg: `A ${board.chip} não suporta oficialmente o ${cpu.short}. Pode nem dar vídeo.` });
+    if (board.socket === 'AM5' && board.chip === 'A620' && cpu.x3d && cpu.series === 9) A.push({ lvl: 'info', msg: 'Confirme o suporte da A620 a este X3D (BIOS e alimentação).' });
+  }
+
+  // Memória
+  if (p.ram) {
+    const rs = p.ram.specs || {};
+    const need = ramNeeded(board, cpu);
+    if (rs.type && need && need !== 'either' && rs.type !== need) A.push({ lvl: 'crit', tag: 'ram', msg: `Memória ${rs.type} não funciona nesta plataforma, que usa ${need}.` });
+    else if (rs.type && need === 'either' && board) A.push({ lvl: 'info', msg: `A ${board.chip} existe em versões DDR4 e DDR5: escreva DDR4 ou DDR5 no nome da placa-mãe para conferir com a memória.` });
+    if (!rs.gb) A.push({ lvl: 'warn', msg: 'Informe a capacidade da memória RAM.' });
+    else if (rs.gb <= 8) A.push({ lvl: 'warn', msg: `Apenas ${rs.gb} GB de RAM: para jogos hoje o recomendado é 16 GB.` });
+    if (rs.sticks === 1 && rs.gb >= 8) A.push({ lvl: 'info', msg: 'Memória em pente único: dois pentes (dual channel) rendem mais em jogos.' });
+  }
+
+  // Fonte
+  const gpuW = p.gpu ? (p.gpu.specs?.w || gpuP?.w || 0) : 0;
+  const psuW = p.psu?.specs?.w || 0;
+  if (p.psu && !psuW) A.push({ lvl: 'warn', msg: 'Informe a potência da fonte (W) para conferir com a placa de vídeo.' });
+  if (p.gpu && !gpuP && !p.gpu.specs?.w) A.push({ lvl: 'info', msg: 'Placa de vídeo não reconhecida: informe o consumo (W) nela para checar a fonte.' });
+  if (psuW && p.gpu && gpuW) {
+    const min = gpuW + 120;
+    const rec = Math.ceil(min * 1.25 / 50) * 50;
+    const gname = gpuP && !gpuP.igpu ? gpuP.label : 'placa de vídeo';
+    if (psuW < min) A.push({ lvl: 'crit', tag: 'psu', msg: `Fonte de ${psuW} W abaixo do mínimo estimado de ${min} W para a ${gname}.` });
+    else if (psuW < rec) A.push({ lvl: 'warn', msg: `Fonte de ${psuW} W no limite para a ${gname}. Recomendado a partir de ${rec} W.` });
+  }
+
+  // Armazenamento
+  if (p.nvme || p.sata) {
+    const unknown = (p.nvme && !p.nvme.specs?.gb) || (p.sata && !p.sata.specs?.gb);
+    const tot = storageGB(p);
+    if (unknown && !tot) A.push({ lvl: 'info', msg: 'Informe a capacidade do armazenamento.' });
+    else if (tot && tot < 480) A.push({ lvl: 'warn', msg: `Armazenamento total de ${gbLabel(tot)}: abaixo de 480 GB.` });
+  }
+
+  // Equilíbrio
+  if (cpu && gpuP && !gpuP.igpu) {
+    if (gpuP.tier - cpu.score >= 2) A.push({ lvl: 'warn', msg: `Possível gargalo: o ${cpu.short} deve limitar a ${gpuP.label}.` });
+    const pcie = Math.min(cpu.pcie, board ? board.pcie : 9);
+    if (pcie <= 3 && gpuP.lanes === 4) A.push({ lvl: 'warn', msg: `A ${gpuP.label} usa só 4 linhas PCIe e perde desempenho nesta plataforma PCIe 3.0.` });
+    else if (cpu.apuZenPlus && gpuP.lanes === 8 && gpuP.tier >= 3) A.push({ lvl: 'info', msg: `O ${cpu.short} libera só PCIe 3.0 x8 para a placa de vídeo, o que tira um pouco do desempenho da ${gpuP.label}.` });
+  }
+
+  // Comercial
+  const onWay = Object.values(p).filter(x => x.mode === 'inv' && x.status === 'caminho').length;
+  if (onWay) A.push({ lvl: b.status === 'estoque' ? 'warn' : 'info', msg: `${plural(onWay, 'peça ainda está', 'peças ainda estão')} a caminho.` });
+  if (!(b.price > 0)) A.push({ lvl: 'info', msg: 'Defina o preço pretendido.' });
+  else if (f.profit < 0) A.push({ lvl: 'crit', msg: `Preço pretendido abaixo do custo (${money(f.cost)}).` });
+  else if (f.margin < 10) A.push({ lvl: 'warn', msg: `Margem de ${pct(f.margin)}: abaixo de 10%.` });
+  if (b.status === 'estoque') {
+    const d = daysSince(b.readyAt);
+    if (d != null && d >= (S.settings.staleDays || 30)) A.push({ lvl: 'warn', msg: `Parado em estoque há ${d} dias.` });
+  }
+  const order = { crit: 0, warn: 1, info: 2 };
+  return A.sort((a, b) => order[a.lvl] - order[b.lvl]);
+}
+
+/* Perfil e anúncio */
+function profileFor(b) {
+  const p = parts(b);
+  const cpu = p.cpu ? parseCPU(p.cpu.name) : null;
+  let tier;
+  if (p.gpu) {
+    const g = parseGPU(p.gpu.name);
+    if (!g) return null;
+    tier = g.tier;
+  } else if (cpu && cpu.igpu) {
+    tier = cpu.brand === 'AMD' && cpu.series === 8 && /g/i.test(cpu.short) ? 1 : 0;
+  } else return null;
+  if (cpu && tier - cpu.score >= 2) tier = cpu.score + 1;
+  return Math.max(0, Math.min(5, tier));
+}
+function adCfg(b) {
+  const d = S.settings.ad, o = b.ad || {};
+  return {
+    title: o.title || '',
+    cond: o.cond ?? d.cond, os: o.os ?? d.os, terms: o.terms ?? d.terms, notes: o.notes ?? d.notes,
+  };
+}
+function autoTitle(b) {
+  const p = parts(b);
+  const bits = ['PC Gamer'];
+  const cpu = p.cpu ? parseCPU(p.cpu.name) : null;
+  const g = p.gpu ? parseGPU(p.gpu.name) : null;
+  const head = s => String(s || '').split(/\s+\+\s+/)[0].trim();
+  const cpuS = cpu ? cpu.short : head(p.cpu?.name);
+  const gpuS = p.gpu ? (g ? g.label : head(p.gpu.name)) : (cpu?.igpu ? 'Vídeo integrado' : '');
+  const main = [cpuS, gpuS].filter(Boolean).join(' + ');
+  if (main) bits.push(main);
+  if (p.ram?.specs?.gb) bits.push(`${p.ram.specs.gb}GB`);
+  const disk = Math.max(p.nvme?.specs?.gb || 0, p.sata?.specs?.gb || 0);
+  if (disk) bits.push(`SSD ${gbLabel(disk).replace(' ', '')}`);
+  return bits.join(' ');
+}
+function adCheck(b) {
+  const p = parts(b);
+  const cpu = p.cpu ? parseCPU(p.cpu.name) : null;
+  const need = [];
+  if (!p.cpu) need.push('Processador');
+  if (!p.gpu && !(cpu && cpu.igpu)) need.push('Placa de vídeo');
+  if (!p.mobo) need.push('Placa-mãe');
+  if (!p.ram) need.push('Memória RAM');
+  if (!p.nvme && !p.sata) need.push('Armazenamento');
+  if (!p.psu) need.push('Fonte');
+  if (!p.case) need.push('Gabinete');
+  const blocks = alertsFor(b).filter(a => a.lvl === 'crit' && a.tag);
+  return { need, blocks };
+}
+function adText(b) {
+  const p = parts(b);
+  const cfg = adCfg(b);
+  const cpu = p.cpu ? parseCPU(p.cpu.name) : null;
+  const tier = profileFor(b);
+  const L = [];
+  L.push((cfg.title || autoTitle(b)).toUpperCase());
+  L.push('');
+  if (tier != null) { L.push(`Perfil: ${PROFILES[tier].name}`); L.push(PROFILES[tier].text); L.push(''); }
+  L.push('CONFIGURAÇÃO');
+  const line = (lab, cat) => { if (p[cat]) L.push(`• ${lab}: ${p[cat].name}`); };
+  line('Processador', 'cpu');
+  line('Cooler', 'cooler');
+  if (p.gpu) L.push(`• Placa de vídeo: ${p.gpu.name}`);
+  else if (cpu?.igpu) L.push('• Vídeo: integrado ao processador');
+  line('Placa-mãe', 'mobo');
+  if (p.ram) {
+    const rs = p.ram.specs || {};
+    const nm = p.ram.name;
+    const extra = rs.sticks > 1 && !/\dx\d/i.test(nm.replace(/\s/g, '')) ? ` (${rs.sticks}x${+(rs.gb / rs.sticks).toFixed(1)} GB)` : '';
+    L.push(`• Memória RAM: ${nm}${extra}`);
+  }
+  line('SSD NVMe', 'nvme');
+  line(p.sata && /hd|hdd/i.test(p.sata.name) && !/ssd/i.test(p.sata.name) ? 'HD' : 'SSD', 'sata');
+  line('Fonte', 'psu');
+  line('Gabinete', 'case');
+  line('Ventilação', 'fans');
+  L.push('');
+  if (cfg.cond.trim()) L.push(cfg.cond.trim());
+  if (cfg.os.trim()) L.push(cfg.os.trim());
+  const terms = cfg.terms.split('\n').map(t => t.trim()).filter(Boolean);
+  if (terms.length) { L.push(''); L.push('CONDIÇÕES'); terms.forEach(t => L.push(`• ${t}`)); }
+  if (cfg.notes.trim()) { L.push(''); L.push(cfg.notes.trim()); }
+  return L.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+/* Histórico e busca de preços */
+const STOP = new Set('de da do das dos e com para placa video memoria ram ssd hd hdd gb tb mhz fonte w gabinete processador cooler kit nvme sata m 2 the and'.split(' '));
+const SUFFIX = new Set(['ti', 'xt', 'xtx', 'super', 'x', 'g', 'f', 'k', 'kf', 'gt', 'ks', 'gre']);
+function matchName(query, name) {
+  const qt = toks(query), nt = toks(name);
+  if (!qt.length) return true;
+  const qn = qt.join(' '), nn = nt.join(' ');
+  let sig = qt.filter(t => !STOP.has(t));
+  if (!sig.length) sig = qt;
+  if (!(nn.includes(qn) || sig.every(t => nt.includes(t)))) return false;
+  // "6600" não deve casar com "6600 XT", nem "5600" com "5600X"
+  for (let i = 0; i < qt.length; i++) {
+    if (!/^\d{3,5}$/.test(qt[i])) continue;
+    const j = nt.indexOf(qt[i]);
+    if (j < 0) continue;
+    const nNext = nt[j + 1], qNext = qt[i + 1];
+    if (nNext && SUFFIX.has(nNext) && nNext !== qNext) return false;
+  }
+  return true;
+}
+function histFind(cat, text) {
+  return S.hist.filter(h => (!cat || h.cat === cat) && matchName(text, h.name))
+    .sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.u || 0) - (a.u || 0));
+}
+function nameSuggestions(cat, text, limit = 6) {
+  const qt = toks(text);
+  if (!qt.length) return [];
+  const pool = new Map();
+  const add = (n, cost, date, specs, c) => {
+    if (!n || (cat && c !== cat)) return;
+    const k = norm(n);
+    const cur = pool.get(k);
+    if (!cur || (date || '') > (cur.date || '')) pool.set(k, { name: n, cost, date, specs, cat: c });
+  };
+  S.hist.forEach(h => add(h.name, h.cost, h.date, h.specs, h.cat));
+  S.inv.forEach(i => add(i.name, i.cost, i.date, i.specs, i.cat));
+  const out = [];
+  for (const v of pool.values()) {
+    const nt = toks(v.name);
+    if (qt.every(q => nt.some(t => t.startsWith(q)))) out.push(v);
+  }
+  const typed = norm(text);
+  return out.filter(v => norm(v.name) !== typed).sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, limit);
+}
+
+/* Capital, mensal */
+function capital() {
+  let free = 0, inPCs = 0, onWay = 0, planned = 0;
+  S.inv.forEach(i => { if (i.status === 'caminho') onWay += i.cost; else if (i.buildId) inPCs += i.cost; else free += i.cost; });
+  S.builds.forEach(b => { if (b.status !== 'vendido') CATS.forEach(c => { const sl = b.slots[c.k]; if (sl && sl.mode === 'plan') planned += sl.cost || 0; }); });
+  return { free: round2(free), inPCs: round2(inPCs), onWay: round2(onWay), total: round2(free + inPCs + onWay), planned: round2(planned) };
+}
+function realizedEvents() {
+  const ev = [];
+  S.builds.filter(b => b.status === 'vendido').forEach(b => { const f = fin(b); if (f.price > 0) ev.push({ kind: 'pc', date: b.sale.date, revenue: f.price, profit: f.profit, ref: b }); });
+  S.sales.forEach(s => { const fee = cardFee(s.price, s.card); ev.push({ kind: 'part', date: s.date, revenue: s.price, profit: round2(s.price - (s.item?.cost || 0) - fee), ref: s }); });
+  return ev;
+}
+function monthly() {
+  const map = {};
+  realizedEvents().forEach(e => {
+    const k = isDate(e.date) ? e.date.slice(0, 7) : 'sem-data';
+    const m = map[k] || (map[k] = { k, pcs: 0, parts: 0, revenue: 0, profit: 0 });
+    if (e.kind === 'pc') m.pcs++; else m.parts++;
+    m.revenue += e.revenue; m.profit += e.profit;
+  });
+  return Object.values(map).sort((a, b) => b.k.localeCompare(a.k));
+}
+
+/* ================= Cópia na nuvem (só quando a página roda dentro do Claude) =================
+   Os dados ficam sempre no aparelho. Quando o Claude oferece armazenamento privado,
+   cada registro também vai para lá, para não se perder e abrir em outro aparelho. */
+const Cloud = {
+  db: null, root: null, on: false, status: 'local', busy: false, again: false, timer: null, pushed: {}, lastPull: 0,
+  cols: { builds: 'builds', inv: 'inv', hist: 'hist', sales: 'sales', offers: 'offers' },
+
+  async init() {
+    if (!window.claude || typeof window.claude.use !== 'function') { this.setStatus('local'); return; }
+    this.setStatus('connecting');
+    try {
+      const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+      if (!db || !user) { this.setStatus('local'); return; }
+      const uid = await user.id();
+      if (!uid) { this.setStatus('local'); return; }
+      this.db = db;
+      this.root = db.doc(`data/users/${uid}/pcsgamer`);
+      this.on = true;
+      await this.sync(true);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && Date.now() - this.lastPull > 20000 && !META.dirty && !Sheet.isOpen()) this.sync(false);
+      });
+    } catch (e) {
+      console.warn('Nuvem indisponível', e);
+      this.on = false; this.setStatus('local');
+    }
+  },
+  col(c) { return this.root.collection(this.cols[c]); },
+  async readAll(c) {
+    const out = [];
+    let last = null;
+    for (let guard = 0; guard < 100; guard++) {
+      let q = this.col(c).orderBy('id').limit(500);
+      if (last) q = this.col(c).where('id', '>', last).orderBy('id').limit(500);
+      const snap = await q.get();
+      snap.docs.forEach(d => { if (d.exists) out.push(clone(d.data())); });
+      if (snap.size < 500) break;
+      last = out[out.length - 1].id;
+    }
+    return out;
+  },
+  // Baixa a nuvem e decide quem vale: sem alterações locais pendentes, vale a nuvem;
+  // com pendências, junta registro a registro pelo mais recente.
+  async sync(first) {
+    if (!this.on) return;
+    if (this.busy) { this.again = true; return; }
+    this.busy = true; this.setStatus('saving');
+    try {
+      const metaSnap = await this.root.get();
+      this.lastPull = Date.now();
+      if (!metaSnap.exists) {
+        this.pushed = {}; COLLS.forEach(c => { this.pushed[c] = {}; });
+        this.busy = false;
+        META.dirty = true; saveLocal();
+        await this.push();
+        return;
+      }
+      const remote = {};
+      for (const c of COLLS) remote[c] = await this.readAll(c);
+      const meta = metaSnap.data() || {};
+      this.pushed = {};
+      COLLS.forEach(c => { this.pushed[c] = {}; remote[c].forEach(r => { this.pushed[c][r.id] = JSON.stringify(r); }); });
+      let next;
+      if (!META.dirty) {
+        next = { v: 1, builds: remote.builds, inv: remote.inv, hist: remote.hist, sales: remote.sales, settings: meta.settings || S.settings };
+      } else {
+        next = { v: 1, settings: (meta.savedAt || 0) > META.savedAt ? (meta.settings || S.settings) : S.settings };
+        COLLS.forEach(c => {
+          const local = new Map(S[c].map(r => [r.id, r]));
+          const out = [];
+          remote[c].forEach(r => {
+            const l = local.get(r.id);
+            if (l) { out.push((l.u || 0) >= (r.u || 0) ? l : r); local.delete(r.id); return; }
+            const t = (META.tomb[c] || {})[r.id];
+            if (t && (r.u || 0) <= t) return; // apagado aqui depois da última mudança lá
+            out.push(r);
+          });
+          local.forEach(l => out.push(l));
+          next[c] = out;
+        });
+      }
+      const before = JSON.stringify(S);
+      S = sanitizeState(next);
+      buildSnap();
+      saveLocal();
+      if (JSON.stringify(S) !== before) { applyTheme(); render(); }
+      this.busy = false;
+      if (META.dirty) await this.push(); else this.setStatus('cloud');
+    } catch (e) {
+      console.warn('Falha ao sincronizar', e);
+      this.busy = false; this.setStatus('error');
+    }
+    if (this.again) { this.again = false; this.push(); }
+  },
+  schedule() {
+    if (!this.on) { this.setStatus('local'); return; }
+    this.setStatus('saving');
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.push(), 800);
+  },
+  async push() {
+    if (!this.on) return;
+    if (this.busy) { this.again = true; return; }
+    this.busy = true; this.setStatus('saving');
+    const startedAt = META.savedAt;
+    try {
+      for (const c of COLLS) {
+        const map = {};
+        S[c].forEach(r => { map[r.id] = JSON.stringify(r); });
+        for (const [id, js] of Object.entries(map)) {
+          if (this.pushed[c][id] !== js) { await this.col(c).doc(id).set(JSON.parse(js)); this.pushed[c][id] = js; }
+        }
+        for (const id of Object.keys(this.pushed[c])) {
+          if (!map[id]) { await this.col(c).doc(id).delete(); delete this.pushed[c][id]; }
+        }
+      }
+      await this.root.set({ v: 1, savedAt: META.savedAt, settings: clone(S.settings) });
+      if (META.savedAt === startedAt) { META.dirty = false; COLLS.forEach(c => { META.tomb[c] = {}; }); saveLocal(); }
+      this.setStatus('cloud');
+    } catch (e) {
+      console.warn('Falha ao enviar', e);
+      this.setStatus('error');
+      if (e && e.code === 'quota_exceeded') toast('O espaço na nuvem acabou. Seus dados continuam salvos no aparelho.');
+    }
+    this.busy = false;
+    if (this.again) { this.again = false; setTimeout(() => this.push(), 50); }
+  },
+  setStatus(s) {
+    this.status = s;
+    const el = $('#sync');
+    if (!el) return;
+    const map = {
+      local: ['ok', localOk ? 'Salvo neste aparelho' : 'Não foi possível salvar'],
+      connecting: ['busy', 'Conectando…'],
+      saving: ['busy', 'Salvando…'],
+      cloud: ['ok', 'Salvo no aparelho e na nuvem'],
+      error: ['err', 'Salvo só no aparelho'],
+    };
+    const [cls, txt] = map[s] || map.local;
+    el.innerHTML = `<span class="dot ${localOk ? cls : 'err'}"></span>${esc(txt)}`;
+  },
+};
+
+/* ================= Ícones ================= */
+const svg = (d, extra = '') => `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${d}</svg>`;
+const IC = {
+  home: svg('<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-6h4v6"/>'),
+  pc: svg('<rect x="6" y="2.5" width="12" height="19" rx="2"/><circle cx="12" cy="16.5" r="2.2"/><path d="M9.5 6.5h5M9.5 9.5h5"/>'),
+  box: svg('<path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/>'),
+  tag: svg('<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.4"/>'),
+  sliders: svg('<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'),
+  search: svg('<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>'),
+  plus: svg('<path d="M12 5v14M5 12h14"/>'),
+  chev: svg('<path d="m6 9 6 6 6-6"/>', 'class="chev"'),
+  x: svg('<path d="M6 6l12 12M18 6 6 18"/>'),
+  warn: svg('<path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5M12 17.5v.01"/>'),
+  info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.8v.01"/>'),
+  arrow: svg('<path d="M5 12h14M13 6l6 6-6 6"/>'),
+  copy: svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'),
+  share: svg('<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.4M8.2 13.2l7.6 4.4"/>'),
+  stock: svg('<path d="M4 7h16M4 12h16M4 17h10"/>'),
+  cart: svg('<path d="M3 4h2.5l2.2 11h11l2-8H7"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17.5" cy="19.5" r="1.4"/>'),
+  pencil: svg('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
+  truck: svg('<path d="M2.5 6h11v10h-11zM13.5 9.5h4l3 3.5V16h-7"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>'),
+  trash: svg('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'),
+  dup: svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V5a1 1 0 0 1 1-1h11"/>'),
+  ad: svg('<path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/>'),
+  download: svg('<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'),
+  upload: svg('<path d="M12 20V9M7 14l5-5 5 5M5 4h14"/>'),
+  refresh: svg('<path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/>'),
+  check: svg('<path d="m5 12.5 4.5 4.5L19 7"/>'),
+  money: svg('<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>'),
+  link: svg('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'),
+  plan: svg('<path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h4"/>'),
+};
+
+/* ================= Componentes ================= */
+let toastT = null;
+function toast(msg) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('in');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('in'), 2600);
+}
+
+const Sheet = {
+  stack: [],
+  isOpen() { return this.stack.length > 0; },
+  open({ title, body, onMount, onClose }) {
+    const layer = $('#layer');
+    const scrim = document.createElement('div');
+    scrim.className = 'scrim';
+    const el = document.createElement('div');
+    el.className = 'sheet';
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-label', title);
+    el.innerHTML = `<div class="sheet-h"><h2>${esc(title)}</h2><button class="x" data-a="sheet-close" aria-label="Fechar">${IC.x}</button></div><div class="sheet-b">${body}</div>`;
+    layer.append(scrim, el);
+    const entry = { el, scrim, onClose };
+    this.stack.push(entry);
+    scrim.addEventListener('click', () => this.close());
+    requestAnimationFrame(() => { scrim.classList.add('in'); el.classList.add('in'); });
+    document.body.style.overflow = 'hidden';
+    if (onMount) onMount(el);
+    return el;
+  },
+  top() { return this.stack[this.stack.length - 1]?.el || null; },
+  replace(opts) { this.close(true); return this.open(opts); },
+  close(instant) {
+    const e = this.stack.pop();
+    if (!e) return;
+    const { el, scrim, onClose } = e;
+    if (instant) { el.remove(); scrim.remove(); }
+    else { el.classList.remove('in'); scrim.classList.remove('in'); setTimeout(() => { el.remove(); scrim.remove(); }, 230); }
+    if (!this.stack.length) document.body.style.overflow = '';
+    if (onClose) onClose();
+  },
+  closeAll() { while (this.stack.length) this.close(true); },
+};
+function confirmBox({ title, text, ok = 'Confirmar', danger = false, alt = null, check = null }) {
+  return new Promise(resolve => {
+    let done = false;
+    const finish = v => { if (done) return; done = true; resolve(v); };
+    Sheet.open({
+      title,
+      body: `<div class="form">${text ? `<p style="margin:0">${text}</p>` : ''}
+        ${check ? `<label class="check"><input type="checkbox" id="cf-check" ${check.on ? 'checked' : ''}> ${esc(check.label)}</label>` : ''}
+        <div class="sheet-foot" style="flex-wrap:wrap">
+          <button class="btn" data-a="cf" data-v="no">Cancelar</button>
+          ${alt ? `<button class="btn" data-a="cf" data-v="alt">${esc(alt)}</button>` : ''}
+          <button class="btn ${danger ? 'danger solid' : 'primary'}" data-a="cf" data-v="ok">${esc(ok)}</button>
+        </div></div>`,
+      onMount: el => {
+        el.addEventListener('click', e => {
+          const b = e.target.closest('[data-a="cf"]');
+          if (!b) return;
+          e.stopPropagation();
+          const v = b.dataset.v;
+          const chk = $('#cf-check', el)?.checked;
+          finish(v === 'no' ? false : { choice: v, check: chk });
+          Sheet.close();
+        });
+      },
+      onClose: () => finish(false),
+    });
+  });
+}
+
+function sec(id, title, body, { count = null, actions = '' } = {}) {
+  const open = UI.open[id] !== false;
+  return `<section class="sec" id="sec-${id}">
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="sec-h" data-a="sec" data-id="${id}" aria-expanded="${open}">
+        <h2>${esc(title)}</h2>${count != null ? `<span class="count">${count}</span>` : ''}${IC.chev}
+      </button>${actions}
+    </div>
+    ${open ? `<div class="sec-b">${body}</div>` : ''}
+  </section>`;
+}
+const pill = st => `<span class="pill s-${st}">${STATUS[st]}</span>`;
+function alertHTML(a) {
+  return `<div class="alert ${a.lvl}">${a.lvl === 'info' ? IC.info : IC.warn}<span>${esc(a.msg)}</span></div>`;
+}
+function moneyField(id, label, value, extra = '') {
+  return `<label class="field"><span>${label}</span><div class="money-in"><input type="text" inputmode="decimal" autocomplete="off" id="${id}" value="${moneyIn(value)}" placeholder="0,00" ${extra}></div></label>`;
+}
+function segHTML(name, opts, val) {
+  return `<div class="seg" data-name="${name}">${Object.entries(opts).map(([k, l]) => `<button type="button" data-a="seg" data-v="${k}" aria-pressed="${k === val}">${esc(l)}</button>`).join('')}</div>`;
+}
+const segVal = (root, name) => $(`.seg[data-name="${name}"] [aria-pressed="true"]`, root)?.dataset.v;
+function shortMoney(v) {
+  const a = Math.abs(v);
+  if (a >= 10000) return (v < 0 ? '-' : '') + 'R$ ' + (a / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mil';
+  return (v < 0 ? '-' : '') + 'R$ ' + Math.round(a).toLocaleString('pt-BR');
+}
+
+/* ================= Telas ================= */
+function render() {
+  applyTheme();
+  $$('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.tab === UI.tab ? 'page' : 'false'));
+  const v = { home: viewHome, pcs: viewPCs, stock: viewStock, prices: viewPrices, settings: viewSettings }[UI.tab] || viewHome;
+  $('#main').innerHTML = `<div class="wrap">${v()}</div>`;
+  const nNew = S.offers.filter(o => !o.seen && !o.dismissed).length;
+  const tb = $('.tab[data-tab="prices"]');
+  if (tb) { let bd = $('.badge', tb); if (!bd) { bd = document.createElement('span'); bd.className = 'badge'; tb.append(bd); } bd.textContent = nNew > 9 ? '9+' : String(nNew); bd.hidden = !nNew || UI.tab === 'prices'; }
+  if (UI.tab === 'prices' && nNew) { setTimeout(() => { S.offers.forEach(o => { o.seen = true; }); stamp(); }, 1500); }
+  const add = $('#add-btn');
+  const am = { pcs: ['new-pc', 'Novo PC'], stock: ['new-item', 'Nova peça'], prices: ['hist-new', 'Lançar compra antiga'] }[UI.tab];
+  if (add) { add.hidden = !am; if (am) { add.dataset.a = am[0]; add.setAttribute('aria-label', am[1]); add.title = am[1]; } }
+  Cloud.setStatus(Cloud.status);
+}
+function applyTheme() {
+  const t = S.settings.theme;
+  if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-app-theme', t);
+  else document.documentElement.removeAttribute('data-app-theme');
+}
+
+/* ---------- Início ---------- */
+function backupBanner() {
+  const has = S.builds.length || S.inv.length || S.hist.length;
+  if (!has) return '';
+  const last = S.settings.lastBackup;
+  const days = last ? Math.floor((Date.now() - last) / 864e5) : null;
+  if (days != null && days < 7) return '';
+  return `<div class="banner">${IC.warn}<div style="flex:1;min-width:0"><b>${last ? `Último backup há ${days} dias` : 'Você ainda não fez nenhum backup'}</b>
+    <span class="small">Se o aparelho for perdido ou o app apagado, o backup é o que traz seus dados de volta. Salve o arquivo no Google Drive.</span><br>
+    <button class="btn sm primary" data-a="backup">${IC.download} Gerar backup</button></div></div>`;
+}
+function viewHome() {
+  const counts = { montagem: 0, estoque: 0, vendido: 0 };
+  S.builds.forEach(b => counts[b.status]++);
+  if (!S.builds.length && !S.inv.length && !S.hist.length) {
+    return `<div class="panel" style="padding:18px">
+      <div class="label">Primeiros passos</div>
+      <h2 style="font-family:var(--f-display);font-size:22px;margin:6px 0 4px">Bem-vindo ao PCs Gamer</h2>
+      <p class="muted" style="margin:0 0 16px">Controle peças, montagens, preços e lucro de cada PC que você monta para vender. Tudo fica salvo neste aparelho.</p>
+      <div class="optlist">
+        <button class="opt" data-a="new-item"><span class="ic">${IC.box}</span><span><b>Cadastrar uma peça no estoque</b><small>Cada peça ganha um código para anotar na caixa</small></span></button>
+        <button class="opt" data-a="new-pc"><span class="ic">${IC.pc}</span><span><b>Criar um PC</b><small>Monte a configuração e acompanhe custo e margem</small></span></button>
+        <button class="opt" data-a="hist-new"><span class="ic">${IC.tag}</span><span><b>Lançar compras antigas</b><small>Para comparar ofertas com o que você já pagou</small></span></button>
+        <button class="opt" data-a="restore"><span class="ic">${IC.upload}</span><span><b>Restaurar um backup</b><small>Se você já usava o app em outro aparelho</small></span></button>
+      </div></div>`;
+  }
+  const ym = today().slice(0, 7);
+  const ev = realizedEvents();
+  const monthProfit = ev.filter(e => (e.date || '').startsWith(ym)).reduce((s, e) => s + e.profit, 0);
+  const totalProfit = ev.reduce((s, e) => s + e.profit, 0);
+  const cap = capital();
+  let html = backupBanner();
+  html += `<div class="pipe">
+    <button class="stage s-montagem" data-a="goto-pcs" data-f="montagem"><div class="n">${counts.montagem}</div><div class="t">Em montagem</div></button>
+    <span class="arr">${IC.arrow.replace('<svg', '<svg width="16" height="16"')}</span>
+    <button class="stage s-estoque" data-a="goto-pcs" data-f="estoque"><div class="n">${counts.estoque}</div><div class="t">Em estoque</div></button>
+    <span class="arr">${IC.arrow.replace('<svg', '<svg width="16" height="16"')}</span>
+    <button class="stage s-vendido" data-a="goto-pcs" data-f="vendido"><div class="n">${counts.vendido}</div><div class="t">Vendidos</div></button>
+  </div>
+  <div class="money-row">
+    <div class="figure"><div class="label">Lucro em ${MONTHS_LONG[+ym.slice(5) - 1]}</div><div class="v ${monthProfit < 0 ? 'bad' : ''}">${money(monthProfit)}</div><div class="s">Total realizado: ${money(totalProfit)}</div></div>
+    <button class="figure" style="text-align:left" data-a="goto-sec" data-id="capital"><div class="label">Capital empatado</div><div class="v">${money(cap.total)}</div><div class="s">${plural(S.inv.length, 'peça', 'peças')} em estoque</div></button>
+  </div>`;
+
+  // Atenção
+  const att = [];
+  S.builds.forEach(b => alertsFor(b).forEach(a => { if (a.lvl !== 'info') att.push({ a, b }); }));
+  att.sort((x, y) => (x.a.lvl === 'crit' ? 0 : 1) - (y.a.lvl === 'crit' ? 0 : 1));
+  const way = S.inv.filter(i => i.status === 'caminho').sort((a, b) => (a.code || 0) - (b.code || 0));
+  if (att.length || way.length) {
+    const attBody = `<div class="list">${att.slice(0, 8).map(({ a, b }) => `<button class="row" data-a="goto-pc" data-id="${b.id}">
+        <span class="${a.lvl === 'crit' ? 'bad' : 'warnc'} row-ic">${IC.warn}</span>
+        <span class="main"><span class="title" style="font-weight:500">${esc(a.msg)}</span><span class="sub">${esc(b.name)}</span></span></button>`).join('')}
+        ${att.length > 8 ? `<div class="row muted small">E mais ${att.length - 8} avisos nos cartões dos PCs.</div>` : ''}
+        ${way.map(i => { const b = i.buildId ? findBuild(i.buildId) : null; return `<button class="row" data-a="item" data-id="${i.id}">
+          <span class="warnc row-ic">${IC.truck}</span>
+          <span class="main"><span class="title" style="font-weight:500">${code(i.code)} ${esc(i.name)} está a caminho</span>
+          <span class="sub">${b ? 'Para o ' + esc(b.name) : 'Peça do estoque'} · toque quando chegar</span></span></button>`; }).join('')}</div>`;
+    html += sec('attention', 'Atenção', attBody, { count: att.length + way.length });
+  }
+  html += sec('cmp', 'Comparativo de lucro', cmpHTML());
+  html += sec('monthly', 'Resumo mensal', monthlyHTML());
+
+  const capBody = `<div class="panel">
+    <div class="stats">
+      <div><div class="k">Peças soltas</div><div class="v">${money(cap.free)}</div></div>
+      <div><div class="k">Dentro de PCs</div><div class="v">${money(cap.inPCs)}</div></div>
+      <div><div class="k">A caminho</div><div class="v">${money(cap.onWay)}</div></div>
+      <div><div class="k">Total</div><div class="v">${money(cap.total)}</div></div>
+    </div>
+    ${cap.total > 0 ? `<div class="bars-h">
+      <span style="width:${cap.free / cap.total * 100}%;background:var(--ink-3)"></span>
+      <span style="width:${cap.inPCs / cap.total * 100}%;background:var(--accent)"></span>
+      <span style="width:${cap.onWay / cap.total * 100}%;background:var(--warn)"></span></div>
+      <div class="legend"><span><i style="background:var(--ink-3)"></i>Soltas</span><span><i style="background:var(--accent)"></i>Em PCs não vendidos</span><span><i style="background:var(--warn)"></i>A caminho</span></div>` : ''}
+    ${cap.planned > 0 ? `<p class="hint" style="margin:10px 0 0">Peças só planejadas (ainda não compradas) somam ${money(cap.planned)} e não entram no total.</p>` : ''}
+  </div>`;
+  html += sec('capital', 'Capital empatado', capBody);
+  return html;
+}
+function fseg(opts, cur, action) {
+  return `<div class="fseg" role="group">${opts.map(([k, l, n]) => `<button data-a="${action}" data-f="${k}" aria-pressed="${cur === k}"><span class="n">${n}</span><span class="t">${l}</span></button>`).join('')}</div>`;
+}
+const pcCount = st => S.builds.filter(b => st === 'all' || (st === 'ativos' ? b.status !== 'vendido' : b.status === st)).length;
+const pcMatch = (b, f) => f === 'all' || (f === 'ativos' ? b.status !== 'vendido' : b.status === f);
+function cmpHTML() {
+  const list = S.builds.filter(b => pcMatch(b, UI.cmpFilter))
+    .map(b => ({ b, f: fin(b) }))
+    .sort((x, y) => (y.f.margin ?? -1e9) - (x.f.margin ?? -1e9));
+  let tc = 0, tp = 0, tl = 0;
+  list.forEach(({ f }) => { tc += f.cost; if (f.price > 0) { tp += f.price; tl += f.profit; } });
+  const rows = list.length ? list.map(({ b, f }) => {
+    const nA = alertsFor(b).filter(a => a.lvl !== 'info').length;
+    return `<button class="row" data-a="goto-pc" data-id="${b.id}">
+      <span class="main"><span class="title">${esc(b.name)}</span>
+        <span class="sub">${pill(b.status)} Custo ${money(f.cost)} · ${f.price > 0 ? (f.realized ? 'Vendido ' : 'Preço ') + money(f.price) : 'sem preço'}${nA ? ` · <span class="warnc">${plural(nA, 'aviso', 'avisos')}</span>` : ''}</span></span>
+      <span class="end"><span class="v ${f.profit < 0 ? 'bad' : f.profit > 0 ? 'good' : ''}">${f.profit == null ? '—' : money(f.profit)}</span><br><span class="m muted">${pct(f.margin)}</span></span>
+    </button>`;
+  }).join('') : `<div class="empty">Nenhum PC neste filtro.</div>`;
+  const foot = list.length ? `<div class="cmp-foot">
+    <span>Custo total</span><b style="text-align:right">${money(tc)}</b>
+    <span>Preço total</span><b style="text-align:right">${money(tp)}</b>
+    <span>Lucro total</span><b style="text-align:right" class="${tl < 0 ? 'bad' : 'good'}">${money(tl)}</b>
+    <span>Margem média</span><b style="text-align:right">${pct(tp > 0 ? tl / tp * 100 : null)}</b></div>` : '';
+  return `<div style="margin-bottom:10px">${fseg([['all', 'Todos'], ['montagem', 'Montagem'], ['estoque', 'Estoque'], ['vendido', 'Vendidos']].map(([k, l]) => [k, l, pcCount(k)]), UI.cmpFilter, 'cmp-filter')}</div>
+    <div class="list cmp">${rows}${foot}</div>
+    ${list.length ? '<p class="hint" style="margin:8px 2px 0">Ordenado pela maior margem. Vendidos usam o valor realizado; os demais, o preço pretendido. A margem média pondera pelo valor de cada PC.</p>' : ''}`;
+}
+function monthlyHTML() {
+  const rows = monthly();
+  if (!rows.length) return `<div class="list"><div class="empty"><b>Nenhuma venda registrada ainda</b>Marque um PC como vendido ou venda uma peça avulsa para ver o resumo.</div></div>`;
+  // Gráfico dos últimos 6 meses
+  const now = today();
+  let y = +now.slice(0, 4), m = +now.slice(5, 7);
+  const months = [];
+  for (let i = 0; i < 6; i++) { months.unshift(`${y}-${String(m).padStart(2, '0')}`); m--; if (!m) { m = 12; y--; } }
+  const byK = Object.fromEntries(rows.map(r => [r.k, r]));
+  const vals = months.map(k => byK[k]?.profit || 0);
+  const W = 340, H = 150, pad = 22, base0 = H - 24;
+  const max = Math.max(...vals, 0), min = Math.min(...vals, 0);
+  const span = (max - min) || 1;
+  const yOf = v => pad + (max - v) / span * (base0 - pad);
+  const bw = 30, gap = (W - 12 - bw * 6) / 5;
+  const bars = vals.map((v, i) => {
+    const x = 6 + i * (bw + gap);
+    const y1 = yOf(Math.max(v, 0)), y2 = yOf(Math.min(v, 0));
+    const h = Math.max(v === 0 ? 0 : 2, y2 - y1);
+    const col = v < 0 ? 'var(--crit)' : i === 5 ? 'var(--accent)' : 'color-mix(in srgb, var(--accent) 45%, var(--surface-2))';
+    return `<rect x="${x}" y="${y1}" width="${bw}" height="${h}" rx="4" fill="${col}"></rect>
+      ${v !== 0 ? `<text x="${x + bw / 2}" y="${v >= 0 ? y1 - 5 : y2 + 12}" text-anchor="middle" class="${i === 5 ? 'lbl' : ''}">${shortMoney(v)}</text>` : ''}
+      <text x="${x + bw / 2}" y="${H - 6}" text-anchor="middle">${monthShort(months[i]).split('/')[0]}</text>`;
+  }).join('');
+  const chart = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Lucro realizado nos últimos 6 meses">
+    <line x1="0" x2="${W}" y1="${yOf(0)}" y2="${yOf(0)}" stroke="var(--line-2)" stroke-width="1"></line>${bars}</svg>`;
+  const list = rows.slice(0, 12).map(r => `<div class="row">
+      <span class="main"><span class="title">${r.k === 'sem-data' ? 'Vendas sem data' : monthLong(r.k)}</span>
+      <span class="sub">${[r.pcs ? plural(r.pcs, 'PC', 'PCs') : '', r.parts ? plural(r.parts, 'peça avulsa', 'peças avulsas') : ''].filter(Boolean).join(' + ')} · faturou ${money(r.revenue)}</span></span>
+      <span class="end"><span class="v ${r.profit < 0 ? 'bad' : 'good'}">${money(r.profit)}</span><br><span class="muted small">${pct(r.revenue > 0 ? r.profit / r.revenue * 100 : null)}</span></span></div>`).join('');
+  return `<div class="panel"><div class="label" style="margin-bottom:6px">Lucro realizado, últimos 6 meses</div>${chart}</div>
+    <div class="list" style="margin-top:10px">${list}</div>`;
+}
+
+/* ---------- PCs ---------- */
+function viewPCs() {
+  const list = S.builds.filter(b => pcMatch(b, UI.pcFilter))
+    .sort((a, b) => {
+      const o = { montagem: 0, estoque: 1, vendido: 2 };
+      if (o[a.status] !== o[b.status]) return o[a.status] - o[b.status];
+      if (a.status === 'vendido') return (b.sale.date || '').localeCompare(a.sale.date || '') || b.createdAt - a.createdAt;
+      return b.createdAt - a.createdAt;
+    });
+  return `<div class="toolbar">${fseg([['ativos', 'Ativos'], ['montagem', 'Montagem'], ['estoque', 'Estoque'], ['vendido', 'Vendidos']].map(([k, l]) => [k, l, pcCount(k)]), UI.pcFilter, 'pc-filter')}</div>
+    ${list.length ? `<div class="pcs">${list.map(pcCard).join('')}</div>`
+      : `<div class="list"><div class="empty"><b>${S.builds.length ? 'Nenhum PC neste filtro' : 'Nenhum PC cadastrado'}</b>${S.builds.length ? 'Escolha outro filtro acima.' : ''}
+        ${S.builds.length ? '' : `<button class="btn primary" style="margin-top:12px" data-a="new-pc">${IC.plus} Criar o primeiro PC</button>`}</div></div>`}`;
+}
+function numsHTML(b) {
+  const f = fin(b);
+  return `<div><div class="k">Custo</div><div class="v">${money(f.cost)}</div></div>
+    <div><div class="k">${f.realized ? 'Vendido' : 'Preço'}</div><div class="v">${f.price > 0 ? money(f.price) : '—'}</div></div>
+    <div><div class="k">Lucro${f.sold ? ' real' : ''}</div><div class="v ${f.profit < 0 ? 'bad' : f.profit > 0 ? 'good' : ''}">${f.profit == null ? '—' : money(f.profit)}</div></div>
+    <div><div class="k">Margem</div><div class="v">${pct(f.margin)}</div></div>`;
+}
+function pcCard(b) {
+  const open = !b.collapsed;
+  const A = alertsFor(b);
+  const nc = A.filter(a => a.lvl === 'crit').length, nw = A.filter(a => a.lvl === 'warn').length;
+  const miss = b.status === 'vendido' ? [] : missingList(b);
+  const d = b.status === 'estoque' ? daysSince(b.readyAt) : null;
+  const meta = [
+    d != null ? `<span class="pill ${d >= (S.settings.staleDays || 30) ? 'warn' : 'neutral'}">${d === 0 ? 'Pronto hoje' : `Parado há ${plural(d, 'dia', 'dias')}`}</span>` : '',
+    b.status === 'vendido' && b.sale.date ? `<span class="pill neutral">Vendido em ${fmtDate(b.sale.date)}</span>` : '',
+    nc ? `<span class="pill crit">${plural(nc, 'erro', 'erros')}</span>` : '',
+    nw ? `<span class="pill warn">${plural(nw, 'aviso', 'avisos')}</span>` : '',
+    miss.length ? `<span class="pill neutral">Faltam ${miss.length}</span>` : '',
+  ].join('');
+  return `<article class="pc" id="pc-${b.id}">
+    <button class="pc-head" data-a="toggle-pc" data-id="${b.id}" aria-expanded="${open}">
+      <div class="l1"><span class="name">${esc(b.name)}</span>${pill(b.status)}${IC.chev}</div>
+      ${meta ? `<div class="meta">${meta}</div>` : ''}
+      ${!open && b.notes ? `<div class="small muted" style="margin-top:8px;overflow-wrap:anywhere">${esc(b.notes.split('\n')[0])}</div>` : ''}
+      <div class="nums" id="nums-${b.id}">${numsHTML(b)}</div>
+    </button>
+    ${open ? pcBody(b, A, miss) : ''}
+  </article>`;
+}
+function calcHTML(b) {
+  const f = fin(b);
+  let html = `<div class="calc">
+    <div><div class="k">Lucro</div><div class="v ${f.profit < 0 ? 'bad' : f.profit > 0 ? 'good' : ''}">${f.profit == null ? '—' : money(f.profit)}</div></div>
+    <div><div class="k">Margem</div><div class="v">${pct(f.margin)}</div></div>
+    <div><div class="k">Sobre custo</div><div class="v">${pct(f.roi)}</div></div></div>`;
+  if (f.fee > 0) html += `<p class="hint" style="margin:6px 0 0">Inclui ${money(f.fee)} de taxa da maquininha (${NUM1.format(S.settings.card.pct)}%).</p>`;
+  if (!f.sold && S.settings.card.on && S.settings.card.pct > 0 && b.price > 0) {
+    const fee = cardFee(b.price, true);
+    html += `<p class="hint" style="margin:6px 0 0">Se vender no cartão: lucro de ${money(b.price - f.cost - fee)} (taxa de ${money(fee)}).</p>`;
+  }
+  return html;
+}
+function targetHTML(b) {
+  const t = UI.target?.[b.id];
+  const cost = buildCost(b);
+  if (!(t > 0)) return 'Informe a margem que você quer para ver o preço.';
+  if (t >= 100) return 'A margem precisa ser menor que 100%.';
+  if (!(cost > 0)) return 'Cadastre as peças com custo para calcular.';
+  const p = Math.ceil(cost / (1 - t / 100));
+  let s = `Para ${NUM1.format(t)}%: <b>${money(p)}</b> <button class="btn sm" data-a="use-target" data-id="${b.id}" data-v="${p}">Usar</button>`;
+  const fp = S.settings.card.on ? (S.settings.card.pct || 0) : 0;
+  if (fp > 0 && t + fp < 100) s += `<br><span class="hint">No cartão: ${money(Math.ceil(cost / (1 - t / 100 - fp / 100)))}</span>`;
+  return s;
+}
+function alertsBlock(b, A) {
+  if (!A.length) return '';
+  return `<div class="label" style="margin-bottom:8px">Alertas</div><div class="alerts">${A.map(alertHTML).join('')}</div>
+    ${b.status !== 'vendido' ? '<p class="hint" style="margin:8px 0 0">São uma triagem pelo nome das peças. Não substituem o teste real da máquina.</p>' : ''}`;
+}
+// Atualiza só os números e avisos do cartão, sem redesenhar os campos (não perde o toque nem o foco)
+function refreshCard(b) {
+  const card = $('#pc-' + b.id);
+  if (!card) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = pcCard(b);
+  const head = $('.pc-head', card), nhead = $('.pc-head', tmp);
+  if (head && nhead) head.innerHTML = nhead.innerHTML;
+  const al = $('#al-' + b.id), nal = $('#al-' + b.id, tmp);
+  if (al && nal) al.innerHTML = nal.innerHTML;
+  ['calc-', 'tgt-'].forEach(k => { const x = $('#' + k + b.id), n = $('#' + k + b.id, tmp); if (x && n) x.innerHTML = n.innerHTML; });
+}
+function pcBody(b, A, miss) {
+  const sold = b.status === 'vendido';
+  const p = {};
+  const slots = CATS.map(c => {
+    const pt = slotPart(b, c.k);
+    p[c.k] = pt;
+    const empty = !pt || (!pt.name && !pt.cost);
+    let badge = '';
+    if (!empty) {
+      if (pt.mode === 'plan') badge = '<span class="pill neutral">Planejada</span>';
+      else if (pt.code) badge = `<span class="tag">${code(pt.code)}</span>`;
+      if (pt.mode === 'inv' && pt.status === 'caminho') badge += '<span class="pill caminho">A caminho</span>';
+    }
+    const sp = empty ? '' : specLabel(c.k, pt.specs);
+    return `<button class="slot" data-a="slot" data-id="${b.id}" data-cat="${c.k}" ${sold && empty ? 'disabled' : ''}>
+      <span class="c"><span class="cat">${c.l}</span>
+        <span class="nm ${empty ? 'empty-slot' + (c.opt ? ' optional' : '') : ''}">${empty ? (sold ? '—' : c.opt ? '+ Adicionar (opcional)' : '+ Adicionar') : esc(pt.name || '(sem nome)')}</span>
+        ${sp ? `<span class="sp">${esc(sp)}</span>` : ''}</span>
+      ${empty ? '' : `<span class="r"><span class="v">${money(pt.cost)}</span>${badge}</span>`}
+    </button>`;
+  }).join('');
+  const f = fin(b);
+  const ttm = sold && b.readyAt && b.sale.date ? daysBetween(b.readyAt, b.sale.date) : null;
+  return `<div class="pc-body">
+    <div><div class="label" style="margin-bottom:6px">Etapa</div>
+      <div class="seg status">${Object.entries(STATUS).map(([k, l]) => `<button class="s-${k}" data-a="set-status" data-id="${b.id}" data-s="${k}" aria-pressed="${b.status === k}">${l}</button>`).join('')}</div></div>
+    <div>
+      <div class="block-t"><span class="label">Peças</span><span class="hint">${sold ? 'Registro da venda' : 'Toque para escolher ou editar'}</span></div>
+      <div class="slots">${slots}<div class="slot-total"><span>Custo total</span><span>${money(f.cost)}</span></div></div>
+      ${miss.length ? `<div class="missing"><span class="muted">Falta comprar ou definir:</span>${miss.map(m => `<span class="pill neutral">${m}</span>`).join('')}</div>` : ''}
+    </div>
+    ${sold ? `<div>
+      <div class="label" style="margin-bottom:8px">Venda</div>
+      <div class="grid2">
+        ${moneyField(`sp-${b.id}`, 'Valor vendido', b.sale.price, `data-f="s-price" data-id="${b.id}"`)}
+        <label class="field"><span>Data da venda</span><input type="date" id="sd-${b.id}" data-f="s-date" data-id="${b.id}" value="${b.sale.date}"></label>
+      </div>
+      ${S.settings.card.on ? `<label class="check"><input type="checkbox" id="sc-${b.id}" data-f="s-card" data-id="${b.id}" ${b.sale.card ? 'checked' : ''}> Pago no cartão (taxa de ${NUM1.format(S.settings.card.pct || 0)}%)</label>` : ''}
+      <div id="calc-${b.id}">${calcHTML(b)}</div>
+      <p class="hint" style="margin:6px 0 0">Preço pretendido era ${b.price > 0 ? money(b.price) : 'não definido'}${ttm != null && ttm >= 0 ? ` · vendido ${ttm === 0 ? 'no mesmo dia em que ficou pronto' : `${plural(ttm, 'dia', 'dias')} depois de ficar pronto`}` : ''}.</p>
+    </div>` : `<div>
+      <div class="label" style="margin-bottom:8px">Preço</div>
+      ${moneyField(`bp-${b.id}`, 'Preço pretendido', b.price, `data-f="b-price" data-id="${b.id}"`)}
+      <div id="calc-${b.id}">${calcHTML(b)}</div>
+      <button class="link-btn" data-a="calc-toggle" data-id="${b.id}" aria-expanded="${!!UI.calcOpen[b.id]}">${IC.money} Calcular preço pela margem ${IC.chev}</button>
+      ${UI.calcOpen[b.id] ? `<div class="suggest-line">
+        <label class="field"><span>Margem desejada</span><div class="pct-in"><input type="text" inputmode="decimal" id="bt-${b.id}" data-f="b-target" data-id="${b.id}" value="${UI.target?.[b.id] ? NUM1.format(UI.target[b.id]).replace(',0', '') : ''}" placeholder="Ex.: 20"></div></label>
+        <div class="out" id="tgt-${b.id}">${targetHTML(b)}</div>
+      </div>` : ''}
+    </div>`}
+    <div id="al-${b.id}">${alertsBlock(b, A)}</div>
+    <label class="field"><span>Anotações</span><textarea id="bnote-${b.id}" data-f="b-notes" data-id="${b.id}" placeholder="Só para você. Ex.: trocar a placa de vídeo por uma branca.">${esc(b.notes || '')}</textarea></label>
+    <div class="pc-actions">
+      ${!sold ? `<button class="btn primary block" data-a="ad" data-id="${b.id}">${IC.ad} Criar anúncio</button>` : ''}
+      <div class="btns3">
+        <button class="btn" data-a="rename-pc" data-id="${b.id}">${IC.pencil} Renomear</button>
+        <button class="btn" data-a="dup-pc" data-id="${b.id}">${IC.dup} Duplicar</button>
+        <button class="btn danger" data-a="del-pc" data-id="${b.id}">${IC.trash} Excluir</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- Estoque ---------- */
+function itemRow(i) {
+  const b = i.buildId ? findBuild(i.buildId) : null;
+  const where = i.status === 'caminho' ? `<span class="pill caminho">A caminho</span>` : b ? `<span class="pill s-${b.status}">No ${esc(b.name)}</span>` : `<span class="pill neutral">Disponível</span>`;
+  const sp = specLabel(i.cat, i.specs);
+  return `<button class="row" data-a="item" data-id="${i.id}">
+    <span class="tag" style="align-self:flex-start;margin-top:2px">${code(i.code)}</span>
+    <span class="main"><span class="title">${esc(i.name || '(sem nome)')}</span>
+      <span class="sub">${esc(joinDot(condLabel(i.cond), sp, i.date ? fmtDate(i.date) : ''))}</span>
+      <span style="display:block;margin-top:5px">${where}</span></span>
+    <span class="end"><span class="v">${money(i.cost)}</span></span></button>`;
+}
+function viewStock() {
+  const f = UI.stockFilter, cat = UI.stockCat;
+  const items = S.inv.filter(i => (!cat || i.cat === cat) && (
+    f === 'all' || (f === 'disp' && i.status === 'disp' && !i.buildId) || (f === 'inpc' && !!i.buildId) || (f === 'caminho' && i.status === 'caminho')));
+  const opts = { all: 'Todas', disp: 'Disponíveis', inpc: 'Em PCs', caminho: 'A caminho' };
+  const cnt = { all: S.inv.length, disp: S.inv.filter(i => i.status === 'disp' && !i.buildId).length, inpc: S.inv.filter(i => i.buildId).length, caminho: S.inv.filter(i => i.status === 'caminho').length };
+  let html = `<div class="toolbar">${fseg(Object.entries(opts).map(([k, l]) => [k, l, cnt[k]]), f, 'stock-filter')}</div>
+    <div class="toolbar">
+      <select id="stock-cat" data-f="stock-cat" aria-label="Filtrar por categoria" style="flex:1;min-width:0"><option value="">Todas as categorias</option>${CATS.map(c => `<option value="${c.k}" ${cat === c.k ? 'selected' : ''}>${c.l}</option>`).join('')}</select>
+    </div>`;
+  if (!items.length) {
+    html += `<div class="list"><div class="empty"><b>${S.inv.length ? 'Nenhuma peça neste filtro' : 'Estoque vazio'}</b>${S.inv.length ? 'Mude o filtro acima.' : 'Cadastre as peças que você compra. Cada uma ganha um código para anotar na caixa.'}</div></div>`;
+  } else {
+    CATS.forEach(c => {
+      const g = items.filter(i => i.cat === c.k).sort((a, b) => (b.code || 0) - (a.code || 0));
+      if (!g.length) return;
+      const open = UI.grp[c.k] !== false;
+      const tot = g.reduce((s, i) => s + i.cost, 0);
+      html += `<div class="grp"><button class="grp-h" data-a="grp" data-id="${c.k}" aria-expanded="${open}"><h3>${c.l}</h3><span class="muted small">${g.length} · ${money(tot)}</span>${IC.chev}</button>
+        ${open ? `<div class="list">${g.map(itemRow).join('')}</div>` : ''}</div>`;
+    });
+  }
+  const sales = S.sales.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  const salesBody = sales.length ? `<div class="list">${sales.map(s => {
+    const fee = cardFee(s.price, s.card), pr = round2(s.price - (s.item?.cost || 0) - fee);
+    return `<button class="row" data-a="sale" data-id="${s.id}"><span class="tag" style="align-self:flex-start;margin-top:2px">${code(s.item?.code)}</span>
+      <span class="main"><span class="title">${esc(s.item?.name || '')}</span><span class="sub">${CAT[s.item?.cat]?.l || ''} · vendida por ${money(s.price)}${s.date ? ' em ' + fmtDate(s.date) : ''}</span></span>
+      <span class="end"><span class="v ${pr < 0 ? 'bad' : 'good'}">${money(pr)}</span></span></button>`;
+  }).join('')}</div>` : `<div class="list"><div class="empty">Peças vendidas soltas aparecem aqui, com o lucro de cada uma.</div></div>`;
+  html += sec('salesAvulsas', 'Peças vendidas avulsas', salesBody, { count: sales.length || null });
+  return html;
+}
+
+/* ---------- Preços ---------- */
+function viewPrices() {
+  const q = UI.q;
+  return `${offersFeedHTML()}
+    <div class="panel" style="margin-top:18px">
+      <div class="label" style="margin-bottom:10px">Consultar meu histórico</div>
+      <div class="form">
+        <div class="grid2">
+          <label class="field"><span>Tipo de peça</span><select id="q-cat" data-f="q-cat"><option value="">Todas</option>${CATS.map(c => `<option value="${c.k}" ${q.cat === c.k ? 'selected' : ''}>${c.l}</option>`).join('')}</select></label>
+          ${moneyField('q-offer', 'Preço da oferta', parseMoney(q.offer), 'data-f="q-offer"')}
+        </div>
+        <label class="field"><span>Modelo</span><input type="search" id="q-text" data-f="q-text" value="${esc(q.text)}" placeholder="Ex.: RX 6600, i5-9400F, B450M" autocomplete="off"></label>
+      </div>
+    </div>
+    <div id="q-res">${pricesResults()}</div>
+    <div style="margin-top:14px"><button class="btn block" data-a="hist-new">${IC.plus} Lançar compra antiga</button></div>`;
+}
+function ago(ms) {
+  const m = Math.round((Date.now() - ms) / 60000);
+  if (m < 1) return 'agora';
+  if (m < 60) return `há ${m} min`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `há ${h} h`;
+  const d = new Date(ms);
+  return h < 48 ? 'ontem' : `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+const shortChannel = c => { const m = String(c || '').match(/@(\w+)/); return m ? '@' + m[1] : String(c || '').split('(')[0].trim(); };
+function offersFeedHTML() {
+  const list = S.offers.filter(o => !o.dismissed).sort((a, b) => b.at - a.at);
+  const tol = NUM1.format(S.settings.offers.tol).replace(',0', '');
+  const rows = list.map(o => {
+    const rel = o.status === 'great'
+      ? (o.price < o.best ? `${money(o.best - o.price)} abaixo do seu melhor (${money(o.best)})` : `igual ao seu melhor (${money(o.best)})`)
+      : `${NUM1.format(o.diffPct)}% acima do seu melhor (${money(o.best)})`;
+    return `<div class="offer ${o.seen ? '' : 'new'}">
+      <div class="main">
+        <div class="o-line"><b>${esc(o.label)}</b> por <b class="o-price">${money(o.price)}</b></div>
+        <div class="sub">${esc(joinDot(o.store, shortChannel(o.channel), ago(o.at)))}</div>
+        <div class="o-rel ${o.status}">${rel}</div>
+        ${o.coupon ? `<button class="coupon" data-a="copy-coupon" data-v="${esc(o.coupon)}">${IC.copy} Cupom ${esc(o.coupon)}</button>` : ''}
+      </div>
+      <div class="o-act">
+        ${o.link ? `<a class="btn sm primary" href="${esc(o.link)}" target="_blank" rel="noopener noreferrer">Abrir</a>` : ''}
+        <button class="o-x" data-a="offer-dismiss" data-id="${o.id}" aria-label="Remover da lista">${IC.x}</button>
+      </div>
+    </div>`;
+  }).join('');
+  const groups = S.settings.offers.groups.map(shortChannel).join(', ');
+  return `${nativeStatusHTML()}<div class="feed-h"><h2>Bons preços</h2>${list.length ? `<button class="link-btn" style="margin:0" data-a="offers-clear">Limpar lista</button>` : ''}</div>
+    ${list.length ? `<div class="list">${rows}</div>
+      <p class="hint" style="margin:8px 2px 0">Aparece aqui toda peça dos canais igual, abaixo ou até ${tol}% acima do melhor preço que você já pagou.</p>`
+    : `<div class="list"><div class="empty"><b>Nenhum bom preço por enquanto</b>Quando ${esc(groups || 'os canais')} anunciarem uma peça igual, abaixo ou até ${tol}% acima do melhor preço que você já pagou, ela aparece aqui com o link e o cupom.</div></div>`}`;
+}
+function priceChart(recs, offer) {
+  const pts = recs.filter(r => isDate(r.date) && r.cost > 0).sort((a, b) => a.date.localeCompare(b.date));
+  if (pts.length < 2) return '';
+  const W = 340, H = 170, L = 66, R = 10, T = 14, B = 26;
+  const xs = pts.map(p => dayNum(p.date));
+  let x0 = Math.min(...xs), x1 = Math.max(...xs);
+  if (x1 === x0) { x0 -= 15; x1 += 15; }
+  const vals = pts.map(p => p.cost).concat(offer > 0 ? [offer] : []);
+  let y0 = Math.min(...vals), y1 = Math.max(...vals);
+  const padY = (y1 - y0) * 0.15 || y1 * 0.1 || 10;
+  y0 = Math.max(0, y0 - padY); y1 += padY;
+  const X = d => L + (d - x0) / (x1 - x0) * (W - L - R);
+  const Y = v => T + (y1 - v) / (y1 - y0) * (H - T - B);
+  const avg = pts.reduce((s, p) => s + p.cost, 0) / pts.length;
+  const raw = (y1 - y0) / 3, p10 = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+  const step = [1, 2, 5, 10].map(k => k * p10).find(v => v >= raw) || 10 * p10;
+  const ticks = [];
+  for (let t = Math.ceil(y0 / step) * step; t <= y1 + 1e-9 && ticks.length < 6; t += step) ticks.push(t);
+  const condCol = { nova: 'var(--accent)', usada: 'var(--warn)', reparada: 'var(--ink-2)', '': 'var(--info)' };
+  const path = pts.map((p, i) => `${i ? 'L' : 'M'}${X(dayNum(p.date)).toFixed(1)},${Y(p.cost).toFixed(1)}`).join(' ');
+  const first = pts[0].date, last = pts[pts.length - 1].date;
+  return `<div class="panel" style="margin-top:10px"><div class="label" style="margin-bottom:6px">Quanto você pagou ao longo do tempo</div>
+    <svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Preços pagos ao longo do tempo">
+      ${ticks.map(t => `<line x1="${L}" x2="${W - R}" y1="${Y(t)}" y2="${Y(t)}" stroke="var(--line)" stroke-width="1"></line><text x="${L - 6}" y="${Y(t) + 4}" text-anchor="end">${shortMoney(t)}</text>`).join('')}
+      <line x1="${L}" x2="${W - R}" y1="${Y(avg)}" y2="${Y(avg)}" stroke="var(--ink-3)" stroke-dasharray="2 4" stroke-width="1.2"></line>
+      ${offer > 0 ? `<line x1="${L}" x2="${W - R}" y1="${Y(offer)}" y2="${Y(offer)}" stroke="var(--good)" stroke-dasharray="6 4" stroke-width="1.6"></line><text x="${W - R}" y="${Y(offer) - 5}" text-anchor="end" class="lbl" style="fill:var(--good)">oferta</text>` : ''}
+      <path d="${path}" fill="none" stroke="var(--line-2)" stroke-width="1.5"></path>
+      ${pts.map(p => `<circle cx="${X(dayNum(p.date)).toFixed(1)}" cy="${Y(p.cost).toFixed(1)}" r="4" fill="${condCol[p.cond || '']}" stroke="var(--surface)" stroke-width="1.5"></circle>`).join('')}
+      <text x="${L}" y="${H - 6}">${fmtDate(first).replace(/\/(\d\d)(\d\d)$/, '/$2')}</text>${last !== first ? `<text x="${W - R}" y="${H - 6}" text-anchor="end">${fmtDate(last).replace(/\/(\d\d)(\d\d)$/, '/$2')}</text>` : ''}
+    </svg>
+    <div class="legend"><span><i style="background:var(--accent)"></i>Nova</span><span><i style="background:var(--warn)"></i>Usada</span><span><i style="background:var(--ink-2)"></i>Reparada</span>${pts.some(p => !p.cond) ? '<span><i style="background:var(--info)"></i>Não informada</span>' : ''}<span><i style="background:var(--ink-3);height:2px"></i>Média</span></div></div>`;
+}
+function histRow(h) {
+  return `<button class="row" data-a="hist" data-id="${h.id}"><span class="main"><span class="title">${esc(h.name)}</span>
+    <span class="sub">${esc(joinDot(CAT[h.cat]?.l, condLabel(h.cond), h.date ? fmtDate(h.date) : 'sem data', h.kind === 'manual' ? 'lançamento manual' : 'do estoque'))}</span></span>
+    <span class="end"><span class="v">${money(h.cost)}</span></span></button>`;
+}
+function pricesResults() {
+  const q = UI.q, offer = parseMoney(q.offer);
+  if (!q.text.trim()) {
+    const rec = S.hist.filter(h => !q.cat || h.cat === q.cat).sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.u || 0) - (a.u || 0)).slice(0, 6);
+    return `<div class="sec"><div class="label" style="margin:2px 2px 8px">Compras mais recentes</div>
+      ${rec.length ? `<div class="list">${rec.map(histRow).join('')}</div>` : `<div class="list"><div class="empty"><b>Histórico vazio</b>Toda peça cadastrada no estoque entra aqui sozinha. Compras antigas você lança no botão abaixo.</div></div>`}
+      ${S.hist.length > 6 ? `<p class="hint" style="margin:8px 2px 0">${S.hist.length} compras registradas. Digite um modelo para filtrar.</p>` : ''}</div>`;
+  }
+  const m = histFind(q.cat, q.text);
+  if (!m.length) return `<div class="sec"><div class="list"><div class="empty"><b>Nenhuma compra parecida no seu histórico</b>Tente escrever só o modelo, como “6600” ou “B450”.</div></div></div>`;
+  const costs = m.map(h => h.cost);
+  const avg = costs.reduce((s, v) => s + v, 0) / costs.length;
+  const lo = Math.min(...costs), hi = Math.max(...costs);
+  const last = m[0];
+  let verdict = '';
+  if (offer > 0) {
+    const diff = offer - avg, dp = avg > 0 ? diff / avg * 100 : 0;
+    const cls = dp <= -5 ? 'good' : dp >= 5 ? 'bad' : 'mid';
+    const txt = Math.abs(dp) < 0.5 ? 'Oferta igual à sua média.' : `Oferta ${money(Math.abs(diff))} (${NUM1.format(Math.abs(dp))}%) ${diff < 0 ? 'abaixo' : 'acima'} da sua média.`;
+    verdict = `<div class="verdict ${cls}">${txt}${offer < lo ? ' Mais barato que qualquer compra sua.' : offer > hi ? ' Mais caro que qualquer compra sua.' : ''}</div>`;
+  }
+  return `<div class="panel" style="margin-top:14px">
+      <div class="label" style="margin-bottom:10px">${plural(m.length, 'compra parecida', 'compras parecidas')}</div>
+      <div class="stats">
+        <div><div class="k">Média paga</div><div class="v">${money(avg)}</div></div>
+        <div><div class="k">Última compra</div><div class="v">${money(last.cost)}</div><div class="hint">${last.date ? fmtDate(last.date) : 'sem data'}</div></div>
+        <div><div class="k">Menor</div><div class="v good">${money(lo)}</div></div>
+        <div><div class="k">Maior</div><div class="v bad">${money(hi)}</div></div>
+      </div>${verdict}</div>
+    ${priceChart(m, offer)}
+    <div class="sec"><div class="list">${m.slice(0, 12).map(histRow).join('')}</div>
+    ${m.length > 12 ? `<p class="hint" style="margin:8px 2px 0">Mostrando as 12 mais recentes. A média usa todas as ${m.length}.</p>` : ''}</div>`;
+}
+
+/* ---------- Ajustes ---------- */
+function viewSettings() {
+  const st = S.settings;
+  const last = st.lastBackup ? new Date(st.lastBackup) : null;
+  const where = Cloud.on
+    ? 'Seus dados ficam salvos neste aparelho e numa cópia privada na sua conta do Claude. Só você vê.'
+    : 'Seus dados ficam salvos somente neste aparelho. Faça backup com frequência.';
+  return `${sec('s-backup', 'Backup', `<div class="panel form">
+      <p style="margin:0">${where}</p>
+      <p class="small muted" style="margin:0">${last ? `Último backup: ${last.toLocaleDateString('pt-BR')} às ${last.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.` : 'Nenhum backup feito ainda.'}
+        O arquivo de backup guarda tudo: PCs, estoque, histórico e ajustes. Guarde no Google Drive.</p>
+      <div class="btns">
+        <button class="btn primary" data-a="backup">${IC.download} Gerar arquivo</button>
+        <button class="btn" data-a="backup-copy">${IC.copy} Copiar como texto</button>
+      </div>
+      <div class="divider"></div>
+      <div class="btns">
+        <label class="btn" for="restore-file">${IC.upload} Restaurar de arquivo</label>
+        <button class="btn" data-a="restore-paste">Colar backup</button>
+      </div>
+      <input type="file" id="restore-file" accept=".json,application/json,text/plain" hidden>
+      ${Cloud.on ? `<div class="divider"></div><button class="btn" data-a="sync-now">${IC.refresh} Buscar dados da nuvem agora</button>` : ''}
+    </div>`)}
+    ${sec('s-ad', 'Padrão dos anúncios', `<div class="panel form">
+      <p class="hint" style="margin:0">Usado em todo anúncio novo. Dá para mudar em cada PC na tela do anúncio.</p>
+      <label class="field"><span>Condição</span><input type="text" id="ad-cond" data-f="set-ad" data-k="cond" value="${esc(st.ad.cond)}"></label>
+      <label class="field"><span>Sistema</span><input type="text" id="ad-os" data-f="set-ad" data-k="os" value="${esc(st.ad.os)}"></label>
+      <label class="field"><span>Condições comerciais (uma por linha)</span><textarea id="ad-terms" data-f="set-ad" data-k="terms">${esc(st.ad.terms)}</textarea></label>
+      <label class="field"><span>Observações</span><textarea id="ad-notes" data-f="set-ad" data-k="notes" placeholder="Ex.: Acompanha cabo de força. Garantia de 3 meses.">${esc(st.ad.notes)}</textarea></label>
+      <button class="btn" data-a="ad-defaults">Voltar ao texto original</button>
+    </div>`)}
+    ${sec('s-offers', 'Alerta de bom preço', `<div class="panel form">
+      <p class="small" style="margin:0">É bom preço quando a oferta fica igual, abaixo ou até a porcentagem abaixo acima do melhor preço que você já pagou no mesmo modelo.</p>
+      <label class="field"><span>Tolerância acima do seu melhor preço</span><div class="pct-in" style="max-width:160px"><input type="text" inputmode="decimal" id="of-tol" data-f="of-tol" value="${NUM1.format(S.settings.offers.tol).replace(',0', '')}"></div></label>
+      <label class="field"><span>Grupos do Telegram (um por linha)</span><textarea id="of-groups" data-f="of-groups">${esc(S.settings.offers.groups.join('\n'))}</textarea></label>
+      <p class="hint" style="margin:0">Os bons preços encontrados nesses canais aparecem na aba Ofertas.</p>
+    </div>`)}
+    ${sec('s-money', 'Cálculos', `<div class="panel form">
+      <label class="check"><input type="checkbox" id="card-on" data-f="card-on" ${st.card.on ? 'checked' : ''}> Descontar taxa da maquininha nas vendas no cartão</label>
+      ${st.card.on ? `<label class="field"><span>Taxa da maquininha</span><div class="pct-in" style="max-width:160px"><input type="text" inputmode="decimal" id="card-pct" data-f="card-pct" value="${st.card.pct ? NUM2.format(st.card.pct) : ''}" placeholder="0,00"></div></label>
+        <p class="hint" style="margin:0">Ao registrar uma venda, marque “Pago no cartão” para descontar a taxa do lucro.</p>` : ''}
+      <label class="field"><span>Avisar quando um PC pronto ficar parado por</span><div class="unit-in" style="max-width:160px"><input type="text" inputmode="numeric" id="stale" data-f="stale" value="${st.staleDays}"><em>dias</em></div></label>
+    </div>`)}
+    ${sec('s-look', 'Aparência', `<div class="panel">${segHTML('theme', { auto: 'Automático', light: 'Claro', dark: 'Escuro' }, st.theme)}</div>`)}
+    ${sec('s-danger', 'Apagar dados', `<div class="panel form">
+      <p class="small" style="margin:0">Remove todos os PCs, peças, histórico e ajustes deste aparelho${Cloud.on ? ' e da cópia na nuvem' : ''}. Faça um backup antes.</p>
+      <button class="btn danger" data-a="wipe">${IC.trash} Apagar tudo</button></div>`)}
+    <p class="hint" style="text-align:center;margin:22px 0 0">PCs Gamer · ${plural(S.builds.length, 'PC', 'PCs')} · ${plural(S.inv.length, 'peça', 'peças')} em estoque · ${plural(S.hist.length, 'compra', 'compras')} no histórico${NATIVE ? ' · versão ' + esc(nativeCall('version') || '') : ''}</p>`;
+}
+
+/* ================= Formulário de peça ================= */
+function specFields(cat, sp) {
+  sp = sp || {};
+  if (cat === 'ram') {
+    const gbs = RAM_GB.includes(sp.gb) || !sp.gb ? RAM_GB : [...RAM_GB, sp.gb].sort((a, b) => a - b);
+    return `<div class="grid3">
+      <label class="field"><span>Capacidade total</span><select id="pf-gb"><option value="">—</option>${gbs.map(g => `<option value="${g}" ${sp.gb === g ? 'selected' : ''}>${g} GB</option>`).join('')}</select></label>
+      <label class="field"><span>Tipo</span><select id="pf-type"><option value="">—</option>${['DDR3', 'DDR4', 'DDR5'].map(t => `<option ${sp.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+      <label class="field"><span>Pentes</span><select id="pf-sticks"><option value="">—</option>${[1, 2, 4].map(n => `<option value="${n}" ${sp.sticks === n ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+    </div>`;
+  }
+  if (cat === 'nvme' || cat === 'sata') {
+    const gbs = DISK_GB.includes(sp.gb) || !sp.gb ? DISK_GB : [...DISK_GB, sp.gb].sort((a, b) => a - b);
+    return `<label class="field"><span>Capacidade</span><select id="pf-gb"><option value="">—</option>${gbs.map(g => `<option value="${g}" ${sp.gb === g ? 'selected' : ''}>${gbLabel(g)}</option>`).join('')}</select></label>`;
+  }
+  if (cat === 'psu') return `<label class="field"><span>Potência</span><div class="unit-in"><input type="text" inputmode="numeric" id="pf-w" value="${sp.w || ''}" placeholder="Ex.: 550"><em>W</em></div></label>`;
+  if (cat === 'gpu') return `<label class="field"><span>Consumo (opcional)</span><div class="unit-in"><input type="text" inputmode="numeric" id="pf-w" value="${sp.w || ''}" placeholder=""><em>W</em></div><span class="hint" id="pf-wh"></span></label>`;
+  return '';
+}
+function readSpecs(root, cat) {
+  const v = id => $('#' + id, root)?.value;
+  if (cat === 'ram') return cleanSpecs(cat, { gb: +v('pf-gb') || 0, type: v('pf-type') || '', sticks: +v('pf-sticks') || 0 });
+  if (cat === 'nvme' || cat === 'sata') return cleanSpecs(cat, { gb: +v('pf-gb') || 0 });
+  if (cat === 'psu' || cat === 'gpu') return cleanSpecs(cat, { w: parseIntSafe(v('pf-w')) });
+  return {};
+}
+// mode: 'item' (estoque/compra), 'plan' (planejada), 'hist' (compra antiga)
+function partFormHTML(d, mode, chooseCat) {
+  const cat = d.cat;
+  return `<div class="form" id="pf" data-mode="${mode}" data-cat="${cat}">
+    ${chooseCat ? `<label class="field"><span>Categoria</span><select id="pf-cat">${CATS.map(c => `<option value="${c.k}" ${c.k === cat ? 'selected' : ''}>${c.l}</option>`).join('')}</select></label>` : ''}
+    <div class="field"><label class="field"><span>Nome / modelo</span><input type="text" id="pf-name" value="${esc(d.name || '')}" placeholder="${esc(namePlaceholder(cat))}" autocomplete="off" maxlength="120"></label>
+      <div id="pf-sugg"></div><div id="pf-detect"></div></div>
+    ${moneyField('pf-cost', mode === 'plan' ? 'Custo estimado' : 'Valor pago', d.cost)}
+    <span class="hint" id="pf-last" style="margin-top:-8px"></span>
+    ${mode !== 'plan' ? `<div class="field"><span>Condição</span>${segHTML('cond', CONDS, d.cond ?? 'nova')}</div>
+      <label class="field"><span>Data da compra</span><input type="date" id="pf-date" value="${isDate(d.date) ? d.date : d.id || d.name ? '' : today()}"></label>` : ''}
+    ${mode === 'item' ? `<div class="field"><span>Situação</span>${segHTML('status', { disp: 'Já está comigo', caminho: 'A caminho' }, d.status || 'disp')}</div>` : ''}
+    ${mode !== 'hist' ? `<div id="pf-specs">${specFields(cat, d.specs)}</div>` : ''}
+  </div>`;
+}
+function namePlaceholder(cat) {
+  return { cpu: 'Ex.: Intel Core i5-9400F', cooler: 'Ex.: Rise Mode Z4 ARGB', gpu: 'Ex.: ASUS Dual RX 6600 8GB', mobo: 'Ex.: Gigabyte B450M DS3H', ram: 'Ex.: Kingston Fury 16GB (2x8) DDR4 3200', nvme: 'Ex.: Kingston NV2 500GB', sata: 'Ex.: SSD Crucial BX500 480GB', psu: 'Ex.: MSI MAG A550BN 550W', case: 'Ex.: Gabinete aquário Rise Mode Glass 06', fans: 'Ex.: Kit 3 fans ARGB' }[cat] || '';
+}
+function mountPartForm(root) {
+  const pf = $('#pf', root);
+  const curCat = () => $('#pf-cat', root)?.value || pf.dataset.cat;
+  const refresh = () => {
+    const cat = curCat();
+    const name = $('#pf-name', root).value;
+    const det = detectLine(cat, name);
+    $('#pf-detect', root).innerHTML = det ? `<div class="detect" style="margin-top:6px">${esc(det)}</div>` : '';
+    const wh = $('#pf-wh', root);
+    if (wh) { const g = parseGPU(name); wh.textContent = g && !g.igpu ? `Em branco, uso ${g.w} W (típico da ${g.label}).` : 'Preencha se o modelo não for reconhecido.'; }
+    const sug = pf.dataset.mode === 'plan' && !name ? [] : nameSuggestions(cat, name);
+    $('#pf-sugg', root).innerHTML = sug.length && document.activeElement === $('#pf-name', root)
+      ? `<div class="sugg" style="margin-top:6px">${sug.map((s, i) => `<button type="button" data-a="pf-sugg" data-i="${i}"><span>${esc(s.name)}</span><span>${s.cost ? money(s.cost) : ''}${s.date ? ' · ' + fmtDate(s.date).slice(3) : ''}</span></button>`).join('')}</div>` : '';
+    pf._sugg = sug;
+  };
+  const fillGuess = () => {
+    const cat = curCat();
+    const g = guessSpecs(cat, $('#pf-name', root).value);
+    const set = (id, v) => { const el = $('#' + id, root); if (el && !el.value && v) el.value = String(v); };
+    set('pf-gb', g.gb); set('pf-type', g.type); set('pf-sticks', g.sticks); set('pf-w', g.w);
+  };
+  const lastPaid = (name) => {
+    const el = $('#pf-last', root);
+    if (!el) return;
+    const m = name ? histFind(curCat(), name) : [];
+    el.textContent = m.length ? `Última compra parecida: ${money(m[0].cost)}${m[0].date ? ' em ' + fmtDate(m[0].date) : ''} · média ${money(m.reduce((s, h) => s + h.cost, 0) / m.length)}` : '';
+    el.hidden = !m.length;
+  };
+  $('#pf-name', root).addEventListener('input', () => { refresh(); fillGuess(); });
+  $('#pf-name', root).addEventListener('focus', refresh);
+  $('#pf-name', root).addEventListener('blur', () => {
+    setTimeout(() => {
+      if (pf._picking) return;
+      if ($('#pf-sugg', root)) $('#pf-sugg', root).innerHTML = '';
+      lastPaid($('#pf-name', root).value);
+    }, 200);
+  });
+  root.addEventListener('pointerdown', e => { if (e.target.closest('[data-a="pf-sugg"]')) pf._picking = true; });
+  root.addEventListener('click', e => {
+    const b = e.target.closest('[data-a="pf-sugg"]');
+    if (!b) return;
+    e.stopPropagation();
+    pf._picking = false;
+    const s = pf._sugg?.[+b.dataset.i];
+    if (!s) return;
+    $('#pf-name', root).value = s.name;
+    const sp = s.specs || {};
+    const set = (id, v) => { const el = $('#' + id, root); if (el && !el.value && v) el.value = String(v); };
+    set('pf-gb', sp.gb); set('pf-type', sp.type); set('pf-sticks', sp.sticks); set('pf-w', sp.w);
+    fillGuess();
+    $('#pf-sugg', root).innerHTML = '';
+    refresh();
+    $('#pf-sugg', root).innerHTML = '';
+    lastPaid(s.name);
+    $('#pf-cost', root).focus();
+  });
+  const catSel = $('#pf-cat', root);
+  if (catSel) catSel.addEventListener('change', () => {
+    const sp = $('#pf-specs', root);
+    if (sp) sp.innerHTML = specFields(catSel.value, {});
+    $('#pf-name', root).placeholder = namePlaceholder(catSel.value);
+    fillGuess(); refresh(); lastPaid($('#pf-name', root).value);
+  });
+  refresh();
+  $('#pf-sugg', root).innerHTML = '';
+  lastPaid($('#pf-name', root).value);
+}
+function readPartForm(root) {
+  const pf = $('#pf', root);
+  const cat = $('#pf-cat', root)?.value || pf.dataset.cat;
+  return {
+    cat,
+    name: $('#pf-name', root).value.trim(),
+    cost: parseMoney($('#pf-cost', root).value),
+    cond: segVal(root, 'cond') || '',
+    date: $('#pf-date', root)?.value || '',
+    status: segVal(root, 'status') || 'disp',
+    specs: readSpecs(root, cat),
+  };
+}
+
+/* ================= Estoque e histórico ================= */
+function createItem(d) {
+  const it = { id: newId(), code: S.settings.nextCode++, cat: d.cat, name: d.name, cost: d.cost, cond: d.cond, status: d.status || 'disp', date: isDate(d.date) ? d.date : today(), specs: cleanSpecs(d.cat, d.specs), buildId: null, createdAt: Date.now() };
+  S.inv.push(it);
+  S.hist.push({ id: newId(), invId: it.id, cat: it.cat, name: it.name, cost: it.cost, cond: it.cond, date: it.date, specs: clone(it.specs), kind: 'auto', createdAt: Date.now() });
+  return it;
+}
+function syncHistFromItem(it) {
+  const h = S.hist.find(x => x.invId === it.id);
+  if (!h) return;
+  Object.assign(h, { cat: it.cat, name: it.name, cost: it.cost, cond: it.cond, date: it.date, specs: clone(it.specs || {}) });
+}
+function updateItem(it, d) {
+  const catChanged = d.cat && d.cat !== it.cat;
+  Object.assign(it, { name: d.name, cost: d.cost, cond: d.cond, date: isDate(d.date) ? d.date : it.date, specs: cleanSpecs(d.cat || it.cat, d.specs) });
+  if (d.status) it.status = d.status;
+  if (catChanged) {
+    // Mudou de categoria: sai do PC onde estava
+    if (it.buildId) unlinkItem(it);
+    it.cat = d.cat;
+  }
+  syncHistFromItem(it);
+  const b = it.buildId ? findBuild(it.buildId) : null;
+  if (b) { const sl = b.slots[it.cat]; if (sl && sl.mode === 'inv' && sl.invId === it.id) sl.snap = snapOf(it); }
+}
+const snapOf = it => ({ id: it.id, code: it.code, cat: it.cat, name: it.name, cost: it.cost, cond: it.cond, date: it.date, specs: clone(it.specs || {}), status: it.status });
+function linkItem(b, it) {
+  const cat = it.cat;
+  const cur = b.slots[cat];
+  if (cur && cur.mode === 'inv' && cur.invId !== it.id) { const old = findInv(cur.invId); if (old) old.buildId = null; }
+  if (it.buildId && it.buildId !== b.id) { const ob = findBuild(it.buildId); if (ob && ob.slots[cat]?.invId === it.id) delete ob.slots[cat]; }
+  b.slots[cat] = { mode: 'inv', invId: it.id, snap: snapOf(it) };
+  it.buildId = b.id;
+}
+function unlinkItem(it) {
+  const b = it.buildId ? findBuild(it.buildId) : null;
+  if (b) { const sl = b.slots[it.cat]; if (sl && sl.mode === 'inv' && sl.invId === it.id) delete b.slots[it.cat]; }
+  it.buildId = null;
+}
+
+function openNewItem(prefCat) {
+  const cat = prefCat || UI.stockCat || 'cpu';
+  Sheet.open({
+    title: 'Cadastrar peça',
+    body: `${partFormHTML({ cat, cond: 'nova', status: 'disp' }, 'item', true)}
+      <div class="sheet-foot"><button class="btn" data-a="sheet-close">Cancelar</button><button class="btn primary" data-a="item-save-new">Salvar no estoque</button></div>`,
+    onMount: el => mountPartForm(el),
+  });
+}
+function openItem(id) {
+  const it = findInv(id);
+  if (!it) return;
+  const b = it.buildId ? findBuild(it.buildId) : null;
+  const sp = specLabel(it.cat, it.specs);
+  Sheet.open({
+    title: CAT[it.cat].l,
+    body: `<div class="part-card"><div class="nm">${esc(it.name || '(sem nome)')}</div>
+        <div class="meta"><span class="tag">${code(it.code)}</span><b>${money(it.cost)}</b>${it.cond ? `<span>${condLabel(it.cond)}</span>` : ''}${it.date ? `<span>comprada em ${fmtDate(it.date)}</span>` : ''}${sp ? `<span>${esc(sp)}</span>` : ''}</div>
+        <div class="meta">${it.status === 'caminho' ? '<span class="pill caminho">A caminho</span>' : ''}${b ? `<span class="pill s-${b.status}">No PC ${esc(b.name)}</span>` : it.status !== 'caminho' ? '<span class="pill neutral">Disponível</span>' : ''}</div></div>
+      <div class="optlist" style="margin-top:14px">
+        <button class="opt" data-a="item-edit" data-id="${it.id}"><span class="ic">${IC.pencil}</span><span><b>Editar</b><small>Nome, valor, condição e detalhes</small></span></button>
+        ${it.status === 'caminho' ? `<button class="opt" data-a="item-arrived" data-id="${it.id}"><span class="ic">${IC.check}</span><span><b>Chegou</b><small>Marca como disponível</small></span></button>` : ''}
+        ${b ? `<button class="opt" data-a="goto-pc" data-id="${b.id}"><span class="ic">${IC.pc}</span><span><b>Ver no PC</b><small>${esc(b.name)}</small></span></button>
+             <button class="opt" data-a="item-unlink" data-id="${it.id}"><span class="ic">${IC.link}</span><span><b>Tirar do PC</b><small>Volta a ficar disponível</small></span></button>` : ''}
+        ${!b ? `<button class="opt" data-a="item-sell" data-id="${it.id}"><span class="ic">${IC.money}</span><span><b>Vender avulsa</b><small>Registra a venda e o lucro desta peça</small></span></button>
+             <button class="opt" data-a="item-del" data-id="${it.id}"><span class="ic" style="background:var(--crit-soft);color:var(--crit)">${IC.trash}</span><span><b>Excluir do estoque</b><small>O preço continua no histórico</small></span></button>` : ''}
+      </div>`,
+  });
+}
+function openEditItem(id) {
+  const it = findInv(id);
+  if (!it) return;
+  Sheet.replace({
+    title: `Editar ${code(it.code)}`,
+    body: `${partFormHTML(it, 'item', !it.buildId)}
+      <div class="sheet-foot"><button class="btn" data-a="sheet-close">Cancelar</button><button class="btn primary" data-a="item-save" data-id="${it.id}">Salvar</button></div>`,
+    onMount: el => mountPartForm(el),
+  });
+}
+function openSellItem(id) {
+  const it = findInv(id);
+  if (!it) return;
+  Sheet.replace({
+    title: 'Vender peça avulsa',
+    body: `<div class="form"><div class="part-card"><div class="nm">${esc(it.name)}</div><div class="meta"><span class="tag">${code(it.code)}</span>Custo ${money(it.cost)}</div></div>
+      <div class="grid2">${moneyField('vs-price', 'Valor vendido', 0)}<label class="field"><span>Data</span><input type="date" id="vs-date" value="${today()}"></label></div>
+      ${S.settings.card.on ? `<label class="check"><input type="checkbox" id="vs-card"> Pago no cartão</label>` : ''}
+      <p class="hint" style="margin:0">A peça sai do estoque. O preço que você pagou continua no histórico.</p></div>
+      <div class="sheet-foot"><button class="btn" data-a="sheet-close">Cancelar</button><button class="btn primary" data-a="item-sell-ok" data-id="${it.id}">Registrar venda</button></div>`,
+  });
+}
+function openSale(id) {
+  const s = S.sales.find(x => x.id === id);
+  if (!s) return;
+  const fee = cardFee(s.price, s.card), pr = round2(s.price - (s.item?.cost || 0) - fee);
+  Sheet.open({
+    title: 'Venda avulsa',
+    body: `<div class="part-card"><div class="nm">${esc(s.item?.name)}</div><div class="meta"><span class="tag">${code(s.item?.code)}</span><span>${CAT[s.item?.cat]?.l || ''}</span></div>
+      <div class="meta">Custo ${money(s.item?.cost)} · vendida por ${money(s.price)}${s.date ? ' em ' + fmtDate(s.date) : ''}${fee ? ` · taxa ${money(fee)}` : ''}</div>
+      <div class="meta"><b class="${pr < 0 ? 'bad' : 'good'}">Lucro ${money(pr)}</b></div></div>
+      <div class="optlist" style="margin-top:14px">
+        <button class="opt" data-a="sale-undo" data-id="${s.id}"><span class="ic">${IC.refresh}</span><span><b>Desfazer venda</b><small>A peça volta ao estoque com o mesmo código</small></span></button>
+        <button class="opt" data-a="sale-del" data-id="${s.id}"><span class="ic" style="background:var(--crit-soft);color:var(--crit)">${IC.trash}</span><span><b>Excluir registro</b><small>Some do resumo mensal</small></span></button>
+      </div>`,
+  });
+}
+function openHist(id) {
+  const h = S.hist.find(x => x.id === id);
+  const isNew = !h;
+  const d = h || { cat: UI.q.cat || 'cpu', cond: 'nova', date: '' };
+  const linked = h && h.invId && findInv(h.invId);
+  Sheet.open({
+    title: isNew ? 'Lançar compra antiga' : 'Compra registrada',
+    body: `${linked ? `<p class="hint" style="margin:0 0 12px">Este registro vem da peça ${code(findInv(h.invId).code)} do estoque. Alterar a peça no estoque atualiza aqui também.</p>` : ''}
+      ${partFormHTML(d, 'hist', true)}
+      <div class="sheet-foot">
+        ${isNew ? '<button class="btn" data-a="sheet-close">Cancelar</button>' : `<button class="btn danger" data-a="hist-del" data-id="${h.id}">${IC.trash} Excluir</button>`}
+        <button class="btn primary" data-a="hist-save" data-id="${h ? h.id : ''}">${isNew ? 'Lançar' : 'Salvar'}</button></div>`,
+    onMount: el => mountPartForm(el),
+  });
+}
+
+/* ================= Montagens ================= */
+function newBuild(name) {
+  const b = { id: newId(), name, status: 'montagem', slots: {}, price: 0, sale: { price: 0, date: '', card: false }, ad: {}, collapsed: false, readyAt: null, createdAt: Date.now() };
+  S.builds.push(b);
+  return b;
+}
+function openRename(id) {
+  const b = findBuild(id);
+  if (!b) return;
+  Sheet.open({
+    title: 'Renomear PC',
+    body: `<div class="form"><label class="field"><span>Nome do PC</span><input type="text" id="rn-name" value="${esc(b.name)}" maxlength="80"></label></div>
+      <div class="sheet-foot"><button class="btn" data-a="sheet-close">Cancelar</button><button class="btn primary" data-a="rename-ok" data-id="${b.id}">Salvar</button></div>`,
+    onMount: el => { const i = $('#rn-name', el); setTimeout(() => { i.focus(); i.select(); }, 250); },
+  });
+}
+function openNewPC() {
+  let n = S.builds.length + 1;
+  while (S.builds.some(b => b.name === `PC ${n}`)) n++;
+  Sheet.open({
+    title: 'Novo PC',
+    body: `<div class="form"><label class="field"><span>Nome do PC</span><input type="text" id="np-name" value="PC ${n}" maxlength="80"></label>
+      <p class="hint" style="margin:0">Ele começa “Em montagem”, sem peças. Depois você escolhe cada peça do estoque ou cadastra na hora.</p></div>
+      <div class="sheet-foot"><button class="btn" data-a="sheet-close">Cancelar</button><button class="btn primary" data-a="new-pc-ok">Criar PC</button></div>`,
+    onMount: el => { const i = $('#np-name', el); setTimeout(() => { i.focus(); i.select(); }, 250); },
+  });
+}
+function gotoPC(id) {
+  const b = findBuild(id);
+  if (!b) return;
+  Sheet.closeAll();
+  b.collapsed = false;
+  UI.tab = 'pcs';
+  if (!(UI.pcFilter === b.status || (UI.pcFilter === 'ativos' && b.status !== 'vendido'))) UI.pcFilter = b.status === 'vendido' ? 'vendido' : 'ativos';
+  commit();
+  requestAnimationFrame(() => {
+    const el = $('#pc-' + id);
+    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1500); }
+  });
+}
+function openSlot(bid, cat) {
+  const b = findBuild(bid);
+  if (!b) return;
+  const pt = slotPart(b, cat);
+  const filled = pt && (pt.name || pt.cost);
+  const sold = b.status === 'vendido';
+  if (sold) {
+    if (!filled) return;
+    Sheet.open({
+      title: CAT[cat].l,
+      body: `<div class="part-card"><div class="nm">${esc(pt.name)}</div><div class="meta">${pt.code ? `<span class="tag">${code(pt.code)}</span>` : ''}<b>${money(pt.cost)}</b>${pt.cond ? `<span>${condLabel(pt.cond)}</span>` : ''}</div></div>
+        <p class="hint">PC vendido: as peças ficam como registro da venda. Para trocar alguma peça, desfaça a venda mudando a etapa.</p>
+        <div class="optlist"><button class="opt" data-a="slot-edit" data-id="${bid}" data-cat="${cat}"><span class="ic">${IC.pencil}</span><span><b>Corrigir nome ou valor</b><small>Ajusta o registro desta venda</small></span></button></div>`,
+    });
+    return;
+  }
+  if (filled) {
+    const st = pt.mode === 'plan' ? '<span class="pill neutral">Planejada, ainda não comprada</span>' : `<span class="tag">${code(pt.code)}</span>${pt.status === 'caminho' ? '<span class="pill caminho">A caminho</span>' : ''}`;
+    Sheet.open({
+      title: CAT[cat].l,
+      body: `<div class="part-card"><div class="nm">${esc(pt.name || '(sem nome)')}</div><div class="meta">${st}<b>${money(pt.cost)}</b>${pt.cond ? `<span>${condLabel(pt.cond)}</span>` : ''}${specLabel(cat, pt.specs) ? `<span>${esc(specLabel(cat, pt.specs))}</span>` : ''}</div></div>
+        <div class="optlist" style="margin-top:14px">
+          <button class="opt" data-a="slot-edit" data-id="${bid}" data-cat="${cat}"><span class="ic">${IC.pencil}</span><span><b>Editar</b><small>${pt.mode === 'inv' ? 'Altera também a peça no estoque' : 'Nome, custo estimado e detalhes'}</small></span></button>
+          ${pt.mode === 'plan' ? `<button class="opt" data-a="slot-bought" data-id="${bid}" data-cat="${cat}"><span class="ic">${IC.cart}</span><span><b>Comprei esta peça</b><small>Registra no estoque e no histórico</small></span></button>` : ''}
+          ${pt.mode === 'inv' && pt.status === 'caminho' ? `<button class="opt" data-a="item-arrived" data-id="${pt.invId}" data-b="${bid}"><span class="ic">${IC.check}</span><span><b>Chegou</b><small>Marca como disponível</small></span></button>` : ''}
+          <button class="opt" data-a="slot-change" data-id="${bid}" data-cat="${cat}"><span class="ic">${IC.refresh}</span><span><b>Trocar por outra</b><small>Escolher do estoque ou cadastrar</small></span></button>
+          <button class="opt" data-a="slot-remove" data-id="${bid}" data-cat="${cat}"><span class="ic" style="background:var(--crit-soft);color:var(--crit)">${IC.x}</span><span><b>Tirar deste PC</b><small>${pt.mode === 'inv' ? 'A peça volta a ficar disponível no estoque' : 'Apaga o planejamento'}</small></span></button>
+        </div>`,
+    });
+    return;
+  }
+  openSlotChoose(bid, cat, false);
+}
+function openSlotChoose(bid, cat, replace) {
+  const b = findBuild(bid);
+  const avail = S.inv.filter(i => i.cat === cat && !i.buildId).sort((a, c) => (c.code || 0) - (a.code || 0));
+  const opts = {
+    title: `${CAT[cat].l} · ${b.name}`,
+    body: `<div class="label" style="margin-bottom:8px">Do estoque</div>
+      ${avail.length ? `<div class="list">${avail.map(i => `<button class="row" data-a="slot-pick" data-id="${bid}" data-inv="${i.id}">
+          <span class="tag" style="align-self:flex-start;margin-top:2px">${code(i.code)}</span>
+          <span class="main"><span class="title">${esc(i.name)}</span><span class="sub">${esc(joinDot(condLabel(i.cond), specLabel(cat, i.specs), i.status === 'caminho' ? 'a caminho' : ''))}</span></span>
+          <span class="end"><span class="v">${money(i.cost)}</span></span></button>`).join('')}</div>`
+        : `<div class="list"><div class="empty">Nenhum(a) ${CAT[cat].l.toLowerCase()} disponível no estoque.</div></div>`}
+      <div class="optlist" style="margin-top:14px">
+        <button class="opt" data-a="slot-new" data-id="${bid}" data-cat="${cat}"><span class="ic">${IC.cart}</span><span><b>Comprei agora</b><small>Cadastra no estoque e já coloca neste PC</small></span></button>
+        <button class="opt" data-a="slot-plan" data-id="${bid}" data-cat="${cat}"><span class="ic">${IC.plan}</span><span><b>Só planejar</b><small>Ainda não comprei: nome e custo estimado</small></span></button>
+      </div>`,
+  };
+  if (replace) Sheet.replace(opts); else Sheet.open(opts);
+}
+function openSlotForm(bid, cat, kind) {
+  const b = findBuild(bid);
+  const pt = slotPart(b, cat);
+  let d = { cat, cond: 'nova', status: 'disp' };
+  if (kind === 'edit' && pt) d = { cat, name: pt.name, cost: pt.cost, cond: pt.cond || '', date: pt.date, status: pt.status || 'disp', specs: pt.specs };
+  if (kind === 'bought' && pt) d = { cat, name: pt.name, cost: pt.cost, cond: 'nova', status: 'disp', date: today(), specs: pt.specs };
+  const mode = kind === 'plan' || (kind === 'edit' && pt?.mode === 'plan') ? 'plan' : kind === 'edit' && pt?.mode === 'sold' ? 'hist' : 'item';
+  const titles = { new: 'Comprei agora', plan: 'Planejar peça', edit: 'Editar peça', bought: 'Registrar compra' };
+  Sheet.replace({
+    title: `${titles[kind]} · ${CAT[cat].l}`,
+    body: `${partFormHTML(d, mode, false)}
+      <div class="sheet-foot"><button class="btn" data-a="sheet-close">Cancelar</button><button class="btn primary" data-a="slot-save" data-id="${bid}" data-cat="${cat}" data-k="${kind}">Salvar</button></div>`,
+    onMount: el => mountPartForm(el),
+  });
+}
+function saveSlotForm(bid, cat, kind) {
+  const b = findBuild(bid);
+  const root = Sheet.top();
+  const d = readPartForm(root);
+  if (!d.name) { toast('Escreva o nome da peça.'); $('#pf-name', root).focus(); return; }
+  const pt = slotPart(b, cat);
+  if (kind === 'plan' || (kind === 'edit' && pt?.mode === 'plan')) {
+    b.slots[cat] = { mode: 'plan', name: d.name, cost: d.cost, specs: d.specs };
+  } else if (kind === 'edit' && pt?.mode === 'inv') {
+    const it = findInv(pt.invId);
+    if (it) updateItem(it, { ...d, cat });
+  } else if (kind === 'edit' && pt?.mode === 'sold') {
+    const sl = b.slots[cat];
+    Object.assign(sl.item, { name: d.name, cost: d.cost, cond: d.cond, date: d.date || sl.item.date });
+    const h = S.hist.find(x => x.invId === sl.item.id);
+    if (h) Object.assign(h, { name: d.name, cost: d.cost, cond: d.cond, date: d.date || h.date });
+  } else {
+    const it = createItem({ ...d, cat });
+    linkItem(b, it);
+  }
+  Sheet.close();
+  commit();
+  toast('Peça salva');
+}
+
+/* Venda e etapa */
+function linkedItems(b) { return CATS.map(c => b.slots[c.k]).filter(sl => sl && sl.mode === 'inv').map(sl => findInv(sl.invId)).filter(Boolean); }
+function setStatus(id, s) {
+  const b = findBuild(id);
+  if (!b || b.status === s) return;
+  if (s === 'vendido') return openSell(b);
+  if (b.status === 'vendido') return openUndoSale(b, s);
+  if (s === 'estoque') {
+    b.readyAt = today();
+    const miss = missingList(b);
+    if (miss.length) toast(`Atenção: ainda faltam ${miss.join(', ').toLowerCase()}.`);
+  } else b.readyAt = null;
+  b.status = s;
+  commit();
+}
+function openSell(b) {
+  const n = linkedItems(b).length;
+  const planned = CATS.filter(c => b.slots[c.k]?.mode === 'plan').length;
+  Sheet.open({
+    title: `Vender ${b.name}`,
+    body: `<div class="form">
+      <div class="grid2">${moneyField('sell-price', 'Valor vendido', b.price)}<label class="field"><span>Data da venda</span><input type="date" id="sell-date" value="${today()}"></label></div>
+      ${S.settings.card.on ? `<label class="check"><input type="checkbox" id="sell-card"> Pago no cartão (taxa de ${NUM1.format(S.settings.card.pct || 0)}%)</label>` : ''}
+      ${n ? `<div class="alert info">${IC.info}<span>${plural(n, 'peça vinculada sai', 'peças vinculadas saem')} do estoque. Os preços pagos continuam no histórico e o PC fica guardado com todas as peças e custos.</span></div>` : ''}
+      ${planned ? `<div class="alert warn">${IC.warn}<span>${plural(planned, 'peça está só planejada', 'peças estão só planejadas')}. O custo estimado entra no lucro desta venda.</span></div>` : ''}
+    </div>
+    <div class="sheet-foot"><button class="btn" data-a="sheet-close">Cancelar</button><button class="btn primary" data-a="sell-ok" data-id="${b.id}">Confirmar venda</button></div>`,
+  });
+}
+function doSell(id) {
+  const b = findBuild(id);
+  const root = Sheet.top();
+  const price = parseMoney($('#sell-price', root).value);
+  const date = $('#sell-date', root).value;
+  const card = !!$('#sell-card', root)?.checked;
+  CATS.forEach(c => {
+    const sl = b.slots[c.k];
+    if (sl && sl.mode === 'inv') {
+      const it = findInv(sl.invId) || sl.snap;
+      if (it) b.slots[c.k] = { mode: 'sold', item: snapOf(it) };
+      else delete b.slots[c.k];
+      S.inv = S.inv.filter(i => i.id !== sl.invId);
+    }
+  });
+  b.status = 'vendido';
+  b.sale = { price, date: isDate(date) ? date : '', card };
+  Sheet.close();
+  gotoPC(b.id);
+  toast('Venda registrada. O PC foi para Vendidos.');
+}
+function openUndoSale(b, target) {
+  const n = CATS.filter(c => b.slots[c.k]?.mode === 'sold').length;
+  confirmBox({
+    title: 'Desfazer venda',
+    text: `${esc(b.name)} volta para “${STATUS[target]}”. O valor e a data da venda serão apagados.`,
+    check: n ? { label: `Devolver as ${n} peças ao estoque, vinculadas a este PC`, on: true } : null,
+    ok: 'Desfazer venda',
+  }).then(r => {
+    if (!r) return;
+    if (r.check) {
+      CATS.forEach(c => {
+        const sl = b.slots[c.k];
+        if (sl && sl.mode === 'sold') {
+          const src = sl.item;
+          const it = { id: src.id && !findInv(src.id) ? src.id : newId(), code: src.code || S.settings.nextCode++, cat: c.k, name: src.name, cost: round2(src.cost), cond: condOk(src.cond), status: 'disp', date: isDate(src.date) ? src.date : '', specs: cleanSpecs(c.k, src.specs), buildId: null, createdAt: Date.now() };
+          S.inv.push(it);
+          linkItem(b, it);
+        }
+      });
+    } else {
+      CATS.forEach(c => { const sl = b.slots[c.k]; if (sl && sl.mode === 'sold') b.slots[c.k] = { mode: 'plan', name: sl.item.name, cost: round2(sl.item.cost), specs: cleanSpecs(c.k, sl.item.specs) }; });
+    }
+    b.status = target;
+    b.sale = { price: 0, date: '', card: false };
+    b.readyAt = target === 'estoque' ? today() : null;
+    gotoPC(b.id);
+    toast('Venda desfeita');
+  });
+}
+
+/* Anúncio */
+function openAd(id) {
+  const b = findBuild(id);
+  if (!b) return;
+  const cfg = adCfg(b);
+  const auto = autoTitle(b);
+  const tier = profileFor(b);
+  Sheet.open({
+    title: `Anúncio · ${b.name}`,
+    body: `<div class="form">
+      <div id="ad-status"></div>
+      <div id="adf-btns" class="ad-btns">
+        <button class="btn primary block" data-a="ad-copy" data-id="${b.id}">${IC.copy} Copiar anúncio</button>
+        <div class="btns">
+          <button class="btn" data-a="ad-copy-title" data-id="${b.id}">${IC.copy} Copiar título</button>
+          ${navigator.share || NATIVE ? `<button class="btn" data-a="ad-share" data-id="${b.id}">${IC.share} Compartilhar</button>` : ''}
+        </div>
+      </div>
+      <div><div class="block-t"><span class="label">Prévia</span><span class="hint">O preço fica de fora: coloque direto no anúncio.</span></div><div class="preview" id="adf-preview"></div>
+        <span class="counter" id="adf-count" style="display:block;margin-top:4px"></span></div>
+      <button class="link-btn" id="adf-toggle" type="button" aria-expanded="false">${IC.pencil} Personalizar texto${Object.keys(b.ad || {}).some(k => b.ad[k]) ? ' (alterado neste PC)' : ''} ${IC.chev}</button>
+      <div id="adf-custom" class="form" hidden>
+        <label class="field"><span>Título</span><input type="text" id="adf-title" value="${esc(cfg.title)}" placeholder="${esc(auto)}" maxlength="120"></label>
+        <label class="field"><span>Condição</span><input type="text" id="adf-cond" value="${esc(cfg.cond)}"></label>
+        <label class="field"><span>Sistema</span><input type="text" id="adf-os" value="${esc(cfg.os)}"></label>
+        <label class="field"><span>Condições comerciais (uma por linha)</span><textarea id="adf-terms">${esc(cfg.terms)}</textarea></label>
+        <label class="field"><span>Observações</span><textarea id="adf-notes" placeholder="Opcional">${esc(cfg.notes)}</textarea></label>
+        <button class="btn" data-a="ad-reset" data-id="${b.id}">Voltar ao texto padrão neste PC</button>
+        <p class="hint" style="margin:0">O texto padrão de todos os anúncios fica em Ajustes.</p>
+      </div>
+    </div>`,
+    onMount: el => {
+      const upd = () => {
+        b.ad = readAdForm(el, b);
+        $('#adf-preview', el).textContent = adText(b);
+        const t = (b.ad.title || auto);
+        const c = $('#adf-count', el);
+        c.textContent = `Título com ${t.length}/70 caracteres${t.length > 70 ? ' · a OLX corta títulos longos' : ''}`;
+        c.classList.toggle('over', t.length > 70);
+        const chk = adCheck(b);
+        const blocked = chk.need.length || chk.blocks.length;
+        $('#ad-status', el).innerHTML = chk.need.length ? `<div class="alert crit">${IC.warn}<span>Para anunciar, falta: ${esc(chk.need.join(', '))}.</span></div>`
+          : chk.blocks.length ? chk.blocks.map(alertHTML).join('') + `<div class="alert crit">${IC.warn}<span>Corrija o erro acima antes de anunciar.</span></div>` : '';
+        $$('#adf-btns .btn', el).forEach(x => { x.disabled = !!blocked; });
+      };
+      $$('input,textarea', el).forEach(x => x.addEventListener('input', () => { upd(); commitQuiet(); }));
+      const tg = $('#adf-toggle', el), box = $('#adf-custom', el);
+      tg.addEventListener('click', () => { box.hidden = !box.hidden; tg.setAttribute('aria-expanded', String(!box.hidden)); if (!box.hidden) $('#adf-title', el).focus({ preventScroll: true }); });
+      el._upd = upd;
+      upd();
+    },
+    onClose: () => { commit(); },
+  });
+}
+function readAdForm(el, b) {
+  const d = S.settings.ad;
+  const v = id => $('#' + id, el).value;
+  const o = {};
+  const t = v('adf-title').trim();
+  if (t) o.title = t;
+  ['cond', 'os', 'terms', 'notes'].forEach(k => { const x = v('adf-' + k); if (x !== d[k]) o[k] = x; });
+  return o;
+}
+async function copyText(t, okMsg) {
+  if (NATIVE && nativeCall('copy', t)) { toast(okMsg); return true; }
+  try { await navigator.clipboard.writeText(t); toast(okMsg); return true; }
+  catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = t; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.append(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e2) {}
+    ta.remove();
+    if (ok) { toast(okMsg); return true; }
+    Sheet.open({ title: 'Copie o texto', body: `<p class="hint" style="margin-top:0">Não consegui copiar sozinho. Toque e segure no texto para copiar.</p><textarea readonly style="min-height:260px">${esc(t)}</textarea>` });
+    return false;
+  }
+}
+
+/* Busca geral */
+function openSearch() {
+  Sheet.open({
+    title: 'Buscar',
+    body: `<div class="search-box"><input type="search" id="gs" placeholder="PC, peça, modelo ou código (#014)" autocomplete="off"></div><div id="gs-res"><p class="hint">Procura nos PCs, no estoque, nas vendas avulsas e no histórico de preços.</p></div>`,
+    onMount: el => {
+      const i = $('#gs', el);
+      setTimeout(() => i.focus(), 250);
+      i.addEventListener('input', () => { $('#gs-res', el).innerHTML = searchResults(i.value); });
+    },
+  });
+}
+function searchResults(q) {
+  q = q.trim();
+  if (!q) return '<p class="hint">Procura nos PCs, no estoque, nas vendas avulsas e no histórico de preços.</p>';
+  const cm = q.match(/^#?0*(\d{1,6})$/);
+  const byCode = cm ? +cm[1] : null;
+  const onlyCode = q.startsWith('#');
+  const nameOk = n => !onlyCode && matchName(q, n);
+  const pcs = S.builds.filter(b => nameOk(b.name) || (!onlyCode && b.notes && norm(b.notes).includes(norm(q))) || CATS.some(c => { const p = slotPart(b, c.k); return p && (nameOk(p.name) || (byCode && p.code === byCode)); })).slice(0, 8);
+  const inv = S.inv.filter(i => (byCode && i.code === byCode) || nameOk(i.name)).slice(0, 8);
+  const sales = S.sales.filter(s => (byCode && s.item?.code === byCode) || nameOk(s.item?.name)).slice(0, 5);
+  const hist = onlyCode ? [] : histFind('', q).slice(0, 8);
+  if (!pcs.length && !inv.length && !hist.length && !sales.length) return `<div class="empty"><b>Nada encontrado</b>Tente só o modelo, como “6600”, ou um código como #12.</div>`;
+  let h = '';
+  if (pcs.length) h += `<div class="label res-h">PCs</div><div class="list">${pcs.map(b => { const f = fin(b); return `<button class="row" data-a="goto-pc" data-id="${b.id}"><span class="main"><span class="title">${esc(b.name)}</span><span class="sub">${STATUS[b.status]} · custo ${money(f.cost)}</span></span>${IC.arrow.replace('<svg', '<svg width="18" height="18"')}</button>`; }).join('')}</div>`;
+  if (inv.length) h += `<div class="label res-h">Estoque</div><div class="list">${inv.map(i => `<button class="row" data-a="item" data-id="${i.id}"><span class="tag">${code(i.code)}</span><span class="main"><span class="title">${esc(i.name)}</span><span class="sub">${CAT[i.cat].l}${i.buildId ? ' · no ' + esc(findBuild(i.buildId)?.name || 'PC') : i.status === 'caminho' ? ' · a caminho' : ' · disponível'}</span></span><span class="end v">${money(i.cost)}</span></button>`).join('')}</div>`;
+  if (sales.length) h += `<div class="label res-h">Vendas avulsas</div><div class="list">${sales.map(s => `<button class="row" data-a="sale" data-id="${s.id}"><span class="tag">${code(s.item?.code)}</span><span class="main"><span class="title">${esc(s.item?.name)}</span><span class="sub">vendida por ${money(s.price)}</span></span></button>`).join('')}</div>`;
+  if (hist.length) h += `<div class="label res-h">Histórico de preços</div><div class="list">${hist.map(histRow).join('')}</div>`;
+  return h;
+}
+
+/* Backup */
+function backupJSON() {
+  return JSON.stringify({ app: 'pcs-gamer', version: 1, exportedAt: new Date().toISOString(), data: S }, null, 1);
+}
+async function doBackup() {
+  const name = `pcs-gamer-backup-${today()}.json`;
+  const data = backupJSON();
+  const markDone = () => { S.settings.lastBackup = Date.now(); commit(); toast('Backup gerado. Guarde o arquivo no Google Drive.'); };
+  if (NATIVE) {
+    // No Android abre o menu de compartilhar: escolha o Google Drive
+    if (nativeCall('shareFile', name, data)) { S.settings.lastBackup = Date.now(); commit(); toast('Escolha o Google Drive para guardar o backup.'); }
+    else toast('Não consegui gerar o arquivo. Use “Copiar como texto”.');
+    return;
+  }
+  let dl = null;
+  try { dl = window.claude && typeof window.claude.use === 'function' ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
+  if (dl) {
+    try { await dl.save({ filename: name, data }); markDone(); }
+    catch (e) {
+      if (e && e.code === 'declined') toast('Backup cancelado.');
+      else if (e && e.code === 'rate_limited') toast('Aguarde um instante e tente de novo.');
+      else { toast('Não deu para gerar o arquivo aqui. Use “Copiar como texto”.'); }
+    }
+    return;
+  }
+  try {
+    const url = URL.createObjectURL(new Blob([data], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    markDone();
+  } catch (e) { toast('Não deu para gerar o arquivo aqui. Use “Copiar como texto”.'); }
+}
+function parseBackup(text) {
+  let o;
+  try { o = JSON.parse(text); } catch (e) { return { err: 'O texto não é um backup válido do PCs Gamer.' }; }
+  if (!o || o.app !== 'pcs-gamer' || !o.data || typeof o.data !== 'object') return { err: 'Este arquivo não é um backup do PCs Gamer.' };
+  return { data: o.data, when: o.exportedAt };
+}
+function confirmRestore(text) {
+  const r = parseBackup(text);
+  if (r.err) { toast(r.err); return; }
+  const st = sanitizeState(r.data);
+  const when = r.when ? new Date(r.when) : null;
+  confirmBox({
+    title: 'Restaurar backup',
+    text: `Backup${when && !isNaN(when) ? ` de ${when.toLocaleDateString('pt-BR')}` : ''} com ${plural(st.builds.length, 'PC', 'PCs')}, ${plural(st.inv.length, 'peça', 'peças')} no estoque e ${plural(st.hist.length, 'compra', 'compras')} no histórico.<br><br><b>Os dados atuais deste aparelho serão substituídos.</b>`,
+    ok: 'Restaurar', danger: true,
+  }).then(ok => {
+    if (!ok) return;
+    const now = Date.now();
+    for (const c of COLLS) { const keep = new Set(st[c].map(x => x.id)); S[c].forEach(x => { if (!keep.has(x.id)) META.tomb[c][x.id] = now; }); }
+    st.settings.lastBackup = Date.now();
+    COLLS.forEach(c => st[c].forEach(x => { x.u = now; }));
+    S = st;
+    buildSnap();
+    Sheet.closeAll();
+    UI.tab = 'home';
+    commit();
+    toast('Backup restaurado');
+  });
+}
+
+/* ================= Ponte com o app Android =================
+   No APK existe window.AndroidBridge. Aqui no navegador ela não existe e nada disto é usado. */
+const NATIVE = (typeof window !== 'undefined' && window.AndroidBridge) ? window.AndroidBridge : null;
+const nativeCall = (fn, ...a) => { try { return NATIVE && typeof NATIVE[fn] === 'function' ? NATIVE[fn](...a) : null; } catch (e) { console.warn('Android', fn, e); return null; } };
+
+// Dados que o leitor de notificações precisa: o histórico de compras e as regras do alerta
+function engineSnapshot() {
+  return {
+    hist: S.hist.map(h => ({ cat: h.cat, name: h.name, cost: h.cost, cond: h.cond || '', date: h.date || '', specs: h.specs || {} })),
+    offers: S.settings.offers,
+  };
+}
+let nativeSyncT = null;
+function nativeSync() {
+  if (!NATIVE) return;
+  clearTimeout(nativeSyncT);
+  nativeSyncT = setTimeout(() => nativeCall('syncData', JSON.stringify(engineSnapshot())), 300);
+}
+// Ofertas que o leitor encontrou enquanto o app estava fechado
+function pullNativeOffers() {
+  if (!NATIVE) return 0;
+  let arr = [];
+  try { arr = JSON.parse(nativeCall('takeOffers') || '[]'); } catch (e) { arr = []; }
+  let added = 0;
+  arr.forEach(r => {
+    if (!r || !r.label || !(+r.price > 0)) return;
+    const at = +r.at || Date.now();
+    if (S.offers.some(x => x.k === r.k && Math.abs(x.at - at) < 12 * 3600e3)) return;
+    S.offers.unshift({
+      id: newId(), k: String(r.k || ''), at, channel: String(r.channel || ''), store: r.store || '', kind: r.kind || '', label: r.label,
+      title: String(r.title || '').slice(0, 200), price: round2(r.price), best: round2(r.best), bestCond: r.bestCond || '', diffPct: round2(r.diffPct),
+      status: r.status === 'great' ? 'great' : 'good', coupon: r.coupon || '', link: r.link || '', seen: false, dismissed: false,
+    });
+    added++;
+  });
+  if (added) commit();
+  return added;
+}
+function nativeStatus() {
+  if (!NATIVE) return null;
+  try { return JSON.parse(nativeCall('status') || 'null'); } catch (e) { return null; }
+}
+function nativeStatusHTML() {
+  const st = nativeStatus();
+  if (!st) return `<p class="hint" style="margin:0 2px 12px">Os avisos automáticos funcionam no app para Android, que lê as notificações dos canais do Telegram.</p>`;
+  const row = (ok, title, okText, offText, action, btn) => `<div class="row">
+      <span class="${ok ? 'good' : 'warnc'} row-ic">${ok ? IC.check : IC.warn}</span>
+      <span class="main"><span class="title">${title}</span><span class="sub">${ok ? okText : offText}</span></span>
+      ${ok ? '' : `<span class="end"><button class="btn sm primary" data-a="${action}">${btn}</button></span>`}</div>`;
+  const allOk = st.listener && st.notif && st.engine === 'ok';
+  return `<div class="list" style="margin-bottom:14px">
+    ${row(st.listener, 'Leitura do Telegram', 'Ativa. O app lê as notificações dos canais.', 'Desligada. Toque em Ativar e ligue o PCs Gamer na lista.', 'native-listener', 'Ativar')}
+    ${row(st.notif, 'Avisos no celular', 'Permitidos.', 'Bloqueados. Sem isso os bons preços só aparecem aqui.', 'native-notif', 'Permitir')}
+    ${st.engine === 'ok' ? '' : row(false, 'Leitor de ofertas', '', esc('Falhou ao iniciar: ' + st.engine), 'native-status', 'Tentar de novo')}
+    ${allOk ? `<div class="row"><span class="main"><span class="sub">As notificações do Telegram precisam estar ligadas para esses canais (não silenciados).</span></span>
+      <span class="end"><button class="btn sm" data-a="native-test">Testar aviso</button></span></div>` : ''}
+  </div>`;
+}
+// Ganchos chamados pelo Android
+window.pcgResume = () => { pullNativeOffers(); nativeSync(); if (UI.tab === 'prices') render(); };
+window.pcgOpenTab = t => { Sheet.closeAll(); UI.tab = t; pullNativeOffers(); render(); window.scrollTo(0, 0); };
+window.pcgBack = () => {
+  if (Sheet.isOpen()) { Sheet.close(); return true; }
+  if (UI.tab !== 'home') { UI.tab = 'home'; render(); window.scrollTo(0, 0); return true; }
+  return false;
+};
+
+/* ================= Ações ================= */
+const A = {
+  'sheet-close': () => Sheet.close(),
+  tab: t => { UI.tab = t.dataset.tab; Sheet.closeAll(); render(); window.scrollTo(0, 0); },
+  search: () => openSearch(),
+  sec: t => { const id = t.dataset.id; UI.open[id] = UI.open[id] === false; saveUI(); render(); },
+  grp: t => { const id = t.dataset.id; UI.grp[id] = UI.grp[id] === false; saveUI(); render(); },
+  'goto-pcs': t => { UI.pcFilter = t.dataset.f; UI.tab = 'pcs'; saveUI(); render(); window.scrollTo(0, 0); },
+  'goto-sec': t => { UI.open[t.dataset.id] = true; saveUI(); render(); const el = $('#sec-' + t.dataset.id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); },
+  'goto-pc': t => gotoPC(t.dataset.id),
+  'cmp-filter': t => { UI.cmpFilter = t.dataset.f; saveUI(); render(); },
+  'native-listener': () => { nativeCall('openListenerSettings'); toast('Ligue o PCs Gamer na lista e volte para o app.'); },
+  'native-notif': () => { nativeCall('requestNotifications'); },
+  'native-test': () => { nativeCall('testNotification'); toast('Aviso de teste enviado'); },
+  'native-status': () => render(),
+  'offer-dismiss': t => { const o = S.offers.find(x => x.id === t.dataset.id); if (o) { o.dismissed = true; commit(); } },
+  'offers-clear': () => {
+    confirmBox({ title: 'Limpar lista', text: 'Remover todas as ofertas da lista?', ok: 'Limpar' })
+      .then(ok => { if (!ok) return; S.offers.forEach(o => { o.dismissed = true; }); commit(); });
+  },
+  'copy-coupon': t => copyText(t.dataset.v, `Cupom ${t.dataset.v} copiado`),
+  'calc-toggle': t => { UI.calcOpen[t.dataset.id] = !UI.calcOpen[t.dataset.id]; render(); if (UI.calcOpen[t.dataset.id]) { const i = $('#bt-' + t.dataset.id); if (i) i.focus(); } },
+  'rename-pc': t => openRename(t.dataset.id),
+  'rename-ok': t => {
+    const b = findBuild(t.dataset.id), v = $('#rn-name', Sheet.top()).value.trim();
+    if (!v) { toast('Dê um nome ao PC.'); return; }
+    b.name = v; Sheet.close(); commit(); toast('Nome atualizado');
+  },
+  'pc-filter': t => { UI.pcFilter = t.dataset.f; saveUI(); render(); },
+  'stock-filter': t => { UI.stockFilter = t.dataset.f; render(); },
+
+  'new-pc': () => openNewPC(),
+  'new-pc-ok': () => {
+    const name = $('#np-name', Sheet.top()).value.trim();
+    if (!name) { toast('Dê um nome ao PC.'); return; }
+    const b = newBuild(name);
+    Sheet.close();
+    UI.pcFilter = 'ativos';
+    gotoPC(b.id);
+  },
+  'toggle-pc': t => { const b = findBuild(t.dataset.id); if (!b) return; b.collapsed = !b.collapsed; commit(); },
+  'set-status': t => setStatus(t.dataset.id, t.dataset.s),
+  'sell-ok': t => doSell(t.dataset.id),
+  slot: t => openSlot(t.dataset.id, t.dataset.cat),
+  'slot-edit': t => openSlotForm(t.dataset.id, t.dataset.cat, 'edit'),
+  'slot-bought': t => openSlotForm(t.dataset.id, t.dataset.cat, 'bought'),
+  'slot-change': t => openSlotChoose(t.dataset.id, t.dataset.cat, true),
+  'slot-new': t => openSlotForm(t.dataset.id, t.dataset.cat, 'new'),
+  'slot-plan': t => openSlotForm(t.dataset.id, t.dataset.cat, 'plan'),
+  'slot-save': t => saveSlotForm(t.dataset.id, t.dataset.cat, t.dataset.k),
+  'slot-pick': t => {
+    const b = findBuild(t.dataset.id), it = findInv(t.dataset.inv);
+    if (!b || !it) return;
+    linkItem(b, it);
+    Sheet.close(); commit(); toast(`${code(it.code)} colocada no ${b.name}`);
+  },
+  'slot-remove': t => {
+    const b = findBuild(t.dataset.id), cat = t.dataset.cat;
+    const sl = b?.slots[cat];
+    if (!sl) return;
+    if (sl.mode === 'inv') { const it = findInv(sl.invId); if (it) it.buildId = null; }
+    delete b.slots[cat];
+    Sheet.close(); commit();
+    toast(sl.mode === 'inv' ? 'Peça voltou para o estoque' : 'Planejamento removido');
+  },
+  'use-target': t => { const b = findBuild(t.dataset.id); if (!b) return; b.price = round2(+t.dataset.v); commit(); toast('Preço atualizado'); },
+  'dup-pc': t => {
+    const src = findBuild(t.dataset.id);
+    if (!src) return;
+    const b = newBuild(`${src.name} (cópia)`);
+    CATS.forEach(c => { const p = slotPart(src, c.k); if (p && (p.name || p.cost)) b.slots[c.k] = { mode: 'plan', name: p.name, cost: p.cost, specs: cleanSpecs(c.k, p.specs) }; });
+    b.price = src.price;
+    b.ad = clone(src.ad || {});
+    delete b.ad.title;
+    gotoPC(b.id);
+    toast('Cópia criada com as peças como “planejadas”');
+  },
+  'del-pc': t => {
+    const b = findBuild(t.dataset.id);
+    if (!b) return;
+    const n = linkedItems(b).length;
+    confirmBox({
+      title: 'Excluir PC',
+      text: `Excluir <b>${esc(b.name)}</b>?${b.status === 'vendido' ? ' A venda some do resumo mensal.' : n ? ` ${plural(n, 'peça vinculada volta', 'peças vinculadas voltam')} a ficar disponível no estoque.` : ''} Os preços continuam no histórico.`,
+      ok: 'Excluir', danger: true,
+    }).then(ok => {
+      if (!ok) return;
+      S.inv.forEach(i => { if (i.buildId === b.id) i.buildId = null; });
+      S.builds = S.builds.filter(x => x.id !== b.id);
+      commit(); toast('PC excluído');
+    });
+  },
+
+  'new-item': () => { if (UI.tab !== 'stock') { UI.tab = 'stock'; render(); window.scrollTo(0, 0); } openNewItem(); },
+  'item-save-new': () => {
+    const root = Sheet.top();
+    const d = readPartForm(root);
+    if (!d.name) { toast('Escreva o nome da peça.'); $('#pf-name', root).focus(); return; }
+    const it = createItem(d);
+    Sheet.close(); commit();
+    toast(`Peça ${code(it.code)} salva. Anote o código na caixa.`);
+  },
+  item: t => { Sheet.closeAll(); openItem(t.dataset.id); },
+  'item-edit': t => openEditItem(t.dataset.id),
+  'item-save': t => {
+    const it = findInv(t.dataset.id);
+    const root = Sheet.top();
+    const d = readPartForm(root);
+    if (!d.name) { toast('Escreva o nome da peça.'); return; }
+    updateItem(it, d);
+    Sheet.close(); commit(); toast('Peça atualizada');
+  },
+  'item-arrived': t => {
+    const it = findInv(t.dataset.id);
+    if (!it) return;
+    it.status = 'disp';
+    const b = it.buildId ? findBuild(it.buildId) : null;
+    if (b && b.slots[it.cat]?.invId === it.id) b.slots[it.cat].snap = snapOf(it);
+    Sheet.close(); commit(); toast(`${code(it.code)} marcada como disponível`);
+  },
+  'item-unlink': t => { const it = findInv(t.dataset.id); if (!it) return; unlinkItem(it); Sheet.close(); commit(); toast('Peça voltou a ficar disponível'); },
+  'item-sell': t => openSellItem(t.dataset.id),
+  'item-sell-ok': t => {
+    const it = findInv(t.dataset.id);
+    const root = Sheet.top();
+    const price = parseMoney($('#vs-price', root).value);
+    if (!(price > 0)) { toast('Informe o valor da venda.'); $('#vs-price', root).focus(); return; }
+    const date = $('#vs-date', root).value;
+    const card = !!$('#vs-card', root)?.checked;
+    S.sales.push({ id: newId(), item: snapOf(it), price, date: isDate(date) ? date : '', card, createdAt: Date.now() });
+    S.inv = S.inv.filter(i => i.id !== it.id);
+    Sheet.close(); commit();
+    toast(`Venda registrada: lucro de ${money(price - it.cost - cardFee(price, card))}`);
+  },
+  'item-del': t => {
+    const it = findInv(t.dataset.id);
+    if (!it) return;
+    confirmBox({ title: 'Excluir peça', text: `Excluir <b>${code(it.code)} ${esc(it.name)}</b> do estoque? O preço pago continua no histórico.`, ok: 'Excluir', danger: true })
+      .then(ok => { if (!ok) return; S.inv = S.inv.filter(i => i.id !== it.id); Sheet.closeAll(); commit(); toast('Peça excluída'); });
+  },
+  sale: t => { Sheet.closeAll(); openSale(t.dataset.id); },
+  'sale-undo': t => {
+    const s = S.sales.find(x => x.id === t.dataset.id);
+    if (!s) return;
+    const src = s.item || {};
+    const cat = CAT[src.cat] ? src.cat : 'cpu';
+    S.inv.push({ id: src.id && !findInv(src.id) ? src.id : newId(), code: src.code || S.settings.nextCode++, cat, name: src.name || '', cost: round2(src.cost), cond: condOk(src.cond), status: 'disp', date: isDate(src.date) ? src.date : '', specs: cleanSpecs(cat, src.specs), buildId: null, createdAt: Date.now() });
+    S.sales = S.sales.filter(x => x.id !== s.id);
+    Sheet.close(); commit(); toast('A peça voltou ao estoque');
+  },
+  'sale-del': t => {
+    confirmBox({ title: 'Excluir registro', text: 'Excluir o registro desta venda avulsa? Ela some do resumo mensal.', ok: 'Excluir', danger: true })
+      .then(ok => { if (!ok) return; S.sales = S.sales.filter(x => x.id !== t.dataset.id); Sheet.closeAll(); commit(); });
+  },
+  hist: t => { Sheet.closeAll(); openHist(t.dataset.id); },
+  'hist-new': () => openHist(null),
+  'hist-save': t => {
+    const root = Sheet.top();
+    const d = readPartForm(root);
+    if (!d.name) { toast('Escreva o nome da peça.'); return; }
+    if (!(d.cost > 0)) { toast('Informe o valor pago.'); return; }
+    const h = t.dataset.id ? S.hist.find(x => x.id === t.dataset.id) : null;
+    if (h) Object.assign(h, { cat: d.cat, name: d.name, cost: d.cost, cond: d.cond, date: d.date });
+    else S.hist.push({ id: newId(), invId: null, cat: d.cat, name: d.name, cost: d.cost, cond: d.cond, date: d.date, specs: {}, kind: 'manual', createdAt: Date.now() });
+    Sheet.close(); commit(); toast(h ? 'Compra atualizada' : 'Compra lançada');
+  },
+  'hist-del': t => {
+    confirmBox({ title: 'Excluir do histórico', text: 'Excluir este registro de compra? Ele deixa de contar nas médias de preço.', ok: 'Excluir', danger: true })
+      .then(ok => { if (!ok) return; S.hist = S.hist.filter(x => x.id !== t.dataset.id); Sheet.closeAll(); commit(); });
+  },
+
+  ad: t => openAd(t.dataset.id),
+  'ad-copy-title': t => { const b = findBuild(t.dataset.id); copyText(adCfg(b).title || autoTitle(b), 'Título copiado'); },
+  'ad-copy': t => { const b = findBuild(t.dataset.id); copyText(adText(b), 'Anúncio copiado. É só colar na OLX.'); },
+  'ad-share': async t => {
+    const b = findBuild(t.dataset.id);
+    if (NATIVE) { nativeCall('shareText', adCfg(b).title || autoTitle(b), adText(b)); return; }
+    try { await navigator.share({ title: adCfg(b).title || autoTitle(b), text: adText(b) }); }
+    catch (e) { if (e && e.name === 'AbortError') return; copyText(adText(b), 'Não deu para compartilhar daqui. O anúncio foi copiado.'); }
+  },
+  'ad-reset': t => { const b = findBuild(t.dataset.id); if (!b) return; b.ad = {}; Sheet.close(true); openAd(b.id); toast('Texto padrão aplicado'); },
+
+  backup: () => doBackup(),
+  'backup-copy': async () => { if (await copyText(backupJSON(), 'Backup copiado. Cole numa nota ou documento no Google Drive.')) { S.settings.lastBackup = Date.now(); commit(); } },
+  restore: () => {
+    Sheet.open({
+      title: 'Restaurar backup',
+      body: `<div class="optlist">
+        <label class="opt" for="restore-file2"><span class="ic">${IC.upload}</span><span><b>Escolher arquivo de backup</b><small>O arquivo .json gerado pelo app</small></span></label>
+        <button class="opt" data-a="restore-paste"><span class="ic">${IC.copy}</span><span><b>Colar o texto do backup</b><small>Se você copiou o backup como texto</small></span></button>
+      </div><input type="file" id="restore-file2" accept=".json,application/json,text/plain" hidden>`,
+    });
+  },
+  'restore-paste': () => {
+    Sheet.closeAll();
+    Sheet.open({
+      title: 'Colar backup',
+      body: `<div class="form"><textarea id="rp-text" style="min-height:220px" placeholder="Cole aqui o texto do backup"></textarea></div>
+        <div class="sheet-foot"><button class="btn" data-a="sheet-close">Cancelar</button><button class="btn primary" data-a="restore-paste-ok">Continuar</button></div>`,
+    });
+  },
+  'restore-paste-ok': () => { const t = $('#rp-text', Sheet.top()).value.trim(); if (!t) { toast('Cole o texto do backup.'); return; } confirmRestore(t); },
+  'sync-now': async () => { if (META.dirty) await Cloud.push(); await Cloud.sync(false); render(); toast(Cloud.status === 'cloud' ? 'Dados atualizados' : 'Não foi possível falar com a nuvem agora'); },
+  'ad-defaults': () => { S.settings.ad = { ...DEFAULT_AD }; commit(); toast('Texto original restaurado'); },
+  wipe: () => {
+    confirmBox({
+      title: 'Apagar tudo',
+      text: 'Isso apaga todos os PCs, peças, vendas e o histórico de preços. Não dá para desfazer sem um backup.',
+      check: { label: 'Entendo e quero apagar tudo', on: false }, ok: 'Apagar tudo', danger: true,
+    }).then(r => {
+      if (!r) return;
+      if (!r.check) { toast('Marque a confirmação para apagar.'); return; }
+      const theme = S.settings.theme;
+      S = blankState();
+      S.settings.theme = theme;
+      UI.tab = 'home';
+      commit(); toast('Dados apagados');
+    });
+  },
+  seg: t => {
+    const seg = t.closest('.seg');
+    $$('button', seg).forEach(x => x.setAttribute('aria-pressed', String(x === t)));
+    if (seg.dataset.name === 'theme' && !t.closest('.sheet')) { S.settings.theme = t.dataset.v; commit(); }
+  },
+};
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-a]');
+  if (!t || t.disabled) return;
+  const fn = A[t.dataset.a];
+  if (fn) { e.preventDefault(); fn(t, e); }
+});
+
+function refreshLive(b) {
+  const n = $('#nums-' + b.id); if (n) n.innerHTML = numsHTML(b);
+  const c = $('#calc-' + b.id); if (c) c.innerHTML = calcHTML(b);
+  const g = $('#tgt-' + b.id); if (g) g.innerHTML = targetHTML(b);
+}
+document.addEventListener('input', e => {
+  const el = e.target, f = el.dataset?.f;
+  if (!f) return;
+  const b = el.dataset.id ? findBuild(el.dataset.id) : null;
+  switch (f) {
+    case 'b-price': if (b) { b.price = parseMoney(el.value); commitQuiet(); refreshLive(b); } break;
+    case 's-price': if (b) { b.sale.price = parseMoney(el.value); commitQuiet(); refreshLive(b); } break;
+    case 'b-notes': if (b) { b.notes = el.value; commitQuiet(); } break;
+    case 'b-target': if (b) { UI.target = UI.target || {}; UI.target[b.id] = parseMoney(el.value); const g = $('#tgt-' + b.id); if (g) g.innerHTML = targetHTML(b); } break;
+    case 'q-text': UI.q.text = el.value; $('#q-res').innerHTML = pricesResults(); break;
+    case 'q-offer': UI.q.offer = el.value; $('#q-res').innerHTML = pricesResults(); break;
+    case 'set-ad': S.settings.ad[el.dataset.k] = el.value; commitQuiet(); break;
+    case 'card-pct': S.settings.card.pct = Math.min(parseMoney(el.value), 30); commitQuiet(); break;
+  }
+});
+document.addEventListener('change', e => {
+  const el = e.target, f = el.dataset?.f;
+  if (el.id === 'restore-file' || el.id === 'restore-file2') {
+    const file = el.files && el.files[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => { el.value = ''; Sheet.closeAll(); confirmRestore(String(r.result || '')); };
+    r.onerror = () => toast('Não consegui ler o arquivo.');
+    r.readAsText(file);
+    return;
+  }
+  if (!f) return;
+  const b = el.dataset.id ? findBuild(el.dataset.id) : null;
+  switch (f) {
+    case 'b-name': if (b) { const v = el.value.trim(); if (v) b.name = v; else el.value = b.name; stamp(); refreshCard(b); } break;
+    case 'b-price': if (b) { b.price = parseMoney(el.value); el.value = moneyIn(b.price); stamp(); refreshCard(b); } break;
+    case 's-price': if (b) { b.sale.price = parseMoney(el.value); el.value = moneyIn(b.sale.price); stamp(); refreshCard(b); } break;
+    case 's-date': if (b) { b.sale.date = isDate(el.value) ? el.value : ''; stamp(); refreshCard(b); } break;
+    case 's-card': if (b) { b.sale.card = el.checked; stamp(); refreshCard(b); } break;
+    case 'b-notes': if (b) { b.notes = el.value; stamp(); } break;
+    case 'stock-cat': UI.stockCat = el.value; render(); break;
+    case 'q-cat': UI.q.cat = el.value; $('#q-res').innerHTML = pricesResults(); break;
+    case 'card-on': S.settings.card.on = el.checked; commit(); break;
+    case 'card-pct': S.settings.card.pct = Math.min(parseMoney(el.value), 30); el.value = S.settings.card.pct ? NUM2.format(S.settings.card.pct) : ''; stamp(); break;
+    case 'of-tol': S.settings.offers.tol = Math.min(50, parseMoney(el.value)); el.value = NUM1.format(S.settings.offers.tol).replace(',0', ''); stamp(); break;
+    case 'of-groups': S.settings.offers.groups = el.value.split('\n').map(g => g.trim()).filter(Boolean); stamp(); break;
+    case 'stale': S.settings.staleDays = Math.min(365, Math.max(1, parseIntSafe(el.value) || 30)); el.value = S.settings.staleDays; stamp(); break;
+    case 'set-ad': S.settings.ad[el.dataset.k] = el.value; stamp(); break;
+  }
+});
+// Formata valores em reais ao sair do campo
+document.addEventListener('focusout', e => {
+  const el = e.target;
+  if (el.matches && el.matches('.money-in input') && !el.dataset.f) el.value = moneyIn(parseMoney(el.value));
+});
+// Guarda o que está pendente ao sair do app
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && quietTimer) { clearTimeout(quietTimer); quietTimer = null; stamp(); } });
+
+/* Mantém o foco no mesmo campo quando a tela é redesenhada */
+const _render = render;
+let rendering = false, rerender = false;
+render = function () {
+  if (rendering) { rerender = true; return; }
+  rendering = true;
+  try { doRender(); } finally { rendering = false; }
+  if (rerender) { rerender = false; render(); }
+};
+function doRender() {
+  const ae = document.activeElement;
+  const fid = ae && ae.id && ae.closest && ae.closest('#main') ? ae.id : null;
+  _render();
+  if (fid) {
+    const n = document.getElementById(fid);
+    if (n && n.focus) { n.focus({ preventScroll: true }); if (typeof n.setSelectionRange === 'function' && n.type === 'text') { try { const L = n.value.length; n.setSelectionRange(L, L); } catch (e) {} } }
+  }
+}
+
+/* Início */
+$('#brand-mark').innerHTML = IC.pc;
+$('#search-btn').innerHTML = IC.search;
+$('#add-btn').innerHTML = IC.plus;
+$('#nav').innerHTML = [['home', 'Início', IC.home], ['pcs', 'PCs', IC.pc], ['stock', 'Estoque', IC.box], ['prices', 'Ofertas', IC.tag], ['settings', 'Ajustes', IC.sliders]]
+  .map(([k, l, i]) => `<button class="tab" data-a="tab" data-tab="${k}">${i}<span>${l}</span></button>`).join('');
+loadLocal();
+render();
+Cloud.setStatus('local');
+Cloud.init();
+if (NATIVE) { pullNativeOffers(); nativeSync(); }
+
+</script>
+</body></html>

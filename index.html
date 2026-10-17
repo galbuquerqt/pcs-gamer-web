@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>PCs Gamer</title>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#121826"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>PCs Gamer</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -846,7 +846,7 @@ function defaultSettings() {
 function blankState() { return { v: 1, builds: [], inv: [], hist: [], sales: [], offers: [], settings: defaultSettings() }; }
 
 let S = blankState();
-let META = { savedAt: 0, dirty: false, tomb: {} };
+let META = { savedAt: 0, dirty: false, tomb: {}, dtomb: {}, settingsAt: 0 };
 let SNAP = {};
 let UI = {
   tab: 'home', pcFilter: 'ativos', cmpFilter: 'all', calcOpen: {}, stockFilter: 'all', stockCat: '', q: { cat: '', text: '', offer: '' },
@@ -929,7 +929,7 @@ function repairLinks(st) {
 }
 
 function snapKey(r) { const { u, ...rest } = r; return JSON.stringify(rest); }
-function buildSnap() { SNAP = {}; for (const c of COLLS) { SNAP[c] = {}; S[c].forEach(r => { SNAP[c][r.id] = snapKey(r); }); } }
+function buildSnap() { SNAP = {}; for (const c of COLLS) { SNAP[c] = {}; S[c].forEach(r => { SNAP[c][r.id] = snapKey(r); }); } SNAP.__settings = JSON.stringify(S.settings); }
 
 function loadLocal() {
   try {
@@ -937,16 +937,16 @@ function loadLocal() {
     if (raw) {
       const o = JSON.parse(raw);
       S = sanitizeState(o.state);
-      META = { savedAt: o.savedAt || 0, dirty: !!o.dirty, tomb: o.tomb || {} };
+      META = { savedAt: o.savedAt || 0, dirty: !!o.dirty, tomb: o.tomb || {}, dtomb: o.dtomb || {}, settingsAt: o.settingsAt || 0 };
     }
   } catch (e) { console.warn('Falha ao ler dados locais', e); }
   try { const u = JSON.parse(localStorage.getItem(UIKEY) || 'null'); if (u) { UI.open = { ...UI.open, ...(u.open || {}) }; UI.grp = u.grp || {}; UI.pcFilter = ['ativos', 'montagem', 'estoque', 'vendido'].includes(u.pcFilter) ? u.pcFilter : 'ativos'; UI.cmpFilter = ['all', 'montagem', 'estoque', 'vendido'].includes(u.cmpFilter) ? u.cmpFilter : 'all'; } } catch (e) {}
-  for (const c of COLLS) META.tomb[c] = META.tomb[c] || {};
+  for (const c of COLLS) { META.tomb[c] = META.tomb[c] || {}; META.dtomb[c] = META.dtomb[c] || {}; }
   buildSnap();
 }
 let localOk = true;
 function saveLocal() {
-  try { localStorage.setItem(KEY, JSON.stringify({ state: S, savedAt: META.savedAt, dirty: META.dirty, tomb: META.tomb })); localOk = true; }
+  try { localStorage.setItem(KEY, JSON.stringify({ state: S, savedAt: META.savedAt, dirty: META.dirty, tomb: META.tomb, dtomb: META.dtomb, settingsAt: META.settingsAt })); localOk = true; }
   catch (e) { localOk = false; console.warn('Falha ao salvar localmente', e); }
 }
 function saveUI() { try { localStorage.setItem(UIKEY, JSON.stringify({ open: UI.open, grp: UI.grp, pcFilter: UI.pcFilter, cmpFilter: UI.cmpFilter })); } catch (e) {} }
@@ -962,13 +962,16 @@ function stamp() {
       if (SNAP[c][r.id] !== k) { r.u = now; SNAP[c][r.id] = k; }
       else if (!r.u) r.u = now;
     });
-    for (const id of Object.keys(SNAP[c])) if (!seen[id]) { delete SNAP[c][id]; META.tomb[c][id] = now; }
+    for (const id of Object.keys(SNAP[c])) if (!seen[id]) { delete SNAP[c][id]; META.tomb[c][id] = now; (META.dtomb[c] = META.dtomb[c] || {})[id] = now; }
   }
+  const sk = JSON.stringify(S.settings);
+  if (SNAP.__settings !== sk) { SNAP.__settings = sk; META.settingsAt = now; }
   META.savedAt = now;
   META.dirty = true;
   saveLocal();
   Cloud.schedule();
   nativeSync();
+  Drive.schedule();
 }
 function commit() { stamp(); render(); }
 let quietTimer = null;
@@ -1392,6 +1395,12 @@ const Cloud = {
     this.status = s;
     const el = $('#sync');
     if (!el) return;
+    if (typeof Drive !== 'undefined' && Drive.isOn()) {
+      const [dc, dt] = Drive.statusText();
+      el.innerHTML = `<span class="dot ${localOk ? dc : 'err'}"></span>${esc(dt)}`;
+      if (Drive.state === 'auth') { el.dataset.a = 'drive-connect'; el.style.cursor = 'pointer'; } else { delete el.dataset.a; el.style.cursor = ''; }
+      return;
+    }
     const map = {
       local: ['ok', localOk ? 'Salvo neste aparelho' : 'Não foi possível salvar'],
       connecting: ['busy', 'Conectando…'],
@@ -1567,6 +1576,7 @@ function backupBanner() {
   const last = S.settings.lastBackup;
   const days = last ? Math.floor((Date.now() - last) / 864e5) : null;
   if (days != null && days < 7) return '';
+  if (Drive.isOn() && Drive.cfg.lastSync > Date.now() - 7 * 864e5) return '';
   return `<div class="banner">${IC.warn}<div style="flex:1;min-width:0"><b>${last ? `Último backup há ${days} dias` : 'Você ainda não fez nenhum backup'}</b>
     <span class="small">Se o aparelho for perdido ou o app apagado, o backup é o que traz seus dados de volta. Salve o arquivo no Google Drive.</span><br>
     <button class="btn sm primary" data-a="backup">${IC.download} Gerar backup</button></div></div>`;
@@ -1583,6 +1593,7 @@ function viewHome() {
         <button class="opt" data-a="new-item"><span class="ic">${IC.box}</span><span><b>Cadastrar uma peça no estoque</b><small>Cada peça ganha um código para anotar na caixa</small></span></button>
         <button class="opt" data-a="new-pc"><span class="ic">${IC.pc}</span><span><b>Criar um PC</b><small>Monte a configuração e acompanhe custo e margem</small></span></button>
         <button class="opt" data-a="hist-new"><span class="ic">${IC.tag}</span><span><b>Lançar compras antigas</b><small>Para comparar ofertas com o que você já pagou</small></span></button>
+        ${Drive.available() && !Drive.cfg.on ? `<button class="opt" data-a="drive-connect"><span class="ic">${IC.refresh}</span><span><b>Conectar ao Google Drive</b><small>Traz os dados que você já usa no celular ou no computador</small></span></button>` : ''}
         <button class="opt" data-a="restore"><span class="ic">${IC.upload}</span><span><b>Restaurar um backup</b><small>Se você já usava o app em outro aparelho</small></span></button>
       </div></div>`;
   }
@@ -2024,10 +2035,12 @@ function pricesResults() {
 function viewSettings() {
   const st = S.settings;
   const last = st.lastBackup ? new Date(st.lastBackup) : null;
-  const where = Cloud.on
+  const where = Drive.isOn()
+    ? 'Seus dados ficam salvos neste aparelho e no seu Google Drive, sincronizados com seus outros aparelhos. O arquivo de backup é uma cópia extra.'
+    : Cloud.on
     ? 'Seus dados ficam salvos neste aparelho e numa cópia privada na sua conta do Claude. Só você vê.'
     : 'Seus dados ficam salvos somente neste aparelho. Faça backup com frequência.';
-  return `${sec('s-backup', 'Backup', `<div class="panel form">
+  return `${driveSectionHTML()}${sec('s-backup', 'Backup', `<div class="panel form">
       <p style="margin:0">${where}</p>
       <p class="small muted" style="margin:0">${last ? `Último backup: ${last.toLocaleDateString('pt-BR')} às ${last.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.` : 'Nenhum backup feito ainda.'}
         O arquivo de backup guarda tudo: PCs, estoque, histórico e ajustes. Guarde no Google Drive.</p>
@@ -2065,7 +2078,7 @@ function viewSettings() {
     </div>`)}
     ${sec('s-look', 'Aparência', `<div class="panel">${segHTML('theme', { auto: 'Automático', light: 'Claro', dark: 'Escuro' }, st.theme)}</div>`)}
     ${sec('s-danger', 'Apagar dados', `<div class="panel form">
-      <p class="small" style="margin:0">Remove todos os PCs, peças, histórico e ajustes deste aparelho${Cloud.on ? ' e da cópia na nuvem' : ''}. Faça um backup antes.</p>
+      <p class="small" style="margin:0">Remove todos os PCs, peças, histórico e ajustes deste aparelho${Cloud.on ? ' e da cópia na nuvem' : ''}${Drive.isOn() ? ' e de todos os aparelhos conectados ao Drive' : ''}. Faça um backup antes.</p>
       <button class="btn danger" data-a="wipe">${IC.trash} Apagar tudo</button></div>`)}
     <p class="hint" style="text-align:center;margin:22px 0 0">PCs Gamer · ${plural(S.builds.length, 'PC', 'PCs')} · ${plural(S.inv.length, 'peça', 'peças')} em estoque · ${plural(S.hist.length, 'compra', 'compras')} no histórico${NATIVE ? ' · versão ' + esc(nativeCall('version') || '') : ''}</p>`;
 }
@@ -2769,6 +2782,283 @@ window.pcgBack = () => {
   return false;
 };
 
+/* ================= Sincronização com o Google Drive =================
+   Um arquivo (pcs-gamer-dados.json) na pasta oculta do app no Drive do usuário.
+   Cada aparelho junta o seu conteúdo com o do Drive registro a registro (vale a alteração mais recente),
+   e as exclusões viajam como "lápides". Funciona no APK (login pelo Android) e no site (login do Google). */
+const GOOGLE_CLIENT_ID = '318618849978-3475lj8mbrg6v6uc5u65b42r8rohlk7d.apps.googleusercontent.com';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
+const DRIVE_NAME = 'pcs-gamer-dados.json';
+const DRIVE_KEY = 'pcsgamer.drive';
+const TOMB_DAYS = 120;
+
+const Drive = {
+  cfg: { on: false, fileId: '', lastSync: 0 },
+  token: '', exp: 0, state: 'off', err: '', busy: false, again: false, timer: null, poll: null,
+  pending: null, gis: null, gisLoading: null,
+
+  // Disponível no APK e no site publicado; não dentro do Claude (lá a cópia é a nuvem do Claude)
+  available() {
+    if (NATIVE) return typeof NATIVE.driveAuth === 'function';
+    return typeof location !== 'undefined' && location.protocol === 'https:' && !(window.claude && typeof window.claude.use === 'function');
+  },
+  isOn() { return this.available() && this.cfg.on; },
+  load() { try { this.cfg = { ...this.cfg, ...(JSON.parse(localStorage.getItem(DRIVE_KEY) || '{}')) }; } catch (e) {} },
+  save() { try { localStorage.setItem(DRIVE_KEY, JSON.stringify(this.cfg)); } catch (e) {} },
+
+  init() {
+    this.load();
+    if (!NATIVE && this.available()) this.loadGis().catch(() => {});
+    if (!this.isOn()) return;
+    this.sync('início');
+    this.poll = setInterval(() => { if (document.visibilityState === 'visible') this.sync('periódica'); }, 90000);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') this.sync('voltou'); });
+  },
+
+  /* ---------- Login ---------- */
+  async getToken(interactive) {
+    if (this.token && Date.now() < this.exp - 60000) return this.token;
+    if (!NATIVE) {
+      // No navegador a janela do Google só pode abrir por um toque; sem toque, usa o login guardado na aba
+      try { const t = JSON.parse(sessionStorage.getItem('pcsgamer.drive.token') || 'null'); if (t && Date.now() < t.exp - 60000) { this.token = t.token; this.exp = t.exp; return this.token; } } catch (e) {}
+      if (!interactive) throw { code: 'auth', message: 'Toque para sincronizar com o Drive.' };
+    }
+    let r;
+    if (NATIVE) r = await this.nativeToken(interactive);
+    else r = await this.webToken(interactive);
+    if (r && r.token) {
+      this.token = r.token; this.exp = Date.now() + (r.expiresIn || 3300) * 1000;
+      if (!NATIVE) { try { sessionStorage.setItem('pcsgamer.drive.token', JSON.stringify({ token: this.token, exp: this.exp })); } catch (e) {} }
+      return this.token;
+    }
+    throw { code: 'auth', message: (r && r.error) || 'Conecte de novo ao Google Drive.' };
+  },
+  nativeToken(interactive) {
+    return new Promise(resolve => {
+      if (this.pending) this.pending({ error: 'substituído' });
+      const t = setTimeout(() => { this.pending = null; resolve({ error: 'O Google não respondeu. Tente de novo.' }); }, interactive ? 180000 : 20000);
+      this.pending = res => { clearTimeout(t); this.pending = null; resolve(res); };
+      nativeCall('driveAuth', !!interactive);
+    });
+  },
+  loadGis() {
+    if (window.google && google.accounts && google.accounts.oauth2) return Promise.resolve();
+    if (this.gisLoading) return this.gisLoading;
+    this.gisLoading = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => { this.gisLoading = null; reject(new Error('Sem conexão com o Google.')); };
+      document.head.appendChild(s);
+    });
+    return this.gisLoading;
+  },
+  async webToken(interactive) {
+    try { await this.loadGis(); } catch (e) { return { error: e.message }; }
+    return new Promise(resolve => {
+      let done = false;
+      const finish = r => { if (!done) { done = true; resolve(r); } };
+      const client = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: DRIVE_SCOPE,
+        callback: resp => {
+          if (resp && resp.access_token && google.accounts.oauth2.hasGrantedAllScopes(resp, DRIVE_SCOPE)) finish({ token: resp.access_token, expiresIn: +resp.expires_in || 3300 });
+          else finish({ error: (resp && (resp.error_description || resp.error)) || 'O acesso ao Drive não foi liberado.' });
+        },
+        error_callback: e => finish({ error: e && e.type === 'popup_closed' ? 'Janela do Google fechada.' : e && e.type === 'popup_failed_to_open' ? 'popup' : 'Não foi possível entrar no Google.' }),
+      });
+      try { client.requestAccessToken({ prompt: '' }); }
+      catch (e) { finish({ error: 'Não foi possível entrar no Google.' }); }
+    });
+  },
+
+  /* ---------- Drive ---------- */
+  async api(method, url, { body, type, raw } = {}, retry = true) {
+    const token = await this.getToken(false);
+    const headers = { Authorization: 'Bearer ' + token };
+    if (type) headers['Content-Type'] = type;
+    const res = await fetch(url, { method, headers, body });
+    if (res.status === 401 && NATIVE && retry) { this.token = ''; return this.api(method, url, { body, type, raw }, false); }
+    if (res.status === 401) { this.token = ''; try { sessionStorage.removeItem('pcsgamer.drive.token'); } catch (e) {} throw { code: 'auth', message: 'Conecte de novo ao Google Drive.' }; }
+    if (!res.ok) {
+      let msg = 'Erro ' + res.status + ' no Google Drive.';
+      try { const j = await res.json(); if (j && j.error && j.error.message) msg = j.error.message; } catch (e) {}
+      throw { code: 'http', status: res.status, message: msg };
+    }
+    return raw ? res.text() : res.json();
+  },
+  async findFile() {
+    const q = encodeURIComponent(`name='${DRIVE_NAME}' and trashed=false`);
+    const r = await this.api('GET', `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&fields=files(id,modifiedTime)&orderBy=modifiedTime desc`);
+    return r.files && r.files[0] ? r.files[0].id : '';
+  },
+  async download(id) { return this.api('GET', `https://www.googleapis.com/drive/v3/files/${id}?alt=media`, { raw: true }); },
+  async create(content) {
+    const b = 'pcsgamer' + Date.now();
+    const body = `--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({ name: DRIVE_NAME, parents: ['appDataFolder'] })}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${content}\r\n--${b}--`;
+    const r = await this.api('POST', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { body, type: 'multipart/related; boundary=' + b });
+    return r.id;
+  },
+  async update(id, content) {
+    return this.api('PATCH', `https://www.googleapis.com/upload/drive/v3/files/${id}?uploadType=media&fields=id`, { body: content, type: 'application/json' });
+  },
+
+  /* ---------- Sincronizar ---------- */
+  schedule() {
+    if (!this.isOn()) return;
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.sync('alteração'), 3000);
+  },
+  async sync(reason, interactive) {
+    if (!this.isOn()) return;
+    if (this.busy) { this.again = true; return; }
+    this.busy = true; this.setState('syncing');
+    try {
+      if (interactive) await this.getToken(true);
+      let id = this.cfg.fileId;
+      let remoteText = null;
+      if (id) {
+        try { remoteText = await this.download(id); }
+        catch (e) { if (e.status === 404) { id = ''; } else throw e; }
+      }
+      if (!id) { id = await this.findFile(); if (id) remoteText = await this.download(id); }
+      let remote = null;
+      if (remoteText) { try { remote = JSON.parse(remoteText); } catch (e) { remote = null; } }
+      if (remote && remote.app !== 'pcs-gamer-sync') remote = null;
+
+      const local = localPayload();
+      const merged = mergePayloads(local, remote);
+      const changedHere = applyPayload(merged);
+      const out = JSON.stringify(normalizePayload(merged));
+      if (!remote || out !== JSON.stringify(normalizePayload(remote))) {
+        if (id) await this.update(id, out); else id = await this.create(out);
+      }
+      this.cfg.fileId = id;
+      this.cfg.lastSync = Date.now();
+      this.save();
+      this.err = '';
+      this.setState('ok');
+      if (changedHere) { pullNativeOffers(); nativeSync(); render(); }
+    } catch (e) {
+      this.err = (e && e.message) || 'Falha ao sincronizar.';
+      this.setState(e && e.code === 'auth' ? 'auth' : 'error');
+      console.warn('Drive', reason, e);
+    } finally {
+      this.busy = false;
+      if (this.again) { this.again = false; setTimeout(() => this.sync('fila'), 500); }
+    }
+  },
+  async connect() {
+    this.cfg.on = true; this.save();
+    this.token = '';
+    await this.sync('conectar', true);
+    if (this.state === 'ok') {
+      toast('Conectado ao Google Drive');
+      if (!this.poll) this.init();
+    } else if (this.state === 'auth') {
+      this.cfg.on = false; this.save();
+      toast(this.err === 'popup' ? 'Permita janelas pop-up deste site e tente de novo.' : this.err);
+    }
+    render();
+  },
+  disconnect() {
+    this.cfg = { on: false, fileId: '', lastSync: 0 }; this.save();
+    this.token = ''; this.setState('off');
+    try { sessionStorage.removeItem('pcsgamer.drive.token'); } catch (e) {}
+    if (NATIVE) nativeCall('driveSignOut');
+    clearInterval(this.poll); this.poll = null;
+    render();
+  },
+  setState(s) { this.state = s; Cloud.setStatus(Cloud.status); },
+  statusText() {
+    if (this.state === 'syncing') return ['busy', 'Sincronizando com o Drive…'];
+    if (this.state === 'ok') return ['ok', 'Sincronizado com o Drive'];
+    if (this.state === 'auth') return ['err', NATIVE ? 'Toque para reconectar ao Drive' : 'Toque para sincronizar com o Drive'];
+    if (this.state === 'error') return ['err', 'Sem sincronizar · salvo no aparelho'];
+    return ['busy', 'Conectando ao Drive…'];
+  },
+};
+// Resposta do Android ao pedido de login
+window.pcgDriveToken = (token, error, expiresIn) => { if (Drive.pending) Drive.pending(token ? { token, expiresIn: +expiresIn || 3300 } : { error: error || 'O acesso ao Drive não foi liberado.' }); };
+
+/* ---------- Junção dos dados ---------- */
+function localPayload() {
+  const data = {};
+  COLLS.forEach(c => { data[c] = S[c]; });
+  return { app: 'pcs-gamer-sync', v: 1, settings: S.settings, settingsAt: META.settingsAt || 0, tomb: META.dtomb || {}, data };
+}
+function normalizePayload(p) {
+  const out = { app: 'pcs-gamer-sync', v: 1, settings: p.settings || null, settingsAt: +p.settingsAt || 0, tomb: {}, data: {} };
+  COLLS.forEach(c => {
+    out.tomb[c] = (p.tomb && p.tomb[c]) || {};
+    out.data[c] = Array.isArray(p.data && p.data[c]) ? p.data[c] : [];
+  });
+  return out;
+}
+function mergePayloads(L, R) {
+  L = normalizePayload(L);
+  if (!R) return L;
+  R = normalizePayload(R);
+  const cut = Date.now() - TOMB_DAYS * 864e5;
+  const out = { app: 'pcs-gamer-sync', v: 1, tomb: {}, data: {} };
+  COLLS.forEach(c => {
+    const tomb = {};
+    [R.tomb[c], L.tomb[c]].forEach(t => Object.entries(t || {}).forEach(([id, ts]) => { if (ts > cut && !(tomb[id] >= ts)) tomb[id] = ts; }));
+    const byId = new Map();
+    [R.data[c], L.data[c]].forEach(list => list.forEach(r => {
+      if (!r || typeof r.id !== 'string') return;
+      const cur = byId.get(r.id);
+      if (!cur || (+r.u || 0) > (+cur.u || 0)) byId.set(r.id, r);
+    }));
+    out.data[c] = [...byId.values()].filter(r => !(tomb[r.id] >= (+r.u || 0)) && !(c === 'offers' && !(+r.at > Date.now() - 30 * 864e5)));
+    out.tomb[c] = tomb;
+  });
+  const useLocal = L.settings && (!R.settings || L.settingsAt >= R.settingsAt);
+  out.settings = useLocal ? L.settings : R.settings;
+  out.settingsAt = Math.max(L.settingsAt, R.settingsAt);
+  // Ordem estável para comparar com o que está no Drive
+  COLLS.forEach(c => out.data[c].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)));
+  return out;
+}
+// Coloca o resultado da junção no app. Devolve true se algo mudou aqui.
+function applyPayload(p) {
+  const before = JSON.stringify(COLLS.map(c => S[c].map(r => r.id + ':' + (r.u || 0)).sort())) + JSON.stringify(S.settings);
+  const next = { v: 1, settings: p.settings || S.settings };
+  COLLS.forEach(c => { next[c] = p.data[c].map(r => clone(r)); });
+  const st = sanitizeState(next);
+  // sanitizeState pode ajustar registros; mantém o carimbo de tempo original
+  COLLS.forEach(c => { const u = new Map(p.data[c].map(r => [r.id, r.u])); st[c].forEach(r => { if (u.has(r.id)) r.u = u.get(r.id); }); });
+  const after = JSON.stringify(COLLS.map(c => st[c].map(r => r.id + ':' + (r.u || 0)).sort())) + JSON.stringify(st.settings);
+  META.dtomb = p.tomb;
+  META.settingsAt = p.settingsAt;
+  if (before === after) { saveLocal(); return false; }
+  S = st;
+  buildSnap();
+  saveLocal();
+  return true;
+}
+
+/* ---------- Tela ---------- */
+function driveSectionHTML() {
+  if (!Drive.available()) return '';
+  const on = Drive.cfg.on;
+  const last = Drive.cfg.lastSync ? new Date(Drive.cfg.lastSync) : null;
+  const when = last ? `${last.toLocaleDateString('pt-BR')} às ${last.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : 'ainda não sincronizou';
+  const body = on ? `<div class="panel form">
+      <p style="margin:0"><b>${Drive.state === 'auth' ? 'Precisa reconectar' : Drive.state === 'error' ? 'Não sincronizou' : 'Conectado'}</b> · última sincronização: ${esc(when)}</p>
+      ${Drive.err && Drive.state !== 'ok' && Drive.err !== 'popup' ? `<p class="hint" style="margin:0">${esc(Drive.err)}</p>` : ''}
+      <p class="hint" style="margin:0">Seus dados ficam numa pasta oculta do seu Google Drive, que só o PCs Gamer acessa, e sincronizam entre o celular e o computador.</p>
+      <div class="btns">
+        ${Drive.state === 'auth' ? `<button class="btn primary" data-a="drive-connect">Reconectar</button>` : `<button class="btn primary" data-a="drive-sync">${IC.refresh} Sincronizar agora</button>`}
+        <button class="btn" data-a="drive-off">Desconectar</button>
+      </div></div>`
+    : `<div class="panel form">
+      <p style="margin:0">Conecte sua conta do Google para sincronizar os dados entre o celular e o computador. Eles ficam numa pasta oculta do seu Drive, que só o PCs Gamer acessa.</p>
+      <button class="btn primary" data-a="drive-connect">Conectar ao Google Drive</button></div>`;
+  return sec('s-drive', 'Google Drive', body);
+}
+
 /* ================= Ações ================= */
 const A = {
   'sheet-close': () => Sheet.close(),
@@ -2784,6 +3074,12 @@ const A = {
   'native-notif': () => { nativeCall('requestNotifications'); },
   'native-test': () => { nativeCall('testNotification'); toast('Aviso de teste enviado'); },
   'native-status': () => render(),
+  'drive-connect': () => Drive.connect(),
+  'drive-sync': () => { Drive.sync('manual', !NATIVE && !Drive.token); },
+  'drive-off': () => {
+    confirmBox({ title: 'Desconectar do Drive', text: 'Este aparelho para de sincronizar. Os dados continuam salvos aqui e no Drive.', ok: 'Desconectar' })
+      .then(ok => { if (ok) { Drive.disconnect(); toast('Desconectado do Google Drive'); } });
+  },
   'offer-dismiss': t => { const o = S.offers.find(x => x.id === t.dataset.id); if (o) { o.dismissed = true; commit(); } },
   'offers-clear': () => {
     confirmBox({ title: 'Limpar lista', text: 'Remover todas as ofertas da lista?', ok: 'Limpar' })
@@ -3090,6 +3386,8 @@ render();
 Cloud.setStatus('local');
 Cloud.init();
 if (NATIVE) { pullNativeOffers(); nativeSync(); }
+Drive.init();
+Cloud.setStatus(Cloud.status);
 
 </script>
-</body></html>
+<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(function(){});</script></body></html>

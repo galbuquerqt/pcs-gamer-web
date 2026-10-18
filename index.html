@@ -711,12 +711,12 @@ const EMOJI = /[\u{1F000}-\u{1FAFF}☀-➿️‍⭐⬆⬇⤴⤵〰〽㊗㊙]/gu;
 // O que não é peça avulsa: kits, PCs prontos, notebooks e periféricos
 const OFFER_SKIP = /kit\s*upgrade|\bcombo\b|\bpc\s*gamer\b|computador|\bnotebook\b|\blaptop\b|\bmonitor\b|smartphone|celular|\bconsole\b|\bcontrole\b|headset|teclado|\bmouse\b|cadeira|smartwatch|\btv\b|\biphone\b/;
 const OFFER_KINDS = [
-  ['gpu', /placa\s*de\s*video|\bgpu\b|geforce|radeon\s*rx|\brtx\s?\d|\bgtx\s?\d|\brx\s?\d{3,4}|\barc\s*[ab]\d/],
+  ['gpu', /placas?\s*de\s*video|\bgpu\b|geforce|radeon\s*rx|\brtx\s?\d|\bgtx\s?\d|\brx\s?\d{3,4}|\barc\s*[ab]\d/],
   ['cpu', /processador|\bryzen\b|intel\s*core|core\s*ultra|\bi[3579][\s-]\d{4,5}/],
-  ['mobo', /placa[\s-]*mae|motherboard|\bmobo\b/],
+  ['mobo', /placas?[\s-]*maes?|motherboard|\bmobo\b/],
   ['ram', /memoria|(?<![a-z])ddr[345]|\bram\b/],
   ['ssd', /\bssd\b|nvme|\bm\.?2\b|\bhdd?\b/],
-  ['psu', /\bfonte\b|\bpsu\b/],
+  ['psu', /\bfontes?\b|\bpsu\b/],
 ];
 const KIND_LABEL = { gpu: 'Placa de vídeo', cpu: 'Processador', mobo: 'Placa-mãe', ram: 'Memória RAM', ssd: 'Armazenamento', psu: 'Fonte' };
 
@@ -790,7 +790,7 @@ function productKey(kind, text, specs) {
     let type;
     if (kind === 'nvme') type = 'nvme';
     else if (kind === 'sata') type = /\bhdd?\b/.test(s) && !/\bssd\b/.test(s) ? 'hdd' : 'sata';
-    else type = /nvme|\bm\.?2\b|pcie/.test(s) ? 'nvme' : /\bhdd?\b/.test(s) && !/\bssd\b/.test(s) ? 'hdd' : 'sata';
+    else type = /nvme|\bm\.?2\b|pcie|\bnv[1-3]\b|\bsn\d{3}\b|\b9[789]0\s*(?:evo|pro)\b|\bkc3000\b|\bp[35]\s*plus\b|\bmp\d{3}\b|\ba2000\b|\bnm\d{3,4}\b/.test(s) ? 'nvme' : /\bhdd?\b/.test(s) && !/\bssd\b/.test(s) ? 'hdd' : 'sata';
     const name = { nvme: 'SSD NVMe', sata: 'SSD SATA', hdd: 'HD' }[type];
     return { key: `disk:${type}:${gb}`, label: `${name} ${gbLabel(gb)}` };
   }
@@ -828,7 +828,7 @@ function dayStr(ms) {
   const d = new Date(ms);
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
-const seenId = key => 'v_' + String(key).toLowerCase().replace(/[^a-z0-9]+/g, '_');
+const seenId = key => 'v2_' + String(key).toLowerCase().replace(/[^a-z0-9]+/g, '_');
 function seenFor(key) {
   const list = S.seen || [];
   for (let i = 0; i < list.length; i++) if (list[i].key === key) return list[i];
@@ -882,6 +882,68 @@ function parseOffer(text) {
   o.status = o.price <= best.cost ? 'great' : o.price <= best.cost * (1 + tol / 100) ? 'good' : 'high';
   return o;
 }
+// Mensagem com várias versões e um preço para cada, como
+//   "Kootion SSD SATA 240GB 480GB 512GB" + "💰 240 GB R$ 138,64" + "💰 512 GB R$ 271,40"
+// ou uma lista de peças diferentes, uma por linha com preço. Devolve um texto por versão, ou null.
+const CAP_RE = /\d+(?:[.,]\d+)?\s*(?:gb|tb)\b/gi;
+const WATT_RE = /\b\d{3,4}\s*w\b/gi;
+const PRICE_TOKEN = /R\$\s*[\d.]+(?:,\d{1,2})?/gi;
+function offerVariants(raw) {
+  const text = String(raw || '');
+  const lines = text.split(/\r?\n/);
+  const firstPriced = lines.findIndex(l => offerPrice(l) > 0);
+  if (firstPriced < 0) return null;
+  // Tipo de peça do cabeçalho, para reconhecer versões escritas só com o modelo ("A520M-K R$ 399")
+  const head = lowerRaw(offerTitle(lines.slice(0, firstPriced).join('\n')));
+  const baseKind = (OFFER_KINDS.map(([k, re]) => { const m = head.match(re); return m ? { k, i: m.index } : null; }).filter(Boolean).sort((a, b) => a.i - b.i)[0] || {}).k;
+  const priced = [];
+  lines.forEach((l, i) => {
+    const p = offerPrice(l);
+    if (!(p > 0)) return;
+    const variant = l.replace(PRICE_TOKEN, ' ').replace(/\([^)]*\)/g, ' ').replace(EMOJI, ' ')
+      .replace(/\b(por|de|a partir de|apenas|só|no pix|pix|à vista|a vista)\b/gi, ' ').replace(/[:|•\-–]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const s = lowerRaw(variant);
+    const own = OFFER_KINDS.some(([, re]) => re.test(s));
+    const unit = /\d+(?:[.,]\d+)?\s*(?:gb|tb)\b|\b\d{3,4}\s*w\b/.test(s);
+    const model = !own && !unit && baseKind && variant.length >= 3 && !!productKey(baseKind, variant);
+    priced.push({ i, p, variant, own, useful: own || unit || model });
+  });
+  const useful = priced.filter(x => x.useful);
+  if (useful.length < 2) return null;
+  const base = offerTitle(lines.slice(0, priced[0].i).join('\n'));
+  const store = (STORES.find(([, re]) => re.test(text)) || [''])[0];
+  const link = (text.match(/https?:\/\/[^\s)]+/) || [])[0] || '';
+  return useful.map(x => {
+    const next = priced.find(y => y.i > x.i);
+    const seg = lines.slice(x.i + 1, next ? next.i : lines.length).join('\n');
+    const coupon = (seg.match(/[Cc]upom:?\s*([A-Z0-9][A-Z0-9_-]{3,})\b/) || [])[1] || '';
+    let b = base;
+    if (/gb|tb/i.test(x.variant)) b = b.replace(CAP_RE, ' ');
+    if (/\d\s*w\b/i.test(x.variant)) b = b.replace(WATT_RE, ' ');
+    const product = x.own ? x.variant : (b + ' ' + x.variant).replace(/\s+/g, ' ').trim();
+    return [product, 'R$ ' + String(x.p).replace('.', ','), coupon ? 'Cupom: ' + coupon : '', store, link].filter(Boolean).join('\n');
+  });
+}
+// Todas as peças da mensagem: uma só, ou uma por versão. Repetições do mesmo produto ficam com o menor preço.
+function parseOffers(text) {
+  const vs = offerVariants(text);
+  if (!vs) { const o = parseOffer(text); return o ? [o] : []; }
+  const byKey = {};
+  const out = [];
+  vs.forEach(t => {
+    const o = parseOffer(t);
+    if (!o) return;
+    if (o.key && o.price > 0) {
+      const cur = byKey[o.key];
+      if (cur && cur.price <= o.price) return;
+      if (cur) out.splice(out.indexOf(cur), 1);
+      byKey[o.key] = o;
+    }
+    out.push(o);
+  });
+  return out;
+}
+
 // Vale avisar? Bom preço pelo histórico ou dentro do preço-alvo.
 function offerIsAlert(o) { return !!o && (o.status === 'great' || o.status === 'good' || o.target > 0); }
 // Frases do aviso. Recebe o registro da oferta (price, best, status, target, low).
@@ -937,19 +999,22 @@ function offerStore(o, channel) {
 // Recebe o texto de uma promoção e, se for bom preço, guarda na lista de Ofertas.
 // Devolve o registro criado (ou null). Repetições do mesmo produto e preço em 12 h são ignoradas.
 function ingestOffer(text, channel) {
-  const o = parseOffer(text);
-  if (!o || !o.key || !(o.price > 0)) return null;
-  let changed = recordSeen({ key: o.key, kind: o.kind, label: o.label, price: o.price, store: offerStore(o, channel) });
-  let rec = null;
-  const since = Date.now() - 12 * 3600e3;
-  const key = o.key + '|' + o.price;
-  if (offerIsAlert(o) && !S.offers.some(x => x.k === key && x.at > since)) {
-    rec = Object.assign({ id: newId(), at: Date.now() }, offerRecord(o, channel), { seen: false, dismissed: false });
-    S.offers.unshift(rec);
-    changed = true;
-  }
+  let changed = false;
+  const recs = [];
+  parseOffers(text).forEach(o => {
+    if (!o.key || !(o.price > 0)) return;
+    if (recordSeen({ key: o.key, kind: o.kind, label: o.label, price: o.price, store: offerStore(o, channel) })) changed = true;
+    const since = Date.now() - 12 * 3600e3;
+    const key = o.key + '|' + o.price;
+    if (offerIsAlert(o) && !S.offers.some(x => x.k === key && x.at > since)) {
+      const rec = Object.assign({ id: newId(), at: Date.now() }, offerRecord(o, channel), { seen: false, dismissed: false });
+      S.offers.unshift(rec);
+      recs.push(rec);
+      changed = true;
+    }
+  });
   if (changed) commit();
-  return rec;
+  return recs.length > 1 ? recs : recs[0] || null;
 }
 window.PCG = { ingestOffer, offerNotice };
 
@@ -3669,6 +3734,13 @@ $('#add-btn').innerHTML = IC.plus;
 $('#nav').innerHTML = [['home', 'Início', IC.home], ['pcs', 'PCs', IC.pc], ['stock', 'Estoque', IC.box], ['prices', 'Ofertas', IC.tag], ['settings', 'Ajustes', IC.sliders]]
   .map(([k, l, i]) => `<button class="tab" data-a="tab" data-tab="${k}">${i}<span>${l}</span></button>`).join('');
 loadLocal();
+// Até a versão 1.8 o leitor lia mensagens com várias versões como um produto só e guardou preços vistos errados.
+// Recomeça a lista: os registros novos usam outro código, então nunca se confundem com os antigos.
+if ((S.settings.seenV || 0) < 2) {
+  if (NATIVE) nativeCall('takeSeen');
+  S.settings.seenV = 2;
+}
+if (S.seen.some(r => !String(r.id).startsWith('v2_'))) { S.seen = S.seen.filter(r => String(r.id).startsWith('v2_')); stamp(); }
 render();
 Cloud.setStatus('local');
 Cloud.init();

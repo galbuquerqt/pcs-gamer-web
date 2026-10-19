@@ -767,6 +767,21 @@ function gpuKey(text) {
   const v = sizes ? gpuVram(text, sizes) : 0;
   return { key: 'gpu:' + g.key + (v ? ':' + v + 'gb' : ''), label: g.label + (v ? ' ' + v + ' GB' : ''), needVram: !!sizes && !v, sizes: sizes || null };
 }
+// Capacidades vendidas como equivalentes contam como o mesmo SSD/HD: 480, 500 e 512 GB são a mesma faixa
+function diskTier(gb) {
+  gb = +gb || 0;
+  if (gb <= 140) return 128;
+  if (gb <= 270) return 256;
+  if (gb <= 540) return 512;
+  if (gb <= 1100) return 1000;
+  if (gb <= 2100) return 2000;
+  return Math.round(gb / 1000) * 1000;
+}
+// Converte chaves antigas de disco ("disk:sata:480") para a faixa ("disk:sata:512")
+function normDiskKey(key) {
+  const m = /^disk:(\w+):(\d+)$/.exec(String(key || ''));
+  return m ? `disk:${m[1]}:${diskTier(+m[2])}` : key;
+}
 // Chave do "mesmo produto" para comparar preços: modelo da placa de vídeo, modelo do processador,
 // chipset da placa-mãe, capacidade e tipo da memória, tipo e capacidade do SSD, potência da fonte.
 function productKey(kind, text, specs) {
@@ -792,7 +807,7 @@ function productKey(kind, text, specs) {
     else if (kind === 'sata') type = /\bhdd?\b/.test(s) && !/\bssd\b/.test(s) ? 'hdd' : 'sata';
     else type = /nvme|\bm\.?2\b|pcie|\bnv[1-3]\b|\bsn\d{3}\b|\b9[789]0\s*(?:evo|pro)\b|\bkc3000\b|\bp[35]\s*plus\b|\bmp\d{3}\b|\ba2000\b|\bnm\d{3,4}\b/.test(s) ? 'nvme' : /\bhdd?\b/.test(s) && !/\bssd\b/.test(s) ? 'hdd' : 'sata';
     const name = { nvme: 'SSD NVMe', sata: 'SSD SATA', hdd: 'HD' }[type];
-    return { key: `disk:${type}:${gb}`, label: `${name} ${gbLabel(gb)}` };
+    return { key: `disk:${type}:${diskTier(gb)}`, label: `${name} ${gbLabel(gb)}` };
   }
   if (kind === 'psu') {
     const w = (specs && specs.w) || guessSpecs('psu', text).w;
@@ -1092,10 +1107,21 @@ function sanitizeState(raw) {
   });
   // Preços-alvo
   st.watch = st.watch.filter(w => w.key && +w.max > 0);
-  st.watch.forEach(w => { w.key = String(w.key); w.label = String(w.label || w.key); w.name = String(w.name || w.label); w.kind = String(w.kind || ''); w.max = round2(w.max); w.paused = !!w.paused; w.at = +w.at || Date.now(); });
+  st.watch.forEach(w => { w.key = normDiskKey(String(w.key)); w.label = String(w.label || w.key); w.name = String(w.name || w.label); w.kind = String(w.kind || ''); w.max = round2(w.max); w.paused = !!w.paused; w.at = +w.at || Date.now(); });
   // Preços vistos nos canais: só os últimos 90 dias
   const seenCut = dayStr(Date.now() - SEEN_DAYS * 864e5);
   st.seen.forEach(r => { r.key = String(r.key || ''); r.label = String(r.label || r.key); r.pts = (Array.isArray(r.pts) ? r.pts : []).filter(p => Array.isArray(p) && typeof p[0] === 'string' && p[0] >= seenCut && +p[1] > 0); });
+  // Discos de capacidade equivalente passam a ser um registro só (fica o menor preço de cada dia)
+  const seenBy = {};
+  st.seen = st.seen.filter(r => {
+    r.key = normDiskKey(r.key);
+    if (r.key) r.id = seenId(r.key);
+    const cur = seenBy[r.key];
+    if (!cur) { seenBy[r.key] = r; return true; }
+    r.pts.forEach(p => { const q = cur.pts.find(x => x[0] === p[0]); if (!q) cur.pts.push(p); else if (p[1] < q[1]) { q[1] = p[1]; q[2] = p[2]; } });
+    cur.pts.sort((a, b) => (a[0] < b[0] ? -1 : 1));
+    return false;
+  });
   st.seen = st.seen.filter(r => r.key && r.pts.length).sort((a, b) => (b.pts[b.pts.length - 1][0] < a.pts[a.pts.length - 1][0] ? -1 : 1)).slice(0, 400);
   const maxCode = Math.max(0, ...st.inv.map(i => i.code || 0), ...st.sales.map(s => s.item?.code || 0));
   if (st.settings.nextCode <= maxCode) st.settings.nextCode = maxCode + 1;

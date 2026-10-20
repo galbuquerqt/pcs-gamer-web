@@ -2258,7 +2258,7 @@ function seenListHTML() {
     const sub = joinDot(low ? `menor ${money(low.price)}${low.store ? ' na ' + low.store : ''} (${dayShort(low.day)})` : '',
       last && (!low || last[0] !== low.day) ? `último ${money(last[1])} (${dayShort(last[0])})` : '');
     return `<div class="row"><span class="main"><span class="title">${esc(r.label)}</span><span class="sub">${esc(sub)}</span>
-      ${watchBtn(r.key, r.label, r.kind, low ? low.price : 0)}</span></div>`;
+      <span class="o-tools">${watchBtn(r.key, r.label, r.kind, low ? low.price : 0)}<button class="o-mon" data-a="seen-open" data-key="${esc(r.key)}">${IC.stock} Preços</button></span></span></div>`;
   }).join('');
   return `<div class="list">${rows}</div>${shown.length < list.length ? `<button class="link-btn" data-a="seen-all">Ver todas (${list.length})</button>` : ''}`;
 }
@@ -3037,7 +3037,7 @@ function watchRecHTML(name, kind, id) {
   const recs = histForKey(r.key);
   const other = S.watch.find(w => w.key === r.key && w.id !== id);
   const lines = [
-    low ? `Menor visto nos canais em 90 dias: <b>${money(low.price)}</b>${low.store ? ` na ${esc(low.store)}` : ''} (${dayShort(low.day)})` : 'Ainda não apareceu nos canais nos últimos 90 dias.',
+    low ? `Menor visto nos canais em 90 dias: <b>${money(low.price)}</b>${low.store ? ` na ${esc(low.store)}` : ''} (${dayShort(low.day)}) <button class="link-btn" style="margin:0;min-height:0;font-size:13px" data-a="seen-open" data-key="${esc(r.key)}">Ver ou apagar</button>` : 'Ainda não apareceu nos canais nos últimos 90 dias.',
     recs.length ? `Seu melhor preço pago: <b>${money(recs[0].cost)}</b>${recs[0].cond ? ` (${esc(condLabel(recs[0].cond))})` : ''}` : 'Você ainda não comprou essa peça.',
   ];
   return `<div class="rec-box"><div>Reconhecido como <b>${esc(KIND_LABEL[r.kind] || '')} · ${esc(r.label)}</b></div>
@@ -3069,10 +3069,10 @@ function openWatch(id, pre) {
   });
 }
 function refreshWatchRec() {
-  const root = Sheet.top();
-  if (!root) return;
-  const box = $('#w-rec', root);
-  if (box) box.innerHTML = watchRecHTML($('#w-name', root).value, $('#w-kind', root).value, $('[data-a="watch-save"]', root).dataset.id);
+  // A ficha do preço-alvo pode estar por baixo de outra (ex.: a lista de preços vistos)
+  const box = document.getElementById('w-rec');
+  const root = box && box.closest('.sheet');
+  if (box && root) box.innerHTML = watchRecHTML($('#w-name', root).value, $('#w-kind', root).value, $('[data-a="watch-save"]', root).dataset.id);
 }
 function saveWatch(id) {
   const root = Sheet.top();
@@ -3105,6 +3105,39 @@ function askCloseWatch(it) {
     confirmBox({ title: 'Preço-alvo', text: `Você cadastrou a compra de <b>${esc(it.name)}</b>. Encerrar o preço-alvo de ${esc(w.label)} (até ${money(w.max)})?`, ok: 'Encerrar', cancel: 'Manter' })
       .then(ok => { if (!ok) return; S.watch = S.watch.filter(x => x.id !== w.id); commit(); toast('Preço-alvo encerrado'); });
   }, 400);
+}
+
+/* ================= Preços vistos: ver e apagar preços errados ================= */
+function seenPointsHTML(key) {
+  const r = seenFor(key);
+  if (!r || !r.pts.length) return `<div class="list"><div class="empty">Nenhum preço guardado para esta peça.</div></div>`;
+  const low = seenLow(key);
+  const pts = r.pts.slice().sort((a, b) => (a[0] < b[0] ? 1 : a[0] > b[0] ? -1 : 0));
+  return `<div class="list">${pts.map(p => `<div class="row">
+      <span class="main"><span class="title">${money(p[1])}${low && low.day === p[0] && low.price === p[1] ? ' <span class="pill neutral" style="margin-left:4px">menor</span>' : ''}</span>
+      <span class="sub">${esc(joinDot(fmtDate(p[0]), p[2]))}</span></span>
+      <span class="end"><button class="o-x" data-a="seen-del-pt" data-key="${esc(key)}" data-day="${p[0]}" aria-label="Apagar este preço">${IC.trash}</button></span></div>`).join('')}</div>`;
+}
+function openSeen(key) {
+  const r = seenFor(key);
+  if (!r) return;
+  Sheet.open({
+    title: r.label,
+    body: `<p class="hint" style="margin:0 2px 12px">O menor preço de cada dia em que a peça apareceu nos canais. Se algum foi erro do anúncio, apague: ele deixa de contar como "menor visto".</p>
+      <div id="seen-pts">${seenPointsHTML(key)}</div>
+      <div class="sheet-foot"><button class="btn primary" data-a="sheet-close">Pronto</button></div>`,
+  });
+}
+function deleteSeenPoint(key, day) {
+  const r = seenFor(key);
+  if (!r) return;
+  r.pts = r.pts.filter(p => p[0] !== day);
+  if (!r.pts.length) S.seen = S.seen.filter(x => x !== r);
+  commit();
+  const box = $('#seen-pts', Sheet.top() || document);
+  if (box) box.innerHTML = seenPointsHTML(key);
+  refreshWatchRec();
+  toast('Preço apagado');
 }
 
 /* ================= Ponte com o app Android =================
@@ -3490,6 +3523,14 @@ const A = {
     if (!w) return;
     confirmBox({ title: 'Excluir preço-alvo', text: `Parar de monitorar <b>${esc(w.label)}</b>?`, ok: 'Excluir', danger: true })
       .then(ok => { if (!ok) return; S.watch = S.watch.filter(x => x.id !== w.id); Sheet.closeAll(); commit(); toast('Preço-alvo excluído'); });
+  },
+  'seen-open': t => openSeen(t.dataset.key),
+  'seen-del-pt': t => {
+    const k = t.dataset.key, d = t.dataset.day, r = seenFor(k);
+    const p = r && r.pts.find(x => x[0] === d);
+    if (!p) return;
+    confirmBox({ title: 'Apagar preço', text: `Apagar ${money(p[1])} de ${fmtDate(d)}${p[2] ? ' (' + esc(p[2]) + ')' : ''}? Ele deixa de contar como menor preço visto.`, ok: 'Apagar', danger: true })
+      .then(ok => { if (ok) deleteSeenPoint(k, d); });
   },
   'seen-all': () => { UI.seenAll = true; const el = $('#seen-list'); if (el) el.innerHTML = seenListHTML(); },
   'copy-coupon': t => copyText(t.dataset.v, `Cupom ${t.dataset.v} copiado`),

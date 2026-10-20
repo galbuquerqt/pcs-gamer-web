@@ -811,7 +811,10 @@ function productKey(kind, text, specs) {
   }
   if (kind === 'psu') {
     const w = (specs && specs.w) || guessSpecs('psu', text).w;
-    return w ? { key: 'psu:' + w, label: `Fonte ${w} W` } : null;
+    if (!w) return null;
+    // Fonte SFX (para gabinete pequeno) é outro produto, bem mais caro que a ATX comum
+    const sfx = /\bsfx\b/.test(s);
+    return { key: 'psu:' + (sfx ? 'sfx:' : '') + w, label: `Fonte ${sfx ? 'SFX ' : ''}${w} W` };
   }
   return null;
 }
@@ -826,6 +829,25 @@ function recognizeProduct(text, kind) {
   for (const f of found) { const r = tryKind(f.k); if (r) return r; }
   for (const k of ['cpu', 'gpu', 'mobo', 'ram', 'psu', 'ssd']) { const r = tryKind(k); if (r) return r; }
   return null;
+}
+// Família e "tamanho" de peças que têm versões maiores: fonte (potência) e disco (capacidade, mesmo tipo)
+function specRank(key) {
+  let m;
+  if ((m = /^psu:(sfx:)?(\d+)$/.exec(key))) return { fam: 'psu:' + (m[1] || ''), v: +m[2] };
+  if ((m = /^disk:(\w+):(\d+)$/.exec(key))) return { fam: 'disk:' + m[1], v: +m[2] };
+  return null;
+}
+// Compras de versões superiores (fonte mais potente, SSD maior), da mais barata para a mais cara
+function histBetterThan(key) {
+  const rk = specRank(key);
+  if (!rk) return [];
+  const out = [];
+  S.hist.forEach(h => {
+    const k = productKey(h.cat, h.name, h.specs);
+    const r = k && specRank(k.key);
+    if (r && r.fam === rk.fam && r.v > rk.v) out.push({ h, label: k.label });
+  });
+  return out.sort((a, b) => a.h.cost - b.h.cost);
 }
 // Compras do histórico que são o mesmo produto, da mais barata para a mais cara
 function histForKey(key) {
@@ -886,15 +908,22 @@ function parseOffer(text) {
   o.low = low ? low.price : 0;
   const recs = histForKey(o.key);
   o.recs = recs;
-  if (!recs.length) { o.status = 'new'; return o; }
-  const best = recs[0];
+  // Uma peça inferior só é bom preço se sair mais barata que a superior que você já comprou
+  const better = histBetterThan(o.key)[0] || null;
+  if (!recs.length && !better) { o.status = 'new'; return o; }
   const of = S.settings.offers || {};
   const tol = Math.max(0, +(of.tol == null ? 5 : of.tol));
+  const same = recs[0] || null;
+  const useBetter = better && (!same || better.h.cost < same.cost);
+  const best = useBetter ? better.h : same;
   o.best = best;
-  o.avg = recs.reduce((t, h) => t + h.cost, 0) / recs.length;
+  o.bestLabel = useBetter ? better.label : '';
+  o.avg = recs.length ? recs.reduce((t, h) => t + h.cost, 0) / recs.length : best.cost;
   o.diff = o.price - best.cost;
   o.diffPct = best.cost > 0 ? o.diff / best.cost * 100 : 0;
-  o.status = o.price <= best.cost ? 'great' : o.price <= best.cost * (1 + tol / 100) ? 'good' : 'high';
+  if (o.price <= best.cost) o.status = 'great';
+  else if (same && o.price <= same.cost * (1 + tol / 100) && (!better || o.price < better.h.cost)) o.status = 'good';
+  else o.status = 'high';
   return o;
 }
 // Mensagem com várias versões e um preço para cada, como
@@ -964,6 +993,10 @@ function offerIsAlert(o) { return !!o && (o.status === 'great' || o.status === '
 // Frases do aviso. Recebe o registro da oferta (price, best, status, target, low).
 function offerRelText(r) {
   if (!(r.best > 0) || (r.status !== 'great' && r.status !== 'good')) return '';
+  if (r.bestLabel) {
+    const art = /^fonte/i.test(r.bestLabel) ? 'pela' : 'pelo';
+    return r.price < r.best ? `${money(r.best - r.price)} abaixo do que você pagou ${art} ${r.bestLabel} (${money(r.best)})` : `igual ao que você pagou ${art} ${r.bestLabel} (${money(r.best)})`;
+  }
   if (r.status === 'great') return r.price < r.best ? `${money(r.best - r.price)} abaixo do seu melhor (${money(r.best)})` : `igual ao seu melhor (${money(r.best)})`;
   return `${NUM1.format(r.diffPct)}% acima do seu melhor (${money(r.best)})`;
 }
@@ -978,7 +1011,7 @@ function offerRecord(o, channel) {
   return {
     k: o.key + '|' + o.price, channel: String(channel || ''), store: o.store, kind: o.kind, label: o.label,
     title: o.title.slice(0, 200), price: o.price, best: o.best ? o.best.cost : 0, bestCond: o.best ? o.best.cond || '' : '',
-    diffPct: o.best ? round2(o.diffPct) : 0, status: o.status === 'great' || o.status === 'good' ? o.status : 'target',
+    diffPct: o.best ? round2(o.diffPct) : 0, bestLabel: o.bestLabel || '', status: o.status === 'great' || o.status === 'good' ? o.status : 'target',
     target: o.target || 0, low: o.low || 0, coupon: o.coupon, link: o.link,
   };
 }
@@ -3108,7 +3141,7 @@ function pullNativeOffers() {
     if (S.offers.some(x => x.k === r.k && Math.abs(x.at - at) < 12 * 3600e3)) return;
     S.offers.unshift({
       id: newId(), k: String(r.k || ''), at, channel: String(r.channel || ''), store: r.store || '', kind: r.kind || '', label: r.label,
-      title: String(r.title || '').slice(0, 200), price: round2(r.price), best: round2(r.best), bestCond: r.bestCond || '', diffPct: round2(r.diffPct),
+      title: String(r.title || '').slice(0, 200), price: round2(r.price), best: round2(r.best), bestCond: r.bestCond || '', bestLabel: String(r.bestLabel || ''), diffPct: round2(r.diffPct),
       status: ['great', 'good', 'target'].includes(r.status) ? r.status : 'good', target: round2(r.target), low: round2(r.low),
       coupon: r.coupon || '', link: r.link || '', seen: false, dismissed: false,
     });

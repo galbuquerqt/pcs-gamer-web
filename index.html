@@ -463,6 +463,10 @@ const CATS = [
   { k: 'fans', l: 'Ventilação / fans', s: 'Fans', opt: true },
 ];
 const CAT = Object.fromEntries(CATS.map(c => [c.k, c]));
+// Espaços da montagem: as categorias e um 2º espaço de memória, para pentes comprados separados
+const SLOTS = CATS.flatMap(c => c.k === 'ram' ? [c, { k: 'ram2', cat: 'ram', l: 'Memória RAM (2º pente)', s: '2º pente de RAM', opt: true }] : [c]);
+const SLOT = Object.fromEntries(SLOTS.map(c => [c.k, c]));
+const slotCat = k => (SLOT[k] && SLOT[k].cat) || k;
 const CONDS = { nova: 'Nova', usada: 'Usada', reparada: 'Reparada e testada' };
 const condLabel = c => CONDS[c] || '';
 const condOk = c => (CONDS[c] ? c : '');
@@ -1109,7 +1113,7 @@ function sanitizeState(raw) {
     b.name = String(b.name || 'PC sem nome');
     if (!STATUS[b.status]) b.status = 'montagem';
     b.slots = b.slots && typeof b.slots === 'object' ? b.slots : {};
-    for (const k of Object.keys(b.slots)) if (!CAT[k] || !b.slots[k]) delete b.slots[k];
+    for (const k of Object.keys(b.slots)) if (!SLOT[k] || !b.slots[k]) delete b.slots[k];
     b.price = round2(b.price);
     b.sale = b.sale && typeof b.sale === 'object' ? b.sale : { price: 0, date: '', card: false };
     b.sale.price = round2(b.sale.price);
@@ -1174,14 +1178,14 @@ function repairLinks(st) {
           // Peça sumiu, está em duas montagens ou o PC já foi vendido: vira registro fixo
           const base = it || sl.snap || {};
           b.slots[cat] = b.status === 'vendido'
-            ? { mode: 'sold', item: { ...clone(base), id: base.id || sl.invId, cat } }
-            : { mode: 'plan', name: base.name || '', cost: round2(base.cost), specs: cleanSpecs(cat, base.specs) };
+            ? { mode: 'sold', item: { ...clone(base), id: base.id || sl.invId, cat: slotCat(cat) } }
+            : { mode: 'plan', name: base.name || '', cost: round2(base.cost), specs: cleanSpecs(slotCat(cat), base.specs) };
           continue;
         }
-        if (it.cat !== cat) { b.slots[cat] = { mode: 'plan', name: it.name, cost: it.cost, specs: cleanSpecs(cat, it.specs) }; continue; }
+        if (it.cat !== slotCat(cat)) { b.slots[cat] = { mode: 'plan', name: it.name, cost: it.cost, specs: cleanSpecs(slotCat(cat), it.specs) }; continue; }
         owner[it.id] = b.id;
       } else if (sl.mode === 'plan') {
-        sl.name = String(sl.name || ''); sl.cost = round2(sl.cost); sl.specs = cleanSpecs(cat, sl.specs);
+        sl.name = String(sl.name || ''); sl.cost = round2(sl.cost); sl.specs = cleanSpecs(slotCat(cat), sl.specs);
       } else if (sl.mode !== 'sold' || !sl.item) delete b.slots[cat];
     }
   });
@@ -1253,8 +1257,25 @@ function slotPart(b, cat) {
   if (sl.mode === 'sold') { const it = sl.item; return { mode: 'sold', name: it.name, cost: round2(it.cost), specs: it.specs || {}, cond: it.cond, code: it.code, date: it.date }; }
   return null;
 }
-function parts(b) { const o = {}; CATS.forEach(c => { const p = slotPart(b, c.k); if (p && (p.name || p.cost)) o[c.k] = p; }); return o; }
-function buildCost(b) { return round2(CATS.reduce((s, c) => s + (slotPart(b, c.k)?.cost || 0), 0)); }
+function parts(b) { const o = {}; SLOTS.forEach(c => { const p = slotPart(b, c.k); if (p && (p.name || p.cost)) o[c.k] = p; }); return o; }
+function buildCost(b) { return round2(SLOTS.reduce((s, c) => s + (slotPart(b, c.k)?.cost || 0), 0)); }
+// Em qual espaço da montagem está a peça
+function slotKeyOf(b, it) { return b ? SLOTS.map(c => c.k).find(k => b.slots[k]?.mode === 'inv' && b.slots[k].invId === it.id) || null : null; }
+// Memória somando os dois espaços
+function ramSum(p) {
+  const list = [p.ram, p.ram2].filter(Boolean);
+  if (!list.length) return null;
+  const gbs = list.map(x => +(x.specs?.gb) || 0);
+  const types = [...new Set(list.map(x => x.specs?.type).filter(Boolean))];
+  const per = list.map((x, i) => gbs[i] ? gbs[i] / (x.specs?.sticks || 1) : 0);
+  return {
+    list, n: list.length, gbs, types, per,
+    gb: gbs.every(g => g > 0) ? gbs.reduce((a, c) => a + c, 0) : 0,
+    known: gbs.reduce((a, c) => a + c, 0),
+    type: types.length === 1 ? types[0] : '',
+    sticks: list.reduce((a, x) => a + (x.specs?.sticks || 1), 0),
+  };
+}
 function cardFee(price, card) { return S.settings.card.on && card ? round2(price * (S.settings.card.pct || 0) / 100) : 0; }
 function fin(b) {
   const cost = buildCost(b);
@@ -1278,7 +1299,7 @@ function missingList(b) {
   if (!p.cpu) miss.push('Processador');
   if (!p.gpu && !(cpu && cpu.igpu)) miss.push('Placa de vídeo');
   if (!p.mobo) miss.push('Placa-mãe');
-  if (!p.ram) miss.push('Memória RAM');
+  if (!p.ram && !p.ram2) miss.push('Memória RAM');
   if (!p.nvme && !p.sata) miss.push('Armazenamento');
   if (!p.psu) miss.push('Fonte');
   if (!p.case) miss.push('Gabinete');
@@ -1315,14 +1336,17 @@ function alertsFor(b) {
   }
 
   // Memória
-  if (p.ram) {
-    const rs = p.ram.specs || {};
+  const rm = ramSum(p);
+  if (rm) {
     const need = ramNeeded(board, cpu);
-    if (rs.type && need && need !== 'either' && rs.type !== need) A.push({ lvl: 'crit', tag: 'ram', msg: `Memória ${rs.type} não funciona nesta plataforma, que usa ${need}.` });
-    else if (rs.type && need === 'either' && board) A.push({ lvl: 'info', msg: `A ${board.chip} existe em versões DDR4 e DDR5: escreva DDR4 ou DDR5 no nome da placa-mãe para conferir com a memória.` });
-    if (!rs.gb) A.push({ lvl: 'warn', msg: 'Informe a capacidade da memória RAM.' });
-    else if (rs.gb <= 8) A.push({ lvl: 'warn', msg: `Apenas ${rs.gb} GB de RAM: para jogos hoje o recomendado é 16 GB.` });
-    if (rs.sticks === 1 && rs.gb >= 8) A.push({ lvl: 'info', msg: 'Memória em pente único: dois pentes (dual channel) rendem mais em jogos.' });
+    if (rm.types.length > 1) A.push({ lvl: 'crit', tag: 'ram', msg: `Os pentes de memória são de tipos diferentes (${rm.types.join(' e ')}) e não funcionam juntos.` });
+    else if (rm.type && need && need !== 'either' && rm.type !== need) A.push({ lvl: 'crit', tag: 'ram', msg: `Memória ${rm.type} não funciona nesta plataforma, que usa ${need}.` });
+    else if (rm.type && need === 'either' && board) A.push({ lvl: 'info', msg: `A ${board.chip} existe em versões DDR4 e DDR5: escreva DDR4 ou DDR5 no nome da placa-mãe para conferir com a memória.` });
+    if (!rm.gb) A.push({ lvl: 'warn', msg: rm.n > 1 ? 'Informe a capacidade dos dois pentes de memória RAM.' : 'Informe a capacidade da memória RAM.' });
+    else if (rm.gb <= 8) A.push({ lvl: 'warn', msg: `Apenas ${rm.gb} GB de RAM: para jogos hoje o recomendado é 16 GB.` });
+    if (rm.n === 1 && rm.list[0].specs?.sticks === 1 && rm.gb >= 8) A.push({ lvl: 'info', msg: 'Memória em pente único: dois pentes (dual channel) rendem mais em jogos. Dá para colocar o 2º pente no espaço logo abaixo.' });
+    if (rm.n > 1 && rm.per[0] && rm.per[1] && rm.per[0] !== rm.per[1]) A.push({ lvl: 'info', msg: `Pentes de tamanhos diferentes (${+rm.per[0].toFixed(1)} GB e ${+rm.per[1].toFixed(1)} GB): funciona, mas só parte da memória roda em dual channel.` });
+    if (rm.sticks > 2) A.push({ lvl: 'info', msg: `São ${rm.sticks} pentes no total: confira se a placa-mãe tem slots para todos (placas mais simples têm só 2).` });
   }
 
   // Fonte
@@ -1400,7 +1424,8 @@ function autoTitle(b) {
   const gpuS = p.gpu ? (g ? g.label : head(p.gpu.name)) : (cpu?.igpu ? 'Vídeo integrado' : '');
   const main = [cpuS, gpuS].filter(Boolean).join(' + ');
   if (main) bits.push(main);
-  if (p.ram?.specs?.gb) bits.push(`${p.ram.specs.gb}GB`);
+  const rmT = ramSum(p);
+  if (rmT?.gb) bits.push(`${rmT.gb}GB`);
   const disk = Math.max(p.nvme?.specs?.gb || 0, p.sata?.specs?.gb || 0);
   if (disk) bits.push(`SSD ${gbLabel(disk).replace(' ', '')}`);
   return bits.join(' ');
@@ -1412,7 +1437,7 @@ function adCheck(b) {
   if (!p.cpu) need.push('Processador');
   if (!p.gpu && !(cpu && cpu.igpu)) need.push('Placa de vídeo');
   if (!p.mobo) need.push('Placa-mãe');
-  if (!p.ram) need.push('Memória RAM');
+  if (!p.ram && !p.ram2) need.push('Memória RAM');
   if (!p.nvme && !p.sata) need.push('Armazenamento');
   if (!p.psu) need.push('Fonte');
   if (!p.case) need.push('Gabinete');
@@ -1435,11 +1460,17 @@ function adText(b) {
   if (p.gpu) L.push(`• Placa de vídeo: ${p.gpu.name}`);
   else if (cpu?.igpu) L.push('• Vídeo: integrado ao processador');
   line('Placa-mãe', 'mobo');
-  if (p.ram) {
-    const rs = p.ram.specs || {};
-    const nm = p.ram.name;
+  const rm = ramSum(p);
+  if (rm && rm.n === 1) {
+    const one = rm.list[0];
+    const rs = one.specs || {};
+    const nm = one.name;
     const extra = rs.sticks > 1 && !/\dx\d/i.test(nm.replace(/\s/g, '')) ? ` (${rs.sticks}x${+(rs.gb / rs.sticks).toFixed(1)} GB)` : '';
     L.push(`• Memória RAM: ${nm}${extra}`);
+  } else if (rm) {
+    const [a, c] = rm.list;
+    const names = norm(a.name) === norm(c.name) ? `2x ${a.name}` : `${a.name} + ${c.name}`;
+    L.push(`• Memória RAM: ${rm.gb ? `${rm.gb} GB${rm.type ? ' ' + rm.type : ''} (${names})` : names}`);
   }
   line('SSD NVMe', 'nvme');
   line(p.sata && /hd|hdd/i.test(p.sata.name) && !/ssd/i.test(p.sata.name) ? 'HD' : 'SSD', 'sata');
@@ -1504,7 +1535,7 @@ function nameSuggestions(cat, text, limit = 6) {
 function capital() {
   let free = 0, inPCs = 0, onWay = 0, planned = 0;
   S.inv.forEach(i => { if (i.status === 'caminho') onWay += i.cost; else if (i.buildId) inPCs += i.cost; else free += i.cost; });
-  S.builds.forEach(b => { if (b.status !== 'vendido') CATS.forEach(c => { const sl = b.slots[c.k]; if (sl && sl.mode === 'plan') planned += sl.cost || 0; }); });
+  S.builds.forEach(b => { if (b.status !== 'vendido') SLOTS.forEach(c => { const sl = b.slots[c.k]; if (sl && sl.mode === 'plan') planned += sl.cost || 0; }); });
   return { free: round2(free), inPCs: round2(inPCs), onWay: round2(onWay), total: round2(free + inPCs + onWay), planned: round2(planned) };
 }
 function realizedEvents() {
@@ -2064,17 +2095,20 @@ function refreshCard(b) {
 function pcBody(b, A, miss) {
   const sold = b.status === 'vendido';
   const p = {};
-  const slots = CATS.map(c => {
+  const has = k => { const x = slotPart(b, k); return !!(x && (x.name || x.cost)); };
+  const slots = SLOTS.map(c => {
     const pt = slotPart(b, c.k);
     p[c.k] = pt;
     const empty = !pt || (!pt.name && !pt.cost);
+    // 2º pente: aparece depois que o 1º espaço de memória estiver preenchido
+    if (c.k === 'ram2' && empty && (sold || !has('ram'))) return '';
     let badge = '';
     if (!empty) {
       if (pt.mode === 'plan') badge = '<span class="pill neutral">Planejada</span>';
       else if (pt.code) badge = `<span class="tag">${code(pt.code)}</span>`;
       if (pt.mode === 'inv' && pt.status === 'caminho') badge += '<span class="pill caminho">A caminho</span>';
     }
-    const sp = empty ? '' : specLabel(c.k, pt.specs);
+    const sp = empty ? '' : specLabel(slotCat(c.k), pt.specs);
     return `<button class="slot" data-a="slot" data-id="${b.id}" data-cat="${c.k}" ${sold && empty ? 'disabled' : ''}>
       <span class="c"><span class="cat">${c.l}</span>
         <span class="nm ${empty ? 'empty-slot' + (c.opt ? ' optional' : '') : ''}">${empty ? (sold ? '—' : c.opt ? '+ Adicionar (opcional)' : '+ Adicionar') : esc(pt.name || '(sem nome)')}</span>
@@ -2546,20 +2580,26 @@ function updateItem(it, d) {
   }
   syncHistFromItem(it);
   const b = it.buildId ? findBuild(it.buildId) : null;
-  if (b) { const sl = b.slots[it.cat]; if (sl && sl.mode === 'inv' && sl.invId === it.id) sl.snap = snapOf(it); }
+  const k = slotKeyOf(b, it);
+  if (k) b.slots[k].snap = snapOf(it);
 }
 const snapOf = it => ({ id: it.id, code: it.code, cat: it.cat, name: it.name, cost: it.cost, cond: it.cond, date: it.date, specs: clone(it.specs || {}), status: it.status });
-function linkItem(b, it) {
-  const cat = it.cat;
-  const cur = b.slots[cat];
+// key: espaço da montagem (ex.: 'ram2'); sem ele, usa o da categoria da peça
+function linkItem(b, it, key) {
+  if (!key || slotCat(key) !== it.cat) key = it.cat;
+  const cur = b.slots[key];
   if (cur && cur.mode === 'inv' && cur.invId !== it.id) { const old = findInv(cur.invId); if (old) old.buildId = null; }
-  if (it.buildId && it.buildId !== b.id) { const ob = findBuild(it.buildId); if (ob && ob.slots[cat]?.invId === it.id) delete ob.slots[cat]; }
-  b.slots[cat] = { mode: 'inv', invId: it.id, snap: snapOf(it) };
+  if (it.buildId) {
+    const ob = findBuild(it.buildId), ok = slotKeyOf(ob, it);
+    if (ok && !(ob === b && ok === key)) delete ob.slots[ok];
+  }
+  b.slots[key] = { mode: 'inv', invId: it.id, snap: snapOf(it) };
   it.buildId = b.id;
 }
 function unlinkItem(it) {
   const b = it.buildId ? findBuild(it.buildId) : null;
-  if (b) { const sl = b.slots[it.cat]; if (sl && sl.mode === 'inv' && sl.invId === it.id) delete b.slots[it.cat]; }
+  const k = slotKeyOf(b, it);
+  if (k) delete b.slots[k];
   it.buildId = null;
 }
 
@@ -2694,7 +2734,7 @@ function openSlot(bid, cat) {
   if (sold) {
     if (!filled) return;
     Sheet.open({
-      title: CAT[cat].l,
+      title: SLOT[cat].l,
       body: `<div class="part-card"><div class="nm">${esc(pt.name)}</div><div class="meta">${pt.code ? `<span class="tag">${code(pt.code)}</span>` : ''}<b>${money(pt.cost)}</b>${pt.cond ? `<span>${condLabel(pt.cond)}</span>` : ''}</div></div>
         <p class="hint">PC vendido: as peças ficam como registro da venda. Para trocar alguma peça, desfaça a venda mudando a etapa.</p>
         <div class="optlist"><button class="opt" data-a="slot-edit" data-id="${bid}" data-cat="${cat}"><span class="ic">${IC.pencil}</span><span><b>Corrigir nome ou valor</b><small>Ajusta o registro desta venda</small></span></button></div>`,
@@ -2704,8 +2744,8 @@ function openSlot(bid, cat) {
   if (filled) {
     const st = pt.mode === 'plan' ? '<span class="pill neutral">Planejada, ainda não comprada</span>' : `<span class="tag">${code(pt.code)}</span>${pt.status === 'caminho' ? '<span class="pill caminho">A caminho</span>' : ''}`;
     Sheet.open({
-      title: CAT[cat].l,
-      body: `<div class="part-card"><div class="nm">${esc(pt.name || '(sem nome)')}</div><div class="meta">${st}<b>${money(pt.cost)}</b>${pt.cond ? `<span>${condLabel(pt.cond)}</span>` : ''}${specLabel(cat, pt.specs) ? `<span>${esc(specLabel(cat, pt.specs))}</span>` : ''}</div></div>
+      title: SLOT[cat].l,
+      body: `<div class="part-card"><div class="nm">${esc(pt.name || '(sem nome)')}</div><div class="meta">${st}<b>${money(pt.cost)}</b>${pt.cond ? `<span>${condLabel(pt.cond)}</span>` : ''}${specLabel(slotCat(cat), pt.specs) ? `<span>${esc(specLabel(slotCat(cat), pt.specs))}</span>` : ''}</div></div>
         <div class="optlist" style="margin-top:14px">
           <button class="opt" data-a="slot-edit" data-id="${bid}" data-cat="${cat}"><span class="ic">${IC.pencil}</span><span><b>Editar</b><small>${pt.mode === 'inv' ? 'Altera também a peça no estoque' : 'Nome, custo estimado e detalhes'}</small></span></button>
           ${pt.mode === 'plan' ? `<button class="opt" data-a="slot-bought" data-id="${bid}" data-cat="${cat}"><span class="ic">${IC.cart}</span><span><b>Comprei esta peça</b><small>Registra no estoque e no histórico</small></span></button>` : ''}
@@ -2720,15 +2760,15 @@ function openSlot(bid, cat) {
 }
 function openSlotChoose(bid, cat, replace) {
   const b = findBuild(bid);
-  const avail = S.inv.filter(i => i.cat === cat && !i.buildId).sort((a, c) => (c.code || 0) - (a.code || 0));
+  const avail = S.inv.filter(i => i.cat === slotCat(cat) && !i.buildId).sort((a, c) => (c.code || 0) - (a.code || 0));
   const opts = {
-    title: `${CAT[cat].l} · ${b.name}`,
+    title: `${SLOT[cat].l} · ${b.name}`,
     body: `<div class="label" style="margin-bottom:8px">Do estoque</div>
-      ${avail.length ? `<div class="list">${avail.map(i => `<button class="row" data-a="slot-pick" data-id="${bid}" data-inv="${i.id}">
+      ${avail.length ? `<div class="list">${avail.map(i => `<button class="row" data-a="slot-pick" data-id="${bid}" data-cat="${cat}" data-inv="${i.id}">
           <span class="tag" style="align-self:flex-start;margin-top:2px">${code(i.code)}</span>
-          <span class="main"><span class="title">${esc(i.name)}</span><span class="sub">${esc(joinDot(condLabel(i.cond), specLabel(cat, i.specs), i.status === 'caminho' ? 'a caminho' : ''))}</span></span>
+          <span class="main"><span class="title">${esc(i.name)}</span><span class="sub">${esc(joinDot(condLabel(i.cond), specLabel(slotCat(cat), i.specs), i.status === 'caminho' ? 'a caminho' : ''))}</span></span>
           <span class="end"><span class="v">${money(i.cost)}</span></span></button>`).join('')}</div>`
-        : `<div class="list"><div class="empty">Nenhum(a) ${CAT[cat].l.toLowerCase()} disponível no estoque.</div></div>`}
+        : `<div class="list"><div class="empty">Nenhum(a) ${CAT[slotCat(cat)].l.toLowerCase()} disponível no estoque.</div></div>`}
       <div class="optlist" style="margin-top:14px">
         <button class="opt" data-a="slot-new" data-id="${bid}" data-cat="${cat}"><span class="ic">${IC.cart}</span><span><b>Comprei agora</b><small>Cadastra no estoque e já coloca neste PC</small></span></button>
         <button class="opt" data-a="slot-plan" data-id="${bid}" data-cat="${cat}"><span class="ic">${IC.plan}</span><span><b>Só planejar</b><small>Ainda não comprei: nome e custo estimado</small></span></button>
@@ -2739,13 +2779,14 @@ function openSlotChoose(bid, cat, replace) {
 function openSlotForm(bid, cat, kind) {
   const b = findBuild(bid);
   const pt = slotPart(b, cat);
-  let d = { cat, cond: 'nova', status: 'disp' };
-  if (kind === 'edit' && pt) d = { cat, name: pt.name, cost: pt.cost, cond: pt.cond || '', date: pt.date, status: pt.status || 'disp', specs: pt.specs };
-  if (kind === 'bought' && pt) d = { cat, name: pt.name, cost: pt.cost, cond: 'nova', status: 'disp', date: today(), specs: pt.specs };
+  const pc = slotCat(cat);
+  let d = { cat: pc, cond: 'nova', status: 'disp' };
+  if (kind === 'edit' && pt) d = { cat: pc, name: pt.name, cost: pt.cost, cond: pt.cond || '', date: pt.date, status: pt.status || 'disp', specs: pt.specs };
+  if (kind === 'bought' && pt) d = { cat: pc, name: pt.name, cost: pt.cost, cond: 'nova', status: 'disp', date: today(), specs: pt.specs };
   const mode = kind === 'plan' || (kind === 'edit' && pt?.mode === 'plan') ? 'plan' : kind === 'edit' && pt?.mode === 'sold' ? 'hist' : 'item';
   const titles = { new: 'Comprei agora', plan: 'Planejar peça', edit: 'Editar peça', bought: 'Registrar compra' };
   Sheet.replace({
-    title: `${titles[kind]} · ${CAT[cat].l}`,
+    title: `${titles[kind]} · ${SLOT[cat].l}`,
     body: `${partFormHTML(d, mode, false)}
       <div class="sheet-foot"><button class="btn" data-a="sheet-close">Cancelar</button><button class="btn primary" data-a="slot-save" data-id="${bid}" data-cat="${cat}" data-k="${kind}">Salvar</button></div>`,
     onMount: el => mountPartForm(el),
@@ -2762,15 +2803,15 @@ function saveSlotForm(bid, cat, kind) {
     b.slots[cat] = { mode: 'plan', name: d.name, cost: d.cost, specs: d.specs };
   } else if (kind === 'edit' && pt?.mode === 'inv') {
     const it = findInv(pt.invId);
-    if (it) updateItem(it, { ...d, cat });
+    if (it) updateItem(it, { ...d, cat: slotCat(cat) });
   } else if (kind === 'edit' && pt?.mode === 'sold') {
     const sl = b.slots[cat];
     Object.assign(sl.item, { name: d.name, cost: d.cost, cond: d.cond, date: d.date || sl.item.date });
     const h = S.hist.find(x => x.invId === sl.item.id);
     if (h) Object.assign(h, { name: d.name, cost: d.cost, cond: d.cond, date: d.date || h.date });
   } else {
-    created = createItem({ ...d, cat });
-    linkItem(b, created);
+    created = createItem({ ...d, cat: slotCat(cat) });
+    linkItem(b, created, cat);
   }
   Sheet.close();
   commit();
@@ -2779,7 +2820,7 @@ function saveSlotForm(bid, cat, kind) {
 }
 
 /* Venda e etapa */
-function linkedItems(b) { return CATS.map(c => b.slots[c.k]).filter(sl => sl && sl.mode === 'inv').map(sl => findInv(sl.invId)).filter(Boolean); }
+function linkedItems(b) { return SLOTS.map(c => b.slots[c.k]).filter(sl => sl && sl.mode === 'inv').map(sl => findInv(sl.invId)).filter(Boolean); }
 function setStatus(id, s) {
   const b = findBuild(id);
   if (!b || b.status === s) return;
@@ -2795,7 +2836,7 @@ function setStatus(id, s) {
 }
 function openSell(b) {
   const n = linkedItems(b).length;
-  const planned = CATS.filter(c => b.slots[c.k]?.mode === 'plan').length;
+  const planned = SLOTS.filter(c => b.slots[c.k]?.mode === 'plan').length;
   Sheet.open({
     title: `Vender ${b.name}`,
     body: `<div class="form">
@@ -2813,7 +2854,7 @@ function doSell(id) {
   const price = parseMoney($('#sell-price', root).value);
   const date = $('#sell-date', root).value;
   const card = !!$('#sell-card', root)?.checked;
-  CATS.forEach(c => {
+  SLOTS.forEach(c => {
     const sl = b.slots[c.k];
     if (sl && sl.mode === 'inv') {
       const it = findInv(sl.invId) || sl.snap;
@@ -2829,7 +2870,7 @@ function doSell(id) {
   toast('Venda registrada. O PC foi para Vendidos.');
 }
 function openUndoSale(b, target) {
-  const n = CATS.filter(c => b.slots[c.k]?.mode === 'sold').length;
+  const n = SLOTS.filter(c => b.slots[c.k]?.mode === 'sold').length;
   confirmBox({
     title: 'Desfazer venda',
     text: `${esc(b.name)} volta para “${STATUS[target]}”. O valor e a data da venda serão apagados.`,
@@ -2838,17 +2879,17 @@ function openUndoSale(b, target) {
   }).then(r => {
     if (!r) return;
     if (r.check) {
-      CATS.forEach(c => {
+      SLOTS.forEach(c => {
         const sl = b.slots[c.k];
         if (sl && sl.mode === 'sold') {
           const src = sl.item;
-          const it = { id: src.id && !findInv(src.id) ? src.id : newId(), code: src.code || S.settings.nextCode++, cat: c.k, name: src.name, cost: round2(src.cost), cond: condOk(src.cond), status: 'disp', date: isDate(src.date) ? src.date : '', specs: cleanSpecs(c.k, src.specs), buildId: null, createdAt: Date.now() };
+          const it = { id: src.id && !findInv(src.id) ? src.id : newId(), code: src.code || S.settings.nextCode++, cat: slotCat(c.k), name: src.name, cost: round2(src.cost), cond: condOk(src.cond), status: 'disp', date: isDate(src.date) ? src.date : '', specs: cleanSpecs(slotCat(c.k), src.specs), buildId: null, createdAt: Date.now() };
           S.inv.push(it);
-          linkItem(b, it);
+          linkItem(b, it, c.k);
         }
       });
     } else {
-      CATS.forEach(c => { const sl = b.slots[c.k]; if (sl && sl.mode === 'sold') b.slots[c.k] = { mode: 'plan', name: sl.item.name, cost: round2(sl.item.cost), specs: cleanSpecs(c.k, sl.item.specs) }; });
+      SLOTS.forEach(c => { const sl = b.slots[c.k]; if (sl && sl.mode === 'sold') b.slots[c.k] = { mode: 'plan', name: sl.item.name, cost: round2(sl.item.cost), specs: cleanSpecs(slotCat(c.k), sl.item.specs) }; });
     }
     b.status = target;
     b.sale = { price: 0, date: '', card: false };
@@ -2956,7 +2997,7 @@ function searchResults(q) {
   const byCode = cm ? +cm[1] : null;
   const onlyCode = q.startsWith('#');
   const nameOk = n => !onlyCode && matchName(q, n);
-  const pcs = S.builds.filter(b => nameOk(b.name) || (!onlyCode && b.notes && norm(b.notes).includes(norm(q))) || CATS.some(c => { const p = slotPart(b, c.k); return p && (nameOk(p.name) || (byCode && p.code === byCode)); })).slice(0, 8);
+  const pcs = S.builds.filter(b => nameOk(b.name) || (!onlyCode && b.notes && norm(b.notes).includes(norm(q))) || SLOTS.some(c => { const p = slotPart(b, c.k); return p && (nameOk(p.name) || (byCode && p.code === byCode)); })).slice(0, 8);
   const inv = S.inv.filter(i => (byCode && i.code === byCode) || nameOk(i.name)).slice(0, 8);
   const sales = S.sales.filter(s => (byCode && s.item?.code === byCode) || nameOk(s.item?.name)).slice(0, 5);
   const hist = onlyCode ? [] : histFind('', q).slice(0, 8);
@@ -3573,7 +3614,7 @@ const A = {
   'slot-pick': t => {
     const b = findBuild(t.dataset.id), it = findInv(t.dataset.inv);
     if (!b || !it) return;
-    linkItem(b, it);
+    linkItem(b, it, t.dataset.cat);
     Sheet.close(); commit(); toast(`${code(it.code)} colocada no ${b.name}`);
   },
   'slot-remove': t => {
@@ -3590,7 +3631,7 @@ const A = {
     const src = findBuild(t.dataset.id);
     if (!src) return;
     const b = newBuild(`${src.name} (cópia)`);
-    CATS.forEach(c => { const p = slotPart(src, c.k); if (p && (p.name || p.cost)) b.slots[c.k] = { mode: 'plan', name: p.name, cost: p.cost, specs: cleanSpecs(c.k, p.specs) }; });
+    SLOTS.forEach(c => { const p = slotPart(src, c.k); if (p && (p.name || p.cost)) b.slots[c.k] = { mode: 'plan', name: p.name, cost: p.cost, specs: cleanSpecs(slotCat(c.k), p.specs) }; });
     b.price = src.price;
     b.ad = clone(src.ad || {});
     delete b.ad.title;
@@ -3638,7 +3679,8 @@ const A = {
     if (!it) return;
     it.status = 'disp';
     const b = it.buildId ? findBuild(it.buildId) : null;
-    if (b && b.slots[it.cat]?.invId === it.id) b.slots[it.cat].snap = snapOf(it);
+    const k = slotKeyOf(b, it);
+    if (k) b.slots[k].snap = snapOf(it);
     Sheet.close(); commit(); toast(`${code(it.code)} marcada como disponível`);
   },
   'item-unlink': t => { const it = findInv(t.dataset.id); if (!it) return; unlinkItem(it); Sheet.close(); commit(); toast('Peça voltou a ficar disponível'); },
